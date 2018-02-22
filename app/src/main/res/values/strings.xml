@@ -1,0 +1,30 @@
+<resources>
+    <string name="app_name">WayMaps</string>
+
+    <!-- Strings related to login -->
+    <string name="login">Login</string>
+    <string name="pass">Password</string>
+    <string name="log_in">Login</string>
+    <string name="error_field_pass">Password check error</string>
+    <string name="error_field_login">Login check error</string>
+    <string name="error_field_login_null">Login can\'t be null</string>
+    <string name="error_field_pass_null">Password can\'t be null</string>
+    <string name="error_incorrect_credentials">This credentials are incorrect</string>
+    <string name="pass_save">Save password</string>
+    <string name="title_activity_main">MainActivity</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="logout">Logout</string>
+    <string name="balance">Balance</string>
+    <string name="technical_support">Technical support</string>
+    <string name="save_location">Save location</string>
+    <string name="settings">Settings</string>
+    <string name="online">Online</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="date">Date</string>
+    <string name="debet">Debet</string>
+    <string name="credit">Credit</string>
+</resources>
