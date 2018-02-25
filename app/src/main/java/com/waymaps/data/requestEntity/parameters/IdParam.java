@@ -3,7 +3,7 @@ package com.waymaps.data.requestEntity.parameters;
 /**
  * Created by Admin on 05.02.2018.
  */
-
+//@todo change to StringParam
 public class IdParam extends Parameter {
     private String id;
 

@@ -3,6 +3,7 @@ package com.waymaps.api;
 
 import com.waymaps.data.requestEntity.Credentials;
 import com.waymaps.data.responseEntity.FinGet;
+import com.waymaps.data.responseEntity.GetCurrent;
 import com.waymaps.data.responseEntity.GetGroup;
 import com.waymaps.data.responseEntity.User;
 
@@ -21,6 +22,7 @@ public interface WayMapsService {
 
     public static final String DEFAULT_FORMAT = "json";
 
+    //@todo
     /*@POST("./")
     Call<User> loginProcedure(@Body Credentials credentials);*/
 
@@ -45,6 +47,12 @@ public interface WayMapsService {
     Call<FinGet[]> finGetProcedure(@Field("action") String action, @Field("name") String name,
                                       @Field("identificator") String identificator, @Field("user_id") String user_id,
                                       @Field("format") String format, @Field("params") String params);
+
+    @FormUrlEncoded
+    @POST("./")
+    Call<GetCurrent[]> getCurrentProcedure(@Field("action") String action, @Field("name") String name,
+                                               @Field("identificator") String identificator, @Field("user_id") String user_id,
+                                               @Field("format") String format, @Field("params") String params);
 
 
     @FormUrlEncoded

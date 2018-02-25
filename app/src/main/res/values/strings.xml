@@ -27,4 +27,6 @@
     <string name="date">Date</string>
     <string name="debet">Debet</string>
     <string name="credit">Credit</string>
+    <string name="location_saved">Location saved!</string>
+    <string name="error_saving_location">Online screen should be chosen</string>
 </resources>

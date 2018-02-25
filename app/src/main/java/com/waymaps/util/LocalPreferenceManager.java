@@ -193,7 +193,7 @@ public class LocalPreferenceManager {
 
     private static void setFloatValue(Context context, String key, float value) {
         SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
-        editor.putFloat(key, value);
+        editor.putString(key, String.valueOf(value));
         editor.commit();
     }
 

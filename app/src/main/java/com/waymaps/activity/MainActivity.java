@@ -8,6 +8,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.view.Gravity;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -18,9 +19,11 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.android.gms.maps.model.LatLng;
 import com.waymaps.R;
 import com.waymaps.api.RetrofitService;
 import com.waymaps.data.requestEntity.Action;
@@ -32,6 +35,7 @@ import com.waymaps.fragment.GMapFragment;
 import com.waymaps.intent.SessionUpdateServiceIntent;
 import com.waymaps.util.ApplicationUtil;
 import com.waymaps.util.JSONUtil;
+import com.waymaps.util.LocalPreferenceManager;
 import com.waymaps.util.LocalPreferencesManagerUtil;
 import com.waymaps.util.SystemUtil;
 
@@ -63,9 +67,6 @@ public class MainActivity extends AppCompatActivity
     @BindView(R.id.drawer_layout)
     DrawerLayout drawer;
 
-    @BindView(R.id.fab)
-    FloatingActionButton fab;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -82,13 +83,6 @@ public class MainActivity extends AppCompatActivity
         toggle.syncState();
 
         navigationView.setNavigationItemSelectedListener(this);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
 
         displaySelectedScreen(R.id.nav_map);
     }
@@ -170,7 +164,7 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_settings) {
 
         } else if (id == R.id.nav_save_location) {
-
+            saveLocation();
         } else if (id == R.id.nav_balance) {
             balance();
         } else if (id == R.id.nav_tech_supp) {
@@ -180,6 +174,25 @@ public class MainActivity extends AppCompatActivity
         }
 
         drawer.closeDrawer(GravityCompat.START);
+    }
+
+    private void saveLocation() {
+        Toast toast = null;
+        if (currentFragment instanceof GMapFragment){
+            LatLng target = ((GMapFragment) currentFragment).getmMap().getCameraPosition().target;
+            float zoom = ((GMapFragment) currentFragment).getmMap().getCameraPosition().zoom;
+            LocalPreferenceManager.saveLatLonZoom(this,target.latitude,target.longitude,zoom);
+            toast = Toast.makeText(getApplicationContext(),
+                    R.string.location_saved,
+                    Toast.LENGTH_SHORT);
+        } else{
+            toast = Toast.makeText(getApplicationContext(),
+                    R.string.error_saving_location,
+                    Toast.LENGTH_SHORT);
+        }
+
+        toast.setGravity(Gravity.CENTER, 0, 0);
+        toast.show();
     }
 
     private void balance() {

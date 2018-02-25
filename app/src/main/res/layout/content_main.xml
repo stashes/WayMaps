@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/holo_purple"
     android:visibility="visible"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.waymaps.activity.MainActivity"
@@ -15,7 +14,6 @@
         android:id="@+id/content_main"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/success"
         app:layout_constraintEnd_toEndOf="parent"
         tools:layout_editor_absoluteY="8dp"></FrameLayout>
 

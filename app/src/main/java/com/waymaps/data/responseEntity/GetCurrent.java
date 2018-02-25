@@ -14,6 +14,7 @@ public class GetCurrent {
     private String gsm;
     private String power;
     private String ignition;
+    private String vector;
     private String motor;
     private String voltage;
     private String dff;
@@ -29,7 +30,7 @@ public class GetCurrent {
     public GetCurrent() {
     }
 
-    public GetCurrent(String id, String l_date, String lat, String lon, String speed, String sat, String gsm, String power, String ignition, String motor, String voltage, String dff, String q_dff, String last_parking_start, String status, String tracker_title, String group_id, String color, String marker, String note) {
+    public GetCurrent(String id, String l_date, String lat, String lon, String speed, String sat, String gsm, String power, String ignition, String vector, String motor, String voltage, String dff, String q_dff, String last_parking_start, String status, String tracker_title, String group_id, String color, String marker, String note) {
         this.id = id;
         this.l_date = l_date;
         this.lat = lat;
@@ -39,6 +40,7 @@ public class GetCurrent {
         this.gsm = gsm;
         this.power = power;
         this.ignition = ignition;
+        this.vector = vector;
         this.motor = motor;
         this.voltage = voltage;
         this.dff = dff;
@@ -210,5 +212,13 @@ public class GetCurrent {
 
     public void setNote(String note) {
         this.note = note;
+    }
+
+    public String getVector() {
+        return vector;
+    }
+
+    public void setVector(String vector) {
+        this.vector = vector;
     }
 }
