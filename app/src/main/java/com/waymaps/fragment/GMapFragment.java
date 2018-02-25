@@ -19,6 +19,11 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.waymaps.R;
 import com.waymaps.activity.MainActivity;
+import com.waymaps.data.responseEntity.User;
+import com.waymaps.util.LocalPreferenceManager;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -29,15 +34,18 @@ import butterknife.ButterKnife;
 
 public class GMapFragment extends Fragment {
 
+
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
     private GoogleMap mMap;
     private MapView mapView;
-
 
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
+        super.onCreateView(inflater,container,savedInstanceState);
         View rootView =   inflater.inflate(R.layout.fragment_map, container, false);
+
         mapView = (MapView) rootView.findViewById(R.id.map);
         mapView.onCreate(savedInstanceState);
 
@@ -46,20 +54,29 @@ public class GMapFragment extends Fragment {
         try {
             MapsInitializer.initialize(getActivity().getApplicationContext());
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error occurs while map inittializing");
         }
         mapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(GoogleMap googleMap) {
                 mMap = googleMap;
+                LatLng location = getLatLng();
+                Float zoom = getZoom();
 
-                // Add a marker in Sydney and move the camera
-                LatLng sydney = new LatLng(-34, 151);
-                mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-                mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location,zoom));
             }
         });
         return rootView;
+    }
+
+    private Float getZoom() {
+        return LocalPreferenceManager.getZoom(getActivity());
+    }
+
+    private LatLng getLatLng() {
+        double latitude = LocalPreferenceManager.getLatitude(getActivity());
+        double longitude = LocalPreferenceManager.getLongitude(getActivity());
+        return new LatLng(latitude,longitude);
     }
 
     @Override

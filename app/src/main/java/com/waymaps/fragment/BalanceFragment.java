@@ -1,20 +1,13 @@
 package com.waymaps.fragment;
 
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
-import android.widget.TableLayout;
-import android.widget.TableRow;
-import android.widget.TextView;
 
 import com.waymaps.R;
-import com.waymaps.activity.MainActivity;
 import com.waymaps.adapter.BalanceAdapter;
 import com.waymaps.api.RetrofitService;
 import com.waymaps.api.WayMapsService;
@@ -23,14 +16,11 @@ import com.waymaps.data.requestEntity.Procedure;
 import com.waymaps.data.requestEntity.parameters.IdParam;
 import com.waymaps.data.requestEntity.parameters.Parameter;
 import com.waymaps.data.responseEntity.FinGet;
-import com.waymaps.data.responseEntity.User;
-import com.waymaps.util.ApplicationUtil;
 import com.waymaps.util.SystemUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.Arrays;
 
 import retrofit2.Call;
@@ -41,17 +31,16 @@ import retrofit2.Response;
  * Created by Admin on 11.02.2018.
  */
 
-public class BalanceFragment extends Fragment {
+public class BalanceFragment extends AbstractFragment {
 
-    private User authorizedUser;
     private FinGet[] finGets;
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
+        super.onCreateView(inflater,container,savedInstanceState);
         View view = inflater.inflate(R.layout.fragment_balance, container, false);
-        getAttrFromBundle();
         getBalance();
         return view;
     }
@@ -61,13 +50,7 @@ public class BalanceFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
     }
 
-    private void getAttrFromBundle() {
-        try {
-            authorizedUser = ApplicationUtil.getObjectFromBundle(getArguments(), "user", User.class);
-        } catch (IOException e) {
-            logger.error("Error while trying to parse parameters {}", this.getClass());
-        }
-    }
+
 
     private void getBalance() {
         Procedure procedure = new Procedure(Action.CALL);

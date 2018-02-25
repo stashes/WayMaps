@@ -15,11 +15,11 @@ public class LocalPreferenceManager {
 
     private static final String LATITUDE = "latitude";
     private static final String LONGITUDE = "longitude";
-    private static final double DEFAULT_LATITUDE = 52.00d;
-    private static final double DEFAULT_LONGITUDE = 38.00d;
+    private static final double DEFAULT_LATITUDE = 48.00d;
+    private static final double DEFAULT_LONGITUDE = 31.70d;
 
     private static final String ZOOM = "zoom";
-    private static final int DEFAULT_ZOOM = 4;
+    private static final float DEFAULT_ZOOM = 4.9f;
 
     private static final String FILTER_OBJECTS = "filterObjects";
     private static final int INVALID_INT = -1;
@@ -75,6 +75,11 @@ public class LocalPreferenceManager {
     public static double getLongitude(Context context) {
         Double longitude = getDoubleValue(context, LONGITUDE);
         return longitude == null ? DEFAULT_LONGITUDE : longitude.doubleValue();
+    }
+
+    public static float getZoom(Context context){
+        Float zoom = getFloatValue(context,ZOOM);
+        return zoom == null ? DEFAULT_ZOOM : zoom;
     }
 
 
@@ -166,6 +171,14 @@ public class LocalPreferenceManager {
             return null;
         }
         return Double.valueOf(Double.parseDouble(doubleValue));
+    }
+
+    private static Float getFloatValue(Context context, String key) {
+        String floatValue = PreferenceManager.getDefaultSharedPreferences(context).getString(key, INVALID_STRING);
+        if (INVALID_STRING.equals(floatValue)) {
+            return null;
+        }
+        return Float.valueOf(Float.parseFloat(floatValue));
     }
 
     private static void setIntValue(Context context, String key, int value) {
