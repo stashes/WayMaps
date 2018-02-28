@@ -10,6 +10,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.waymaps.R;
+import com.waymaps.adapter.TicketListAdapter;
 import com.waymaps.api.RetrofitService;
 import com.waymaps.api.WayMapsService;
 import com.waymaps.data.requestEntity.Action;
@@ -60,7 +61,7 @@ public class TicketListFragment extends Fragment implements AdapterView.OnItemCl
     }
     private void getTickers(){
         Procedure procedure = new Procedure(Action.CALL);
-        Parameter firmId = new IdParam("255");
+        Parameter firmId = new IdParam("251");
         procedure.setFormat(WayMapsService.DEFAULT_FORMAT);
         procedure.setIdentficator(SystemUtil.getWifiMAC(getActivity()));
         procedure.setName(Action.TICKET_LIST);
@@ -72,7 +73,7 @@ public class TicketListFragment extends Fragment implements AdapterView.OnItemCl
             @Override
             public void onResponse(Call<TicketList[]> call, Response<TicketList[]> response) {
                 ticketList = response.body();
-                //populateTable();
+                populateTable();
             }
 
             @Override
@@ -93,12 +94,12 @@ public class TicketListFragment extends Fragment implements AdapterView.OnItemCl
             logger.error("Error while trying to parse parameters {}", this.getClass());
         }
     }
-//    public void populateTable() {
-//        if (ticketList == null){
-//            ticketList = new TicketList[0];
-//        }
-//        TicketListAdapter trackerAdapter = new TicketListAdapter(getContext(), Arrays.asList(ticketList));
-//        ListView lvMain = (ListView) getActivity().findViewById(R.id.ticket_table);
-//        lvMain.setAdapter(trackerAdapter);
-//    }
+    public void populateTable() {
+        if (ticketList == null){
+            ticketList = new TicketList[0];
+        }
+        TicketListAdapter trackerAdapter = new TicketListAdapter(getContext(), Arrays.asList(ticketList));
+        ListView lvMain = (ListView) getActivity().findViewById(R.id.ticket_table);
+        lvMain.setAdapter(trackerAdapter);
+    }
 }
