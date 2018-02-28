@@ -5,6 +5,7 @@ import com.waymaps.data.requestEntity.Credentials;
 import com.waymaps.data.responseEntity.FinGet;
 import com.waymaps.data.responseEntity.GetCurrent;
 import com.waymaps.data.responseEntity.GetGroup;
+import com.waymaps.data.responseEntity.TrackerList;
 import com.waymaps.data.responseEntity.User;
 
 import retrofit2.Call;
@@ -47,6 +48,11 @@ public interface WayMapsService {
     Call<FinGet[]> finGetProcedure(@Field("action") String action, @Field("name") String name,
                                       @Field("identificator") String identificator, @Field("user_id") String user_id,
                                       @Field("format") String format, @Field("params") String params);
+    @FormUrlEncoded
+    @POST("./")
+    Call<TrackerList[]> trackerProcedure(@Field("action") String action, @Field("name") String name,
+                                        @Field("identificator") String identificator, @Field("user_id") String user_id,
+                                        @Field("format") String format, @Field("params") String params);
 
     @FormUrlEncoded
     @POST("./")
@@ -61,6 +67,11 @@ public interface WayMapsService {
                                         @Field("identificator") String identificator, @Field("user_id") String user_id,
                                         @Field("format") String format,@Field("params") String params);
 
+    @FormUrlEncoded
+    @POST("./")
+    <T> Call<T[]> withoutUserProcedure(@Field("action") String action, @Field("name") String name,
+                                   @Field("identificator") String identificator,
+                                   @Field("format") String format,@Field("params") String params);
 
 
 }

@@ -1,5 +1,7 @@
 package com.waymaps.data.responseEntity;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
+
 /**
  * Created by Admin on 05.02.2018.
  */
@@ -26,6 +28,7 @@ public class TrackerList {
         return id;
     }
 
+    @JsonSetter("id")
     public void setId(String id) {
         this.id = id;
     }
@@ -34,6 +37,7 @@ public class TrackerList {
         return title;
     }
 
+    @JsonSetter("title")
     public void setTitle(String title) {
         this.title = title;
     }
@@ -42,6 +46,7 @@ public class TrackerList {
         return color;
     }
 
+    @JsonSetter("color")
     public void setColor(String color) {
         this.color = color;
     }
@@ -50,6 +55,7 @@ public class TrackerList {
         return marker;
     }
 
+    @JsonSetter("marker")
     public void setMarker(String marker) {
         this.marker = marker;
     }
@@ -58,6 +64,7 @@ public class TrackerList {
         return maxspeed;
     }
 
+    @JsonSetter("maxspeed")
     public void setMaxspeed(String maxspeed) {
         this.maxspeed = maxspeed;
     }

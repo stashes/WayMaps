@@ -32,6 +32,7 @@ import com.waymaps.data.requestEntity.UpdateCredentials;
 import com.waymaps.data.responseEntity.User;
 import com.waymaps.fragment.BalanceFragment;
 import com.waymaps.fragment.GMapFragment;
+import com.waymaps.fragment.TrackerListFragment;
 import com.waymaps.intent.SessionUpdateServiceIntent;
 import com.waymaps.util.ApplicationUtil;
 import com.waymaps.util.JSONUtil;
@@ -67,6 +68,9 @@ public class MainActivity extends AppCompatActivity
     @BindView(R.id.drawer_layout)
     DrawerLayout drawer;
 
+//    @BindView(R.id.fab)
+//    FloatingActionButton fab;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -83,6 +87,11 @@ public class MainActivity extends AppCompatActivity
         toggle.syncState();
 
         navigationView.setNavigationItemSelectedListener(this);
+//        fab.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//            }
+//        });
 
         displaySelectedScreen(R.id.nav_map);
     }
@@ -168,7 +177,7 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_balance) {
             balance();
         } else if (id == R.id.nav_tech_supp) {
-
+            showTrackerList();
         } else if (id == R.id.nav_logout) {
             logout();
         }
@@ -225,6 +234,18 @@ public class MainActivity extends AppCompatActivity
         ft.replace(R.id.content_main, fragment);
         ft.commit();
 
+    }
+
+    private void showTrackerList(){
+        Bundle bundle = null;
+        try{
+            bundle = ApplicationUtil.setValueToBundle(new Bundle(),"user", authorisedUser);
+        }catch (JsonProcessingException e){
+            logger.debug("Error while trying write to bundle");
+        }
+        currentFragment = new TrackerListFragment();
+        setActionBarTitleColor("");
+        setFragmentActive(currentFragment, bundle);
     }
 
     private void logout() {
