@@ -1,53 +1,43 @@
 package com.waymaps.fragment;
 
-import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.ColorFilter;
-import android.graphics.Paint;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffColorFilter;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
+import android.support.design.widget.BottomSheetBehavior;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.ListView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.waymaps.R;
-import com.waymaps.activity.MainActivity;
+import com.waymaps.adapter.BalanceAdapter;
+import com.waymaps.adapter.GetCurrentAdapter;
 import com.waymaps.api.RetrofitService;
 import com.waymaps.api.WayMapsService;
 import com.waymaps.data.requestEntity.Action;
 import com.waymaps.data.requestEntity.Procedure;
-import com.waymaps.data.requestEntity.parameters.ComplexParameters;
 import com.waymaps.data.requestEntity.parameters.IdParam;
 import com.waymaps.data.requestEntity.parameters.Parameter;
 import com.waymaps.data.responseEntity.GetCurrent;
-import com.waymaps.data.responseEntity.User;
 import com.waymaps.util.ApplicationUtil;
 import com.waymaps.util.LocalPreferenceManager;
 import com.waymaps.util.SystemUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Arrays;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -69,15 +59,24 @@ public class GMapFragment extends AbstractFragment {
     private Marker[] markers;
     private Procedure procedure;
 
+    @BindView(R.id.bottom_sheet_map_tracker_list)
+    LinearLayout linearLayout;
+
+    @BindView(R.id.get_current_table)
+    ListView listView;
+
+    BottomSheetBehavior sheetBehavior;
+
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         View rootView = inflater.inflate(R.layout.fragment_map, container, false);
-
+        ButterKnife.bind(this,rootView);
         mapView = (MapView) rootView.findViewById(R.id.map);
         mapView.onCreate(savedInstanceState);
+
 
         mapView.onResume(); // needed to get the map to display immediately
 
@@ -113,7 +112,6 @@ public class GMapFragment extends AbstractFragment {
             }
         });
 
-
         return rootView;
     }
 
@@ -148,12 +146,16 @@ public class GMapFragment extends AbstractFragment {
             }
             markers[i].setTag(getCurrents[i]);
         }
+
+        sheetBehavior = BottomSheetBehavior.from(linearLayout);
+        GetCurrentAdapter getCurrentAdapter = new GetCurrentAdapter(getContext(), Arrays.asList(getCurrents));
+        listView.setAdapter(getCurrentAdapter);
+        ApplicationUtil.setListViewHeightBasedOnItems(listView);
+
     }
 
     private Bitmap pickImage(double speed, String marker, String color) {
-        Bitmap bitmap = null;
-        Drawable drawable = null;
-        int bitmapColor = 10000;
+        Drawable drawable;
         if (speed > 5) {
             drawable = getResources().getDrawable(R.drawable.ic_marker_navigation);
         } else {
@@ -163,11 +165,8 @@ public class GMapFragment extends AbstractFragment {
             drawable = getResources().getDrawable(R.drawable.ic_marker_stay);
         }
 
-        if (color != null) {
-            int intColor = Integer.parseInt(color);
-            String hexColor = String.format("#%06X", (0xFFFFFF & intColor));
-            bitmapColor = Color.parseColor(hexColor);
-        }
+        int bitmapColor = ApplicationUtil.changeColorScaleTo16Int(color);
+
 
         return ApplicationUtil.changeIconColor(drawable, bitmapColor);
     }

@@ -35,7 +35,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 
-public class MessageFragment extends Fragment implements View.OnClickListener {
+public class MessageFragment extends AbstractFragment implements View.OnClickListener {
     private User authorizedUser;
     private TrackerList tracker;
     private Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -99,8 +99,8 @@ public class MessageFragment extends Fragment implements View.OnClickListener {
        call.enqueue(new Callback<Void>() {
            @Override
            public void onResponse(Call<Void> call, Response<Void> response) {
-               response.
-                logger.debug("Send message sucessfull");
+/*               response.
+                logger.debug("Send message sucessfull");*/
            }
 
            @Override
