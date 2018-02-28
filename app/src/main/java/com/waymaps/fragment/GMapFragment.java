@@ -120,6 +120,7 @@ public class GMapFragment extends AbstractFragment {
     private void updateMarkers() {
         int numMarkers = getCurrents.length;
         markers = new Marker[numMarkers];
+        if (isAdded() && getActivity()!=null)
         for (int i = 0; i < numMarkers; i++) {
             markers[i] = mMap.addMarker(new MarkerOptions().position(
                     new LatLng(Double.parseDouble(getCurrents[i].getLat())

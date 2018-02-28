@@ -118,11 +118,11 @@ public class TrackerListFragment extends Fragment implements AdapterView.OnItemC
 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-        Bundle bundle = null;
+        Bundle bundle = new Bundle();
         List<TrackerList> list = Arrays.asList(tracker);
         try{
-            bundle = ApplicationUtil.setValueToBundle(new Bundle(),"user", authorizedUser);
-            bundle = ApplicationUtil.setValueToBundle(new Bundle(),"tracker", list.get(i));
+            ApplicationUtil.setValueToBundle(bundle,"user", authorizedUser);
+            ApplicationUtil.setValueToBundle(bundle,"tracker", list.get(i));
         }catch (JsonProcessingException e){
             logger.debug("Error while trying write to bundle");
         }

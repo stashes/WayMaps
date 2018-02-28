@@ -15,6 +15,7 @@ public class Action {
     public static final String FIN_GET = "m_fin_get";
     public static final String TICKET_LIST = "m_ticket_list";
     public static final String TICKET_GET = "m_ticket_get";
+    public static final String TICKET_ADD = "ticket_add";
     public static final String GET_CURRENT = "m_get_current";
     public static final String COMMENT_ADD = "comment_add";
     public static final String TRACKER_LIST = "m_tracker_list";

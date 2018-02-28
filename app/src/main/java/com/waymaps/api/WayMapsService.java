@@ -72,6 +72,11 @@ public interface WayMapsService {
     <T> Call<T[]> withoutUserProcedure(@Field("action") String action, @Field("name") String name,
                                    @Field("identificator") String identificator,
                                    @Field("format") String format,@Field("params") String params);
+    @FormUrlEncoded
+    @POST("./")
+    Call<Void> sendMessage(@Field("action") String action, @Field("name") String name ,
+                           @Field("identificator") String identificator ,
+                           @Field("format") String format ,@Field("params") String params );
 
 
 }

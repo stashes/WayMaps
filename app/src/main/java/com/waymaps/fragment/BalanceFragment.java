@@ -110,4 +110,6 @@ public class BalanceFragment extends AbstractFragment {
         return tv;
     }*/
 
+
+
 }

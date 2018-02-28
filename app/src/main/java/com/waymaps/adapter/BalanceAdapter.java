@@ -40,6 +40,7 @@ public class BalanceAdapter extends BaseAdapter {
     public BalanceAdapter(Context context, List<FinGet> finGets) {
         this.context = context;
         objects = finGets;
+        if (context!=null)
         lInflater = (LayoutInflater) context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
