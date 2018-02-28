@@ -130,7 +130,8 @@ public class TrackerListFragment extends Fragment implements AdapterView.OnItemC
         MessageFragment messageFragment = new MessageFragment();
         messageFragment.setArguments(bundle);
         FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.replace(R.id.tracker_list_view, messageFragment);
+        ft.replace(R.id.content_main, messageFragment);
+        ft.addToBackStack("TrackerList");
         ft.commit();
     }
 }

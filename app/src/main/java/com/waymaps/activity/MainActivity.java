@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.view.Gravity;
 import android.view.View;
@@ -32,6 +33,7 @@ import com.waymaps.data.requestEntity.UpdateCredentials;
 import com.waymaps.data.responseEntity.User;
 import com.waymaps.fragment.BalanceFragment;
 import com.waymaps.fragment.GMapFragment;
+import com.waymaps.fragment.TicketListFragment;
 import com.waymaps.fragment.TrackerListFragment;
 import com.waymaps.intent.SessionUpdateServiceIntent;
 import com.waymaps.util.ApplicationUtil;
@@ -68,8 +70,8 @@ public class MainActivity extends AppCompatActivity
     @BindView(R.id.drawer_layout)
     DrawerLayout drawer;
 
-//    @BindView(R.id.fab)
-//    FloatingActionButton fab;
+    @BindView(R.id.fab)
+    FloatingActionButton fab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,11 +89,12 @@ public class MainActivity extends AppCompatActivity
         toggle.syncState();
 
         navigationView.setNavigationItemSelectedListener(this);
-//        fab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//            }
-//        });
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showTrackerList();
+            }
+        });
 
         displaySelectedScreen(R.id.nav_map);
     }
@@ -177,7 +180,7 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_balance) {
             balance();
         } else if (id == R.id.nav_tech_supp) {
-            showTrackerList();
+            showTicketList();
         } else if (id == R.id.nav_logout) {
             logout();
         }
@@ -224,6 +227,17 @@ public class MainActivity extends AppCompatActivity
             logger.debug("Error while trying write to bundle");
         }
         currentFragment= new GMapFragment();
+        setActionBarTitleColor("");
+        setFragmentActive(currentFragment, bundle);
+    }
+    private void showTicketList(){
+        Bundle bundle = null;
+        try{
+            bundle = ApplicationUtil.setValueToBundle(new Bundle(),"user", authorisedUser);
+        }catch (JsonProcessingException e){
+            logger.debug("Error while trying write to bundle");
+        }
+        currentFragment = new TicketListFragment();
         setActionBarTitleColor("");
         setFragmentActive(currentFragment, bundle);
     }

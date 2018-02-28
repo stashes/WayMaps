@@ -12,6 +12,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.waymaps.R;
 import com.waymaps.api.RetrofitService;
 import com.waymaps.api.WayMapsService;
@@ -21,6 +22,7 @@ import com.waymaps.data.requestEntity.parameters.IdParam;
 import com.waymaps.data.requestEntity.parameters.Parameter;
 import com.waymaps.data.responseEntity.TrackerList;
 import com.waymaps.data.responseEntity.User;
+import com.waymaps.notification.NotificationManager;
 import com.waymaps.util.ApplicationUtil;
 import com.waymaps.util.SystemUtil;
 
@@ -35,7 +37,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 
-public class MessageFragment extends AbstractFragment implements View.OnClickListener {
+public class MessageFragment extends Fragment implements View.OnClickListener {
     private User authorizedUser;
     private TrackerList tracker;
     private Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -79,10 +81,13 @@ public class MessageFragment extends AbstractFragment implements View.OnClickLis
 
     @Override
     public void onClick(View view) {
-        sendMessage();
-        Toast toast = Toast.makeText(view.getContext() , "Sended" , Toast.LENGTH_SHORT);
-        goToMapfragment();
-
+        if (mess_text.getText().toString().trim().equals("")){
+            NotificationManager.showNotification(getActivity() , "Text field is empty");
+        }else {
+            sendMessage();
+            NotificationManager.showNotification(getActivity(), "SMS sended");
+            goToMapfragment();
+        }
     }
     private void sendMessage(){
 
@@ -99,8 +104,6 @@ public class MessageFragment extends AbstractFragment implements View.OnClickLis
        call.enqueue(new Callback<Void>() {
            @Override
            public void onResponse(Call<Void> call, Response<Void> response) {
-/*               response.
-                logger.debug("Send message sucessfull");*/
            }
 
            @Override
@@ -110,9 +113,19 @@ public class MessageFragment extends AbstractFragment implements View.OnClickLis
        });
     }
     private void goToMapfragment(){
-        TrackerListFragment trackerListF =  new TrackerListFragment();
+        Bundle bundle = new Bundle();
+        try {
+            ApplicationUtil.setValueToBundle(bundle,"user", authorizedUser);
+        }catch (JsonProcessingException e){
+            logger.debug("Error while trying write to bundle");
+        }
+        GMapFragment gMapFragment =  new GMapFragment();
+        gMapFragment.setArguments(bundle);
         FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.replace(R.id.message_layout, trackerListF);
+        ft.replace(R.id.content_main, gMapFragment);
+        ft.remove(this);
         ft.commit();
     }
+
+
 }

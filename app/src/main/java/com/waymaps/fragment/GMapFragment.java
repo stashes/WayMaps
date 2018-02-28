@@ -67,7 +67,6 @@ public class GMapFragment extends AbstractFragment {
 
     BottomSheetBehavior sheetBehavior;
 
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {

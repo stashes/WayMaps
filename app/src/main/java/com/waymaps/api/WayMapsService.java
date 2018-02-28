@@ -5,6 +5,7 @@ import com.waymaps.data.requestEntity.Credentials;
 import com.waymaps.data.responseEntity.FinGet;
 import com.waymaps.data.responseEntity.GetCurrent;
 import com.waymaps.data.responseEntity.GetGroup;
+import com.waymaps.data.responseEntity.TicketList;
 import com.waymaps.data.responseEntity.TrackerList;
 import com.waymaps.data.responseEntity.User;
 
@@ -77,6 +78,12 @@ public interface WayMapsService {
     Call<Void> sendMessage(@Field("action") String action, @Field("name") String name ,
                            @Field("identificator") String identificator ,
                            @Field("format") String format ,@Field("params") String params );
+
+    @FormUrlEncoded
+    @POST("./")
+    Call<TicketList[]> tickerListProcedure(@Field("action") String action, @Field("name") String name,
+                                         @Field("identificator") String identificator, @Field("user_id") String user_id,
+                                         @Field("format") String format, @Field("params") String params);
 
 
 }
