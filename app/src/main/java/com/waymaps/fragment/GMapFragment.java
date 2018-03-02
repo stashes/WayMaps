@@ -3,8 +3,10 @@ package com.waymaps.fragment;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +27,7 @@ import com.waymaps.adapter.BalanceAdapter;
 import com.waymaps.adapter.GetCurrentAdapter;
 import com.waymaps.api.RetrofitService;
 import com.waymaps.api.WayMapsService;
+import com.waymaps.components.BottomSheetListView;
 import com.waymaps.data.requestEntity.Action;
 import com.waymaps.data.requestEntity.Procedure;
 import com.waymaps.data.requestEntity.parameters.IdParam;
@@ -62,8 +65,11 @@ public class GMapFragment extends AbstractFragment {
     @BindView(R.id.bottom_sheet_map_tracker_list)
     LinearLayout linearLayout;
 
+    @BindView(R.id.bottom_sheet_map_content)
+    LinearLayout linearLayoutContent;
+
     @BindView(R.id.get_current_table)
-    ListView listView;
+    BottomSheetListView listView;
 
     BottomSheetBehavior sheetBehavior;
 
@@ -72,7 +78,7 @@ public class GMapFragment extends AbstractFragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         View rootView = inflater.inflate(R.layout.fragment_map, container, false);
-        ButterKnife.bind(this,rootView);
+        ButterKnife.bind(this, rootView);
         mapView = (MapView) rootView.findViewById(R.id.map);
         mapView.onCreate(savedInstanceState);
 
@@ -110,46 +116,50 @@ public class GMapFragment extends AbstractFragment {
                 });
             }
         });
-
+/*        TypedValue out = new TypedValue();
+        getResources().getValue(R.dimen.bottom_sheet_height, out, true);
+        float floatResource = out.getFloat();
+        if  (linearLayout.getHeight() >= SystemUtil.getIntHeight(getActivity()) * 0.33)*/
         return rootView;
     }
 
     private void updateMarkers() {
         int numMarkers = getCurrents.length;
         markers = new Marker[numMarkers];
-        if (isAdded() && getActivity()!=null)
-        for (int i = 0; i < numMarkers; i++) {
-            markers[i] = mMap.addMarker(new MarkerOptions().position(
-                    new LatLng(Double.parseDouble(getCurrents[i].getLat())
-                            , Double.parseDouble(getCurrents[i].getLon()))));
+        if (isAdded() && getActivity() != null)
+            for (int i = 0; i < numMarkers; i++) {
+                markers[i] = mMap.addMarker(new MarkerOptions().position(
+                        new LatLng(Double.parseDouble(getCurrents[i].getLat())
+                                , Double.parseDouble(getCurrents[i].getLon()))));
 
-            double speed = 0;
-            if (getCurrents[i].getSpeed() != null) {
-                speed = Double.parseDouble(getCurrents[i].getSpeed());
-            } else
-                speed = 0;
+                double speed = 0;
+                if (getCurrents[i].getSpeed() != null) {
+                    speed = Double.parseDouble(getCurrents[i].getSpeed());
+                } else
+                    speed = 0;
 
-            String marker = getCurrents[i].getMarker();
-            String color = getCurrents[i].getColor();
+                String marker = getCurrents[i].getMarker();
+                String color = getCurrents[i].getColor();
 
-            Bitmap markerIcon = pickImage(speed, marker, color);
+                Bitmap markerIcon = pickImage(speed, marker, color);
 
-            float vector = 0;
-            if (getCurrents[i].getVector() != null) {
-                vector = Float.parseFloat(getCurrents[i].getVector());
+                float vector = 0;
+                if (getCurrents[i].getVector() != null) {
+                    vector = Float.parseFloat(getCurrents[i].getVector());
+                }
+
+                markers[i].setIcon(BitmapDescriptorFactory.fromBitmap(markerIcon));
+                if (speed > 5) {
+                    markers[i].setRotation(vector);
+                }
+                markers[i].setTag(getCurrents[i]);
             }
 
-            markers[i].setIcon(BitmapDescriptorFactory.fromBitmap(markerIcon));
-            if (speed>5){
-                markers[i].setRotation(vector);
-            }
-            markers[i].setTag(getCurrents[i]);
-        }
 
         sheetBehavior = BottomSheetBehavior.from(linearLayout);
         GetCurrentAdapter getCurrentAdapter = new GetCurrentAdapter(getContext(), Arrays.asList(getCurrents));
         listView.setAdapter(getCurrentAdapter);
-        ApplicationUtil.setListViewHeightBasedOnItems(listView);
+        /*ApplicationUtil.setListViewHeightBasedOnItems(listView);*/
 
     }
 

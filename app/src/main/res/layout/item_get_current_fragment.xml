@@ -30,6 +30,7 @@
             android:layout_weight="1"
             android:gravity="fill_vertical"
             android:paddingLeft="20dp"
+            android:textColor="@color/common_google_signin_btn_text_dark_focused"
             android:textSize="20sp"
             android:textStyle="bold"
             tools:text="Opel GS TR-151, Рівне"></TextView>
