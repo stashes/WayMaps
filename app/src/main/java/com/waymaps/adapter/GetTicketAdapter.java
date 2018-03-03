@@ -8,8 +8,8 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.waymaps.R;
+import com.waymaps.data.responseEntity.Ticket;
 import com.waymaps.data.responseEntity.TicketList;
-import com.waymaps.data.responseEntity.TrackerList;
 
 import java.util.List;
 
@@ -17,13 +17,12 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 /**
- * Created by nazar on 28.02.2018.
+ * Created by nazar on 01.03.2018.
  */
 
-public class TicketListAdapter extends BaseAdapter {
-    private Context context;
+public class GetTicketAdapter extends BaseAdapter {private Context context;
     private LayoutInflater lInflater;
-    private List<TicketList> objects;
+    private List<Ticket> objects;
 
     @BindView(R.id.ticketDate)
     TextView ticketDate;
@@ -37,9 +36,9 @@ public class TicketListAdapter extends BaseAdapter {
 //    @BindView(R.id.ticketReadDate)
 //    TextView ticketReadDate;
 
-    public TicketListAdapter(Context context, List<TicketList> ticketLists){
+    public GetTicketAdapter(Context context, List<Ticket> tickets){
         this.context = context;
-        objects = ticketLists;
+        objects = tickets;
         lInflater = (LayoutInflater) context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
@@ -67,15 +66,15 @@ public class TicketListAdapter extends BaseAdapter {
             view = lInflater.inflate(R.layout.item_ticket_list, parent, false);
         }
         ButterKnife.bind(this,view);
-        TicketList ticket = getTicketList(position);
-        ticketDate.setText(ticket.getCreated_date());
-        ticketUsr.setText(ticket.getTracker_title());
+        Ticket ticket = getTickets(position);
+        ticketDate.setText("[" + ticket.getCreatedDate() + "]");
+        ticketUsr.setText(ticket.getUserTitle());
         ticketMessage.setText(ticket.getText());
- //       ticketReadDate.setText("Створено" + "[" + ticket.getCreated_date() +"]");
+        //       ticketReadDate.setText("Створено" + "[" + ticket.getCreated_date() +"]");
         return view;
     }
 
-    public TicketList getTicketList(int position) {
-        return (TicketList) getItem(position);
+    public Ticket getTickets(int position) {
+        return (Ticket) getItem(position);
     }
 }

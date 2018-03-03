@@ -29,4 +29,18 @@
     <string name="credit">Credit</string>
     <string name="location_saved">Location saved!</string>
     <string name="error_saving_location">Online screen should be chosen</string>
+    <string name="record_not_found">No found any record</string>
+
+    <!--Message Layout-->
+    <string name="message_from">Sender</string>
+    <string name="type_your_message">Type your message</string>
+    <string name="send_message">Send</string>
+    <string name="message_actionbar_title">Create ticket</string>
+
+    <!--Tracker list layout-->
+    <string name="tracker_list_actionbar_title">Tracker</string>
+
+    <!--Ticket list layout-->
+    <string name="ticket_list_actionbar_title">Tickets</string>
+
 </resources>

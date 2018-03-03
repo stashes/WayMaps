@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--Message Layout-->
+    <string name="message_from">Відправник</string>
+    <string name="type_your_message">Уведіть своє повідомлення</string>
+    <string name="send_message">Надіслати</string>
+    <string name="message_actionbar_title">Створення тікету</string>
+
+    <!--Tracker list layout-->
+    <string name="tracker_list_actionbar_title">Вибір трекера</string>
+
+    <!--Ticket list layout-->
+    <string name="ticket_list_actionbar_title">Тікети</string>
+</resources>

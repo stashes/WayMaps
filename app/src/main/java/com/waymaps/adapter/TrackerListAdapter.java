@@ -5,8 +5,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.amulyakhare.textdrawable.TextDrawable;
+import com.amulyakhare.textdrawable.util.ColorGenerator;
 import com.waymaps.R;
 import com.waymaps.data.responseEntity.FinGet;
 import com.waymaps.data.responseEntity.TrackerList;
@@ -26,9 +29,13 @@ public class TrackerListAdapter extends BaseAdapter {
     private LayoutInflater lInflater;
     private List<TrackerList> objects;
 
+    ColorGenerator generator = ColorGenerator.MATERIAL;
 
     @BindView(R.id.tracker_name)
     TextView trackerName;
+    @BindView(R.id.gmailitem_letter)
+    ImageView imageView;
+    private String letter;
 
     public TrackerListAdapter(Context context, List<TrackerList> tracker){
         this.context = context;
@@ -63,6 +70,10 @@ public class TrackerListAdapter extends BaseAdapter {
         }
         ButterKnife.bind(this,view);
         TrackerList tracker = getTrackerList(position);
+        letter = String.valueOf(tracker.getTitle().charAt(0));
+        TextDrawable drawable = TextDrawable.builder()
+                .buildRound(letter, generator.getRandomColor());
+        imageView.setImageDrawable(drawable);
         trackerName.setText(tracker.getTitle());
         return view;
     }

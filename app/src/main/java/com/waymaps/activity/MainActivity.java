@@ -70,9 +70,6 @@ public class MainActivity extends AppCompatActivity
     @BindView(R.id.drawer_layout)
     DrawerLayout drawer;
 
-    @BindView(R.id.fab)
-    FloatingActionButton fab;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,12 +86,6 @@ public class MainActivity extends AppCompatActivity
         toggle.syncState();
 
         navigationView.setNavigationItemSelectedListener(this);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showTrackerList();
-            }
-        });
 
         displaySelectedScreen(R.id.nav_map);
     }
@@ -138,7 +129,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
+  //      getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
 
@@ -248,18 +239,6 @@ public class MainActivity extends AppCompatActivity
         ft.replace(R.id.content_main, fragment);
         ft.commit();
 
-    }
-
-    private void showTrackerList(){
-        Bundle bundle = null;
-        try{
-            bundle = ApplicationUtil.setValueToBundle(new Bundle(),"user", authorisedUser);
-        }catch (JsonProcessingException e){
-            logger.debug("Error while trying write to bundle");
-        }
-        currentFragment = new TrackerListFragment();
-        setActionBarTitleColor("");
-        setFragmentActive(currentFragment, bundle);
     }
 
     private void logout() {

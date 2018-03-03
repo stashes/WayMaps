@@ -2,13 +2,17 @@ package com.waymaps.fragment;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.waymaps.R;
 import com.waymaps.adapter.TicketListAdapter;
 import com.waymaps.api.RetrofitService;
@@ -17,7 +21,9 @@ import com.waymaps.data.requestEntity.Action;
 import com.waymaps.data.requestEntity.Procedure;
 import com.waymaps.data.requestEntity.parameters.IdParam;
 import com.waymaps.data.requestEntity.parameters.Parameter;
+import com.waymaps.data.responseEntity.Ticket;
 import com.waymaps.data.responseEntity.TicketList;
+import com.waymaps.data.responseEntity.TrackerList;
 import com.waymaps.data.responseEntity.User;
 import com.waymaps.util.ApplicationUtil;
 import com.waymaps.util.SystemUtil;
@@ -26,8 +32,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -38,12 +46,16 @@ import retrofit2.Response;
  */
 
 public class TicketListFragment extends Fragment implements AdapterView.OnItemClickListener {
-    ListView ticket;
+    ListView ticketListView;
 
     private User authorizedUser;
     private TicketList[] ticketList;
     private Logger logger = LoggerFactory.getLogger(this.getClass());
     private HashMap trackerId = new HashMap();
+    TrackerList[] tracker;
+    Ticket[]tickets;
+    FloatingActionButton fab;
+
 
     @Override
     @Nullable
@@ -51,8 +63,17 @@ public class TicketListFragment extends Fragment implements AdapterView.OnItemCl
         View view = inflater.inflate(R.layout.ticket_list_layout, container, false);
         getAttrFromBundle();
         getTickers();
-        ticket = view.findViewById(R.id.ticket_table);
-        ticket.setOnItemClickListener(this);
+        ticketListView = view.findViewById(R.id.ticket_table);
+        fab = view.findViewById(R.id.fab);
+        android.support.v7.app.ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
+        actionBar.setTitle(R.string.ticket_list_actionbar_title);
+        ticketListView.setOnItemClickListener(this);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showTrackerList();
+            }
+        });
         return view;
     }
     @Override
@@ -85,6 +106,9 @@ public class TicketListFragment extends Fragment implements AdapterView.OnItemCl
 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+        ArrayList list = new ArrayList<>(Arrays.asList(ticketList));
+        TicketList item = (TicketList) list.get(i);
+        goToGetTicketFragment(Integer.parseInt(item.getId()));
 
     }
     private void getAttrFromBundle(){
@@ -99,7 +123,36 @@ public class TicketListFragment extends Fragment implements AdapterView.OnItemCl
             ticketList = new TicketList[0];
         }
         TicketListAdapter trackerAdapter = new TicketListAdapter(getContext(), Arrays.asList(ticketList));
-        ListView lvMain = (ListView) getActivity().findViewById(R.id.ticket_table);
-        lvMain.setAdapter(trackerAdapter);
+        ticketListView.setAdapter(trackerAdapter);
     }
+    private void goToGetTicketFragment(int ticketId){
+        Bundle bundle = new Bundle();
+        try{
+            ApplicationUtil.setValueToBundle(bundle,"user", authorizedUser);
+            ApplicationUtil.setValueToBundle(bundle,"get_ticket_id", ticketId);
+        }catch (JsonProcessingException e){
+            logger.debug("Error while trying write to bundle");
+        }
+        GetTicketFragment getTicketFragment = new GetTicketFragment();
+        getTicketFragment.setArguments(bundle);
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        ft.replace(R.id.content_main, getTicketFragment);
+        ft.addToBackStack("TicketList");
+        ft.commit();
+
+    }
+    private void showTrackerList(){
+        Bundle bundle = null;
+        try{
+            bundle = ApplicationUtil.setValueToBundle(new Bundle(),"user", authorizedUser);
+        }catch (JsonProcessingException e){
+            logger.debug("Error while trying write to bundle");
+        }
+        TrackerListFragment trackerListFragment = new TrackerListFragment();
+        trackerListFragment.setArguments(bundle);
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        ft.replace(R.id.content_main, trackerListFragment);
+        ft.commit();
+    }
+
 }

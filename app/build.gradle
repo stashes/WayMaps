@@ -34,4 +34,5 @@ dependencies {
     compile 'com.squareup.retrofit2:converter-jackson:2.3.0'
     compile 'com.squareup.okhttp3:logging-interceptor:3.6.0'
     compile 'org.slf4j:slf4j-android:1.7.7'
+    compile 'com.amulyakhare:com.amulyakhare.textdrawable:1.0.1'
 }

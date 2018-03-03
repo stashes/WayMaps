@@ -1,10 +1,16 @@
 package com.waymaps.fragment;
 
+import android.app.ActionBar;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -20,6 +26,7 @@ import com.waymaps.data.requestEntity.Action;
 import com.waymaps.data.requestEntity.Procedure;
 import com.waymaps.data.requestEntity.parameters.IdParam;
 import com.waymaps.data.requestEntity.parameters.Parameter;
+import com.waymaps.data.responseEntity.Ticket;
 import com.waymaps.data.responseEntity.TrackerList;
 import com.waymaps.data.responseEntity.User;
 import com.waymaps.notification.NotificationManager;
@@ -42,7 +49,7 @@ public class MessageFragment extends Fragment implements View.OnClickListener {
     private TrackerList tracker;
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    TextView mess_person_from;
+    EditText mess_person_from;
     EditText mess_text;
     Button btn_send;
     String parameters = "";
@@ -53,6 +60,9 @@ public class MessageFragment extends Fragment implements View.OnClickListener {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.message_layout, container, false);
+        setHasOptionsMenu(true);
+        android.support.v7.app.ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
+        actionBar.setTitle(R.string.message_actionbar_title);
         initViewElement(view);
         getAttrFromBundle();
         mess_person_from.setText(tracker.getTitle());
@@ -127,5 +137,9 @@ public class MessageFragment extends Fragment implements View.OnClickListener {
         ft.commit();
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 
+        super.onCreateOptionsMenu(menu, inflater);
+    }
 }

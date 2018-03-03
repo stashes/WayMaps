@@ -8,27 +8,27 @@
     android:orientation="vertical"
     android:layout_height="match_parent">
 
+    <include layout="@layout/classic_action_bar">
+
+    </include>
+
     <TextView
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
         android:textColor="#000000"
-        android:text="Відправник"
+        android:text="@string/message_from"
         android:textSize="20dp"
 
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
-    <TextView
+    <EditText
+        android:editable="false"
         android:textSize="20dp"
         android:textColor="#000000"
         android:id="@+id/mess_person_from"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <TextView
-        android:textColor="#000000"
-        android:textSize="20dp"
-
-        android:text="Текст повідомлення"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
@@ -38,7 +38,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
     <EditText
-        android:textColor="#000000"
+        style="@style/FullWidthEditText"
+        android:hint="@string/type_your_message"
         android:id="@+id/mess_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
@@ -49,10 +50,12 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
         <Button
+            android:textColor="#ffffff"
             android:layout_marginBottom="10dp"
             android:layout_gravity="bottom"
             android:id="@+id/btn_mess_send"
-            android:text="Відправити"
+            android:background="@color/colorPrimaryDark"
+            android:text="@string/send_message"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
     </LinearLayout>

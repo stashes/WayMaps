@@ -6,4 +6,5 @@
     <color name="success">#12b90f</color>
     <color name="fail">#e11a24</color>
     <color name="transparent">#00000000</color>
+    <color name="black">#F000</color>
 </resources>
