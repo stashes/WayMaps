@@ -1,38 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/tracker_list_view"
     android:background="#FFFFFF"
+    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_alignParentLeft="true">
+    android:layout_height="match_parent">
+<include
+    android:id="@+id/get_ticket_acc_bar"
+    layout="@layout/classic_action_bar">
 
-        <ListView
-            android:layout_marginBottom="65dp"
-            android:id="@+id/get_ticket_table"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_centerHorizontal="true"></ListView>
-    <LinearLayout
-        android:background="@color/colorAccent"
-        android:orientation="horizontal"
-        android:layout_gravity="bottom"
+</include>
+    <ProgressBar
+        android:layout_below="@id/get_ticket_acc_bar"
+        android:id="@+id/progress_bar_get_ticket"
+        style="?android:attr/progressBarStyleLarge"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_centerInParent="true"
+        android:visibility="gone" />
+
+    <ListView
+        android:layout_below="@id/get_ticket_acc_bar"
+        android:id="@+id/get_ticket_table"
+        android:layout_width="match_parent"
+        android:layout_height="381dp"
+        android:layout_centerHorizontal="true"></ListView>
+
+    <LinearLayout
+        android:gravity="bottom"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
         <EditText
+            android:gravity="bottom"
+            android:layout_gravity="bottom"
+            android:layout_alignParentBottom="true"
+            android:windowSoftInputMode="adjustPan"
+            android:hint="@string/add_comment"
             android:id="@+id/text_comment_ticket"
             android:layout_weight="0.4"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="wrap_content" />
         <Button
-            android:text="Send"
+            android:layout_gravity="bottom"
+            android:windowSoftInputMode="adjustPan"
+            android:layout_margin="10dp"
+            android:textColor="@color/white"
+            android:background="@color/colorPrimary"
+            android:text="@string/send_message"
             android:id="@+id/send_ticket_comment"
             android:layout_weight="1"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="wrap_content" />
 
-    </LinearLayout>
-
-
+</LinearLayout>
 
 
-</FrameLayout>
+</RelativeLayout>

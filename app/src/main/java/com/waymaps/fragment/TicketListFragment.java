@@ -1,5 +1,9 @@
 package com.waymaps.fragment;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.annotation.TargetApi;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -10,7 +14,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.waymaps.R;
@@ -45,7 +51,7 @@ import retrofit2.Response;
  * Created by nazar on 28.02.2018.
  */
 
-public class TicketListFragment extends Fragment implements AdapterView.OnItemClickListener {
+public class TicketListFragment extends AbstractFragment implements AdapterView.OnItemClickListener {
     ListView ticketListView;
 
     private User authorizedUser;
@@ -55,6 +61,7 @@ public class TicketListFragment extends Fragment implements AdapterView.OnItemCl
     TrackerList[] tracker;
     Ticket[]tickets;
     FloatingActionButton fab;
+    ProgressBar progressBar;
 
 
     @Override
@@ -62,9 +69,10 @@ public class TicketListFragment extends Fragment implements AdapterView.OnItemCl
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.ticket_list_layout, container, false);
         getAttrFromBundle();
-        getTickers();
         ticketListView = view.findViewById(R.id.ticket_table);
+        progressBar = view.findViewById(R.id.progress_bar_ticket_list);
         fab = view.findViewById(R.id.fab);
+        getTickers(ticketListView);
         android.support.v7.app.ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
         actionBar.setTitle(R.string.ticket_list_actionbar_title);
         ticketListView.setOnItemClickListener(this);
@@ -80,7 +88,7 @@ public class TicketListFragment extends Fragment implements AdapterView.OnItemCl
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
     }
-    private void getTickers(){
+    private void getTickers(final View view){
         Procedure procedure = new Procedure(Action.CALL);
         Parameter firmId = new IdParam("251");
         procedure.setFormat(WayMapsService.DEFAULT_FORMAT);
@@ -88,6 +96,7 @@ public class TicketListFragment extends Fragment implements AdapterView.OnItemCl
         procedure.setName(Action.TICKET_LIST);
         procedure.setUser_id(authorizedUser.getId());
         procedure.setParams(firmId.getParameters());
+        showProgress(true , ticketListView , progressBar , fab);
         Call<TicketList[]> call = RetrofitService.getWayMapsService().tickerListProcedure(procedure.getAction(), procedure.getName(),
                 procedure.getIdentficator(), procedure.getUser_id() , procedure.getFormat(), firmId.getParameters());
         call.enqueue(new Callback<TicketList[]>() {
@@ -95,6 +104,7 @@ public class TicketListFragment extends Fragment implements AdapterView.OnItemCl
             public void onResponse(Call<TicketList[]> call, Response<TicketList[]> response) {
                 ticketList = response.body();
                 populateTable();
+                showProgress(false , ticketListView , progressBar , fab);
             }
 
             @Override
@@ -155,4 +165,8 @@ public class TicketListFragment extends Fragment implements AdapterView.OnItemCl
         ft.commit();
     }
 
+    @Override
+    protected void showProgress(boolean show, View... view) {
+        super.showProgress(show, view);
+    }
 }

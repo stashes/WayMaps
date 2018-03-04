@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -44,7 +45,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 
-public class MessageFragment extends Fragment implements View.OnClickListener {
+public class MessageFragment extends AbstractFragment implements View.OnClickListener {
     private User authorizedUser;
     private TrackerList tracker;
     private Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -142,4 +143,5 @@ public class MessageFragment extends Fragment implements View.OnClickListener {
 
         super.onCreateOptionsMenu(menu, inflater);
     }
+
 }

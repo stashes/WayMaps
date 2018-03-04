@@ -1,5 +1,9 @@
 package com.waymaps.fragment;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.annotation.TargetApi;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -11,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.waymaps.R;
@@ -47,23 +52,25 @@ import retrofit2.Response;
  */
 
 
-public class TrackerListFragment extends Fragment implements AdapterView.OnItemClickListener {
+public class TrackerListFragment extends AbstractFragment implements AdapterView.OnItemClickListener {
     ListView trackerList;
 
     private User authorizedUser;
     private TrackerList[] tracker;
     private Logger logger = LoggerFactory.getLogger(this.getClass());
     private HashMap trackerId = new HashMap();
+    ProgressBar progressBar;
 
     @Override
     @Nullable
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_tracker_list, container, false);
         getAttrFromBundle();
+        trackerList = view.findViewById(R.id.tracker_table);
+        progressBar = view.findViewById(R.id.progress_bar_tracker_list);
         getTracker();
         android.support.v7.app.ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
         actionBar.setTitle(R.string.tracker_list_actionbar_title);
-        trackerList = view.findViewById(R.id.tracker_table);
         trackerList.setOnItemClickListener(this);
         return view;
     }
@@ -81,15 +88,15 @@ public class TrackerListFragment extends Fragment implements AdapterView.OnItemC
         procedure.setName(Action.TRACKER_LIST);
         procedure.setUser_id(authorizedUser.getId());
         procedure.setParams(firmId.getParameters());
-
+        showProgress(true , trackerList , progressBar);
         Call<TrackerList[]> call = RetrofitService.getWayMapsService().trackerProcedure(procedure.getAction(), procedure.getName(),
                 procedure.getIdentficator(), procedure.getUser_id(), procedure.getFormat(), procedure.getParams());
         call.enqueue(new Callback<TrackerList[]>() {
             @Override
             public void onResponse(Call<TrackerList[]> call, Response<TrackerList[]> response) {
                 tracker = response.body();
-                logger.debug("Balance load successfully.");
                 populateTable();
+                showProgress(false , trackerList , progressBar);
             }
 
             @Override
@@ -136,5 +143,10 @@ public class TrackerListFragment extends Fragment implements AdapterView.OnItemC
         ft.replace(R.id.content_main, messageFragment);
         ft.addToBackStack("TrackerList");
         ft.commit();
+    }
+
+    @Override
+    protected void showProgress(boolean show, View... view) {
+        super.showProgress(show, view);
     }
 }

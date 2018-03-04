@@ -43,4 +43,8 @@
     <!--Ticket list layout-->
     <string name="ticket_list_actionbar_title">Tickets</string>
 
+    <!--GetTicket list layout -->
+    <string name="get_ticket_actionbar_title">Ticket</string>
+    <string name="add_comment">Type to add comment</string>
+
 </resources>

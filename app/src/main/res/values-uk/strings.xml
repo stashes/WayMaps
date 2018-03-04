@@ -11,4 +11,8 @@
 
     <!--Ticket list layout-->
     <string name="ticket_list_actionbar_title">Тікети</string>
+
+    <!--GetTicket list layout -->
+    <string name="get_ticket_actionbar_title">Тікет</string>
+    <string name="add_comment">Уведіть свій коментар</string>
 </resources>

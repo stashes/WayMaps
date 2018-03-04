@@ -1,14 +1,21 @@
 package com.waymaps.fragment;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.waymaps.R;
@@ -43,23 +50,30 @@ import retrofit2.Response;
  * Created by nazar on 01.03.2018.
  */
 
-public class GetTicketFragment extends Fragment implements AdapterView.OnItemClickListener{
+public class GetTicketFragment extends AbstractFragment implements AdapterView.OnItemClickListener{
 
     ListView ticketsListView;
-
+    ProgressBar progressBar;
     private User authorizedUser;
     private Ticket[] tickets;
     private Logger logger = LoggerFactory.getLogger(this.getClass());
     private HashMap trackerId = new HashMap();
     int ticketId;
+    EditText text;
+    Button btnSend;
 
     @Override
     @Nullable
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_get_ticket, container, false);
         getAttrFromBundle();
-        getTickets();
         ticketsListView = view.findViewById(R.id.get_ticket_table);
+        progressBar = view.findViewById(R.id.progress_bar_get_ticket);
+        text = view.findViewById(R.id.text_comment_ticket);
+        btnSend = view.findViewById(R.id.send_ticket_comment);
+        getTickets();
+        android.support.v7.app.ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
+        actionBar.setTitle(R.string.get_ticket_actionbar_title);
         ticketsListView.setOnItemClickListener(this);
         return view;
     }
@@ -75,6 +89,7 @@ public class GetTicketFragment extends Fragment implements AdapterView.OnItemCli
         procedure.setName(Action.TICKET_GET);
         procedure.setUser_id(authorizedUser.getId());
         procedure.setParams(firmId.getParameters());
+        showProgress(true , ticketsListView , progressBar , text , btnSend);
         Call<Ticket[]> call = RetrofitService.getWayMapsService().getTicket(procedure.getAction(), procedure.getName(),
                 procedure.getIdentficator(), procedure.getUser_id() , procedure.getFormat(), String.valueOf(ticketId));
         call.enqueue(new Callback<Ticket[]>() {
@@ -82,6 +97,7 @@ public class GetTicketFragment extends Fragment implements AdapterView.OnItemCli
             public void onResponse(Call<Ticket[]> call, Response<Ticket[]> response) {
                 tickets = response.body();
                 populateTable();
+                showProgress(false , ticketsListView , progressBar , text , btnSend);
             }
 
             @Override
@@ -128,5 +144,10 @@ public class GetTicketFragment extends Fragment implements AdapterView.OnItemCli
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
+    }
+
+    @Override
+    protected void showProgress(boolean show, View... view) {
+        super.showProgress(show, view);
     }
 }
