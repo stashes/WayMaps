@@ -20,6 +20,7 @@ import android.widget.ProgressBar;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.waymaps.R;
+import com.waymaps.activity.MainActivity;
 import com.waymaps.adapter.TicketListAdapter;
 import com.waymaps.api.RetrofitService;
 import com.waymaps.api.WayMapsService;
@@ -54,7 +55,6 @@ import retrofit2.Response;
 public class TicketListFragment extends AbstractFragment implements AdapterView.OnItemClickListener {
     ListView ticketListView;
 
-    private User authorizedUser;
     private TicketList[] ticketList;
     private Logger logger = LoggerFactory.getLogger(this.getClass());
     private HashMap trackerId = new HashMap();
@@ -68,7 +68,6 @@ public class TicketListFragment extends AbstractFragment implements AdapterView.
     @Nullable
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.ticket_list_layout, container, false);
-        getAttrFromBundle();
         ticketListView = view.findViewById(R.id.ticket_table);
         progressBar = view.findViewById(R.id.progress_bar_ticket_list);
         fab = view.findViewById(R.id.fab);
@@ -90,15 +89,15 @@ public class TicketListFragment extends AbstractFragment implements AdapterView.
     }
     private void getTickers(final View view){
         Procedure procedure = new Procedure(Action.CALL);
-        Parameter firmId = new IdParam("251");
+
         procedure.setFormat(WayMapsService.DEFAULT_FORMAT);
         procedure.setIdentficator(SystemUtil.getWifiMAC(getActivity()));
         procedure.setName(Action.TICKET_LIST);
-        procedure.setUser_id(authorizedUser.getId());
-        procedure.setParams(firmId.getParameters());
+        procedure.setUser_id(MainActivity.authorisedUser.getId());
+        procedure.setParams(MainActivity.authorisedUser.getId());
         showProgress(true , ticketListView , progressBar , fab);
         Call<TicketList[]> call = RetrofitService.getWayMapsService().tickerListProcedure(procedure.getAction(), procedure.getName(),
-                procedure.getIdentficator(), procedure.getUser_id() , procedure.getFormat(), firmId.getParameters());
+                procedure.getIdentficator(), procedure.getUser_id() , procedure.getFormat(), procedure.getParams());
         call.enqueue(new Callback<TicketList[]>() {
             @Override
             public void onResponse(Call<TicketList[]> call, Response<TicketList[]> response) {
@@ -121,13 +120,6 @@ public class TicketListFragment extends AbstractFragment implements AdapterView.
         goToGetTicketFragment(Integer.parseInt(item.getId()));
 
     }
-    private void getAttrFromBundle(){
-        try {
-            authorizedUser = ApplicationUtil.getObjectFromBundle(getArguments(), "user", User.class);
-        } catch (IOException e) {
-            logger.error("Error while trying to parse parameters {}", this.getClass());
-        }
-    }
     public void populateTable() {
         if (ticketList == null){
             ticketList = new TicketList[0];
@@ -138,7 +130,6 @@ public class TicketListFragment extends AbstractFragment implements AdapterView.
     private void goToGetTicketFragment(int ticketId){
         Bundle bundle = new Bundle();
         try{
-            ApplicationUtil.setValueToBundle(bundle,"user", authorizedUser);
             ApplicationUtil.setValueToBundle(bundle,"get_ticket_id", ticketId);
         }catch (JsonProcessingException e){
             logger.debug("Error while trying write to bundle");
@@ -152,14 +143,7 @@ public class TicketListFragment extends AbstractFragment implements AdapterView.
 
     }
     private void showTrackerList(){
-        Bundle bundle = null;
-        try{
-            bundle = ApplicationUtil.setValueToBundle(new Bundle(),"user", authorizedUser);
-        }catch (JsonProcessingException e){
-            logger.debug("Error while trying write to bundle");
-        }
         TrackerListFragment trackerListFragment = new TrackerListFragment();
-        trackerListFragment.setArguments(bundle);
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.replace(R.id.content_main, trackerListFragment);
         ft.commit();

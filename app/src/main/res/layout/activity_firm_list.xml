@@ -7,13 +7,7 @@
     android:layout_height="match_parent"
     android:layout_alignParentLeft="true">
 
-    <include
-        android:id="@+id/action_bar_firm_list"
-        layout="@layout/classic_action_bar">
-
-    </include>
     <ProgressBar
-        android:layout_below="@id/action_bar_firm_list"
         android:id="@+id/progress_bar_firm_list"
         style="?android:attr/progressBarStyleLarge"
         android:layout_width="match_parent"
@@ -23,12 +17,9 @@
         android:visibility="gone" />
 
     <ListView
-        android:layout_below="@id/action_bar_firm_list"
         android:id="@+id/firm_table"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
-
     </ListView>
 
 

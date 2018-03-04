@@ -19,6 +19,7 @@ import android.widget.ProgressBar;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.waymaps.R;
+import com.waymaps.activity.MainActivity;
 import com.waymaps.adapter.TrackerListAdapter;
 import com.waymaps.api.RetrofitService;
 import com.waymaps.api.WayMapsService;
@@ -55,7 +56,6 @@ import retrofit2.Response;
 public class TrackerListFragment extends AbstractFragment implements AdapterView.OnItemClickListener {
     ListView trackerList;
 
-    private User authorizedUser;
     private TrackerList[] tracker;
     private Logger logger = LoggerFactory.getLogger(this.getClass());
     private HashMap trackerId = new HashMap();
@@ -65,7 +65,6 @@ public class TrackerListFragment extends AbstractFragment implements AdapterView
     @Nullable
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_tracker_list, container, false);
-        getAttrFromBundle();
         trackerList = view.findViewById(R.id.tracker_table);
         progressBar = view.findViewById(R.id.progress_bar_tracker_list);
         getTracker();
@@ -81,13 +80,11 @@ public class TrackerListFragment extends AbstractFragment implements AdapterView
 
     private void getTracker(){
         Procedure procedure = new Procedure(Action.CALL);
-        Parameter firmId = new IdParam("255");
-
         procedure.setFormat(WayMapsService.DEFAULT_FORMAT);
         procedure.setIdentficator(SystemUtil.getWifiMAC(getActivity()));
         procedure.setName(Action.TRACKER_LIST);
-        procedure.setUser_id(authorizedUser.getId());
-        procedure.setParams(firmId.getParameters());
+        procedure.setUser_id(MainActivity.authorisedUser.getId());
+        procedure.setParams(MainActivity.authorisedUser.getId());
         showProgress(true , trackerList , progressBar);
         Call<TrackerList[]> call = RetrofitService.getWayMapsService().trackerProcedure(procedure.getAction(), procedure.getName(),
                 procedure.getIdentficator(), procedure.getUser_id(), procedure.getFormat(), procedure.getParams());
@@ -108,14 +105,6 @@ public class TrackerListFragment extends AbstractFragment implements AdapterView
 
     }
 
-    private void getAttrFromBundle() {
-        try {
-            authorizedUser = ApplicationUtil.getObjectFromBundle(getArguments(), "user", User.class);
-        } catch (IOException e) {
-            logger.error("Error while trying to parse parameters {}", this.getClass());
-        }
-    }
-
 
     public void populateTable() {
         if (tracker == null){
@@ -131,7 +120,6 @@ public class TrackerListFragment extends AbstractFragment implements AdapterView
         Bundle bundle = new Bundle();
         List<TrackerList> list = Arrays.asList(tracker);
         try{
-            ApplicationUtil.setValueToBundle(bundle,"user", authorizedUser);
             ApplicationUtil.setValueToBundle(bundle,"tracker", list.get(i));
         }catch (JsonProcessingException e){
             logger.debug("Error while trying write to bundle");

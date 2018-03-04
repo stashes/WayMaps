@@ -27,24 +27,14 @@ import java.io.IOException;
 
 public abstract class AbstractFragment extends Fragment {
 
-    protected User authorizedUser;
     protected Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        getAttrFromBundle();
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 
-    private void getAttrFromBundle() {
-        try {
-            authorizedUser = ApplicationUtil.getObjectFromBundle(getArguments(), "user", User.class);
-        } catch (IOException e) {
-            logger.error("Error while trying to parse parameters {}", this.getClass());
-            authorizedUser = null;
-        }
-    }
     /**
      * Shows the progress UI and hides the login form.
      * main view [0]
@@ -97,7 +87,5 @@ public abstract class AbstractFragment extends Fragment {
             view[1].setVisibility(show ? View.GONE : View.VISIBLE);
         }
     }
-    public void setAuthorizedUser(User authorizedUser) {
-        this.authorizedUser = authorizedUser;
-    }
+
 }

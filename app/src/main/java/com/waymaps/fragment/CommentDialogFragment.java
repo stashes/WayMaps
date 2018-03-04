@@ -14,6 +14,7 @@ import android.widget.EditText;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.waymaps.R;
+import com.waymaps.activity.MainActivity;
 import com.waymaps.api.RetrofitService;
 import com.waymaps.api.WayMapsService;
 import com.waymaps.data.requestEntity.Action;
@@ -35,7 +36,6 @@ import retrofit2.Response;
  */
 
 public class CommentDialogFragment extends DialogFragment implements View.OnClickListener {
-    User authorizedUser;
     EditText text;
     Button addComent;
     int ticketId;
@@ -52,7 +52,6 @@ public class CommentDialogFragment extends DialogFragment implements View.OnClic
     }
     private void getAttrFromBundle(){
         try {
-            authorizedUser = ApplicationUtil.getObjectFromBundle(getArguments(), "user", User.class);
             ticketId = (Integer) ApplicationUtil.getObjectFromBundle(getArguments(), "get_ticket_id", Integer.class);
         } catch (IOException e) {
         }
@@ -66,12 +65,11 @@ public class CommentDialogFragment extends DialogFragment implements View.OnClic
 
     private void addComment() {
         Procedure procedure = new Procedure(Action.CALL);
-        Parameter firmId = new IdParam("251");
         procedure.setFormat(WayMapsService.DEFAULT_FORMAT);
         procedure.setIdentficator(SystemUtil.getWifiMAC(getActivity()));
         procedure.setName(Action.COMMENT_ADD);
-        procedure.setUser_id("251");
-        String parameter = ticketId + ",'" + text.getText().toString() + "'," + firmId.getParameters();
+        procedure.setUser_id(MainActivity.authorisedUser.getId());
+        String parameter = ticketId + ",'" + text.getText().toString() + "'," + MainActivity.authorisedUser.getId();
         Call<Void> call = RetrofitService.getWayMapsService().addComment(procedure.getAction(), procedure.getName(),
                 procedure.getIdentficator(), procedure.getUser_id(), procedure.getFormat(), parameter);
         call.enqueue(new Callback<Void>() {
@@ -88,7 +86,6 @@ public class CommentDialogFragment extends DialogFragment implements View.OnClic
     private void goToGetTicketFragment(){
         Bundle bundle = new Bundle();
         try{
-            ApplicationUtil.setValueToBundle(bundle,"user", authorizedUser);
             ApplicationUtil.setValueToBundle(bundle,"get_ticket_id", ticketId);
         }catch (JsonProcessingException e){
 

@@ -23,6 +23,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.waymaps.R;
+import com.waymaps.activity.MainActivity;
 import com.waymaps.adapter.BalanceAdapter;
 import com.waymaps.adapter.GetCurrentAdapter;
 import com.waymaps.api.RetrofitService;
@@ -182,14 +183,11 @@ public class GMapFragment extends AbstractFragment {
 
     private Procedure configureProcedure() {
         Procedure procedure = new Procedure(Action.CALL);
-        Parameter userId = new IdParam("255");
-        //@todo change getID()
-        //Parameter userId = new IdParam(authorizedUser.getId());
         procedure.setFormat(WayMapsService.DEFAULT_FORMAT);
         procedure.setIdentficator(SystemUtil.getWifiMAC(getActivity()));
         procedure.setName(Action.GET_CURRENT);
-        procedure.setUser_id(authorizedUser.getId());
-        procedure.setParams(userId.getParameters());
+        procedure.setUser_id(MainActivity.authorisedUser.getId());
+        procedure.setParams(MainActivity.firmId);
         return procedure;
     }
 

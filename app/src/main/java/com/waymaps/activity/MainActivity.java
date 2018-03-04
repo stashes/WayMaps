@@ -59,6 +59,7 @@ public class MainActivity extends AppCompatActivity
     Logger logger = LoggerFactory.getLogger(this.getClass());
 
     public static User authorisedUser;
+    public static String firmId;
     public static Fragment currentFragment;
 
     @BindView(R.id.toolbar)
@@ -76,7 +77,6 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        getUserFromIntent();
         startServices();
 
         setSupportActionBar(toolbar);
@@ -104,16 +104,6 @@ public class MainActivity extends AppCompatActivity
         }
 
 
-    }
-
-    private void getUserFromIntent() {
-        try {
-            authorisedUser = JSONUtil.getObjectMapper().readValue(getIntent().getExtras()
-                    .getCharSequence("user").toString(), User.class);
-            logger.debug("User {} reads successfully", authorisedUser.getId());
-        } catch (IOException e) {
-            logger.debug("Something went wrong while try to parse user");
-        }
     }
 
     @Override
@@ -199,42 +189,23 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void balance() {
-        Bundle bundle = null;
-        try {
-            bundle = ApplicationUtil.setValueToBundle(new Bundle(),"user", authorisedUser);
-        } catch (JsonProcessingException e) {
-            logger.debug("Error while trying write to bundle");
-        }
         currentFragment= new BalanceFragment();
         setActionBarTitleColor("Balance");
-        setFragmentActive(currentFragment, bundle);
+        setFragmentActive(currentFragment);
     }
 
     private void map() {
-        Bundle bundle = null;
-        try {
-            bundle = ApplicationUtil.setValueToBundle(new Bundle(),"user", authorisedUser);
-        } catch (JsonProcessingException e) {
-            logger.debug("Error while trying write to bundle");
-        }
         currentFragment= new GMapFragment();
         setActionBarTitleColor("");
-        setFragmentActive(currentFragment, bundle);
+        setFragmentActive(currentFragment);
     }
     private void showTicketList(){
-        Bundle bundle = null;
-        try{
-            bundle = ApplicationUtil.setValueToBundle(new Bundle(),"user", authorisedUser);
-        }catch (JsonProcessingException e){
-            logger.debug("Error while trying write to bundle");
-        }
         currentFragment = new TicketListFragment();
         setActionBarTitleColor("");
-        setFragmentActive(currentFragment, bundle);
+        setFragmentActive(currentFragment);
     }
 
-    private void setFragmentActive(Fragment fragment, Bundle bundle){
-        fragment.setArguments(bundle);
+    private void setFragmentActive(Fragment fragment){
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.content_main, fragment);
         ft.commit();

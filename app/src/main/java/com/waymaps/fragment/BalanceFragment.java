@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 
 import com.waymaps.R;
+import com.waymaps.activity.MainActivity;
 import com.waymaps.adapter.BalanceAdapter;
 import com.waymaps.api.RetrofitService;
 import com.waymaps.api.WayMapsService;
@@ -54,15 +55,11 @@ public class BalanceFragment extends AbstractFragment {
 
     private void getBalance() {
         Procedure procedure = new Procedure(Action.CALL);
-        Parameter firmId = new IdParam("100");
-//        Parameter firmId = new IdParam(authorizedUser.getFirm_id());
-
         procedure.setFormat(WayMapsService.DEFAULT_FORMAT);
         procedure.setIdentficator(SystemUtil.getWifiMAC(getActivity()));
         procedure.setName(Action.FIN_GET);
-        procedure.setUser_id(authorizedUser.getId());
-        procedure.setParams(firmId.getParameters());
-
+        procedure.setUser_id(MainActivity.authorisedUser.getId());
+        procedure.setParams(MainActivity.firmId);
         Call<FinGet[]> call = RetrofitService.getWayMapsService().finGetProcedure(procedure.getAction(), procedure.getName(),
                 procedure.getIdentficator(), procedure.getUser_id(), procedure.getFormat(), procedure.getParams());
         call.enqueue(new Callback<FinGet[]>() {

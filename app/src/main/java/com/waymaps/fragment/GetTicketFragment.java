@@ -16,6 +16,7 @@ import android.widget.ProgressBar;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.waymaps.R;
+import com.waymaps.activity.MainActivity;
 import com.waymaps.adapter.GetTicketAdapter;
 import com.waymaps.api.RetrofitService;
 import com.waymaps.api.WayMapsService;
@@ -47,7 +48,6 @@ public class GetTicketFragment extends AbstractFragment implements AdapterView.O
 
     ListView ticketsListView;
     ProgressBar progressBar;
-    private User authorizedUser;
     private Ticket[] tickets;
     private Logger logger = LoggerFactory.getLogger(this.getClass());
     private HashMap trackerId = new HashMap();
@@ -74,15 +74,14 @@ public class GetTicketFragment extends AbstractFragment implements AdapterView.O
     }
     private void getTickets(){
         Procedure procedure = new Procedure(Action.CALL);
-        Parameter firmId = new IdParam("251");
         procedure.setFormat(WayMapsService.DEFAULT_FORMAT);
         procedure.setIdentficator(SystemUtil.getWifiMAC(getActivity()));
         procedure.setName(Action.TICKET_GET);
-        procedure.setUser_id(authorizedUser.getId());
-        procedure.setParams(firmId.getParameters());
+        procedure.setUser_id(MainActivity.authorisedUser.getId());
+        procedure.setParams(String.valueOf(ticketId));
         showProgress(true , ticketsListView , progressBar , fab);
         Call<Ticket[]> call = RetrofitService.getWayMapsService().getTicket(procedure.getAction(), procedure.getName(),
-                procedure.getIdentficator(), procedure.getUser_id() , procedure.getFormat(), String.valueOf(ticketId));
+                procedure.getIdentficator(), procedure.getUser_id() , procedure.getFormat(), procedure.getParams());
         call.enqueue(new Callback<Ticket[]>() {
             @Override
             public void onResponse(Call<Ticket[]> call, Response<Ticket[]> response) {
@@ -100,7 +99,6 @@ public class GetTicketFragment extends AbstractFragment implements AdapterView.O
 
     private void getAttrFromBundle(){
         try {
-            authorizedUser = ApplicationUtil.getObjectFromBundle(getArguments(), "user", User.class);
             ticketId = (Integer) ApplicationUtil.getObjectFromBundle(getArguments(), "get_ticket_id", Integer.class);
         } catch (IOException e) {
             logger.error("Error while trying to parse parameters {}", this.getClass());
@@ -119,7 +117,6 @@ public class GetTicketFragment extends AbstractFragment implements AdapterView.O
     public void onClick(View view) {
         Bundle bundle = new Bundle();
         try{
-            ApplicationUtil.setValueToBundle(bundle,"user", authorizedUser);
             ApplicationUtil.setValueToBundle(bundle,"get_ticket_id", ticketId);
         }catch (JsonProcessingException e){
             logger.debug("Error while trying write to bundle");

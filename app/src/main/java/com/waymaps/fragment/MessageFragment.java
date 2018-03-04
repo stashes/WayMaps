@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.waymaps.R;
+import com.waymaps.activity.MainActivity;
 import com.waymaps.api.RetrofitService;
 import com.waymaps.api.WayMapsService;
 import com.waymaps.data.requestEntity.Action;
@@ -46,7 +47,7 @@ import retrofit2.Response;
 
 
 public class MessageFragment extends AbstractFragment implements View.OnClickListener {
-    private User authorizedUser;
+
     private TrackerList tracker;
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -76,7 +77,6 @@ public class MessageFragment extends AbstractFragment implements View.OnClickLis
     }
     private void getAttrFromBundle() {
         try {
-            authorizedUser = ApplicationUtil.getObjectFromBundle(getArguments(), "user", User.class);
             tracker = ApplicationUtil.getObjectFromBundle(getArguments(), "tracker", TrackerList.class);
         } catch (IOException e) {
 
@@ -101,15 +101,13 @@ public class MessageFragment extends AbstractFragment implements View.OnClickLis
         }
     }
     private void sendMessage(){
-
         Procedure procedure = new Procedure(Action.CALL);
-        Parameter firmId = new IdParam("251");
-        parameters = "251"+ "," + "'" + mess_text.getText().toString() +"'" +"," + tracker.getId();
+        String parameters = MainActivity.authorisedUser+ "," + "'" + mess_text.getText().toString() +"'" +"," + tracker.getId();
         procedure.setFormat(WayMapsService.DEFAULT_FORMAT);
         procedure.setIdentficator(SystemUtil.getWifiMAC(getActivity()));
         procedure.setName(Action.TICKET_ADD);
-        procedure.setUser_id(authorizedUser.getId());
-        procedure.setParams(firmId.getParameters());
+        procedure.setUser_id(MainActivity.authorisedUser.getId());
+        procedure.setParams(parameters);
         Call<Void> call = RetrofitService.getWayMapsService().sendMessage(procedure.getAction(), procedure.getName(),
                 procedure.getIdentficator(), procedure.getFormat(), parameters);
        call.enqueue(new Callback<Void>() {
@@ -124,14 +122,7 @@ public class MessageFragment extends AbstractFragment implements View.OnClickLis
        });
     }
     private void goToMapfragment(){
-        Bundle bundle = new Bundle();
-        try {
-            ApplicationUtil.setValueToBundle(bundle,"user", authorizedUser);
-        }catch (JsonProcessingException e){
-            logger.debug("Error while trying write to bundle");
-        }
         GMapFragment gMapFragment =  new GMapFragment();
-        gMapFragment.setArguments(bundle);
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.replace(R.id.content_main, gMapFragment);
         ft.remove(this);

@@ -28,6 +28,7 @@ import com.waymaps.data.requestEntity.Action;
 import com.waymaps.data.requestEntity.Credentials;
 import com.waymaps.data.responseEntity.GetGroup;
 import com.waymaps.data.responseEntity.User;
+import com.waymaps.fragment.AbstractFragment;
 import com.waymaps.intent.MainActivityIntent;
 import com.waymaps.util.LocalPreferenceManager;
 import com.waymaps.util.LocalPreferencesManagerUtil;
@@ -182,18 +183,9 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void startActivity(User user) {
-        MainActivityIntent mainActivityIntent = new MainActivityIntent(this);
-        try {
-            mainActivityIntent.putExtra("user", new ObjectMapper().writeValueAsString(user));
-        } catch (JsonProcessingException e) {
-            Toast toast = Toast.makeText(getApplicationContext(),
-                    "Bad server response",
-                    Toast.LENGTH_SHORT);
-            toast.setGravity(Gravity.CENTER, 0, 0);
-            toast.show();
-            return;
-        }
-        startActivityForResult(mainActivityIntent,1);
+        Intent intent = new Intent(this, FirmListActivity.class);
+            MainActivity.authorisedUser = user;
+            startActivity(intent);
     }
 
     @Override
