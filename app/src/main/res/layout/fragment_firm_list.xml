@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/firm_list_view"
+    android:background="#FFFFFF"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_alignParentLeft="true">
+
+    <include
+        android:id="@+id/action_bar_firm_list"
+        layout="@layout/classic_action_bar">
+
+    </include>
+    <ProgressBar
+        android:layout_below="@id/action_bar_firm_list"
+        android:id="@+id/progress_bar_firm_list"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_centerInParent="true"
+        android:visibility="gone" />
+
+    <ListView
+        android:layout_below="@id/action_bar_firm_list"
+        android:id="@+id/firm_table"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
+    </ListView>
+
+
+</RelativeLayout>

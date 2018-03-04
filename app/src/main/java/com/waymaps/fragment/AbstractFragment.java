@@ -26,6 +26,7 @@ import java.io.IOException;
  */
 
 public abstract class AbstractFragment extends Fragment {
+
     protected User authorizedUser;
     protected Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -95,5 +96,8 @@ public abstract class AbstractFragment extends Fragment {
             view[0].setVisibility(show ? View.VISIBLE : View.GONE);
             view[1].setVisibility(show ? View.GONE : View.VISIBLE);
         }
+    }
+    public void setAuthorizedUser(User authorizedUser) {
+        this.authorizedUser = authorizedUser;
     }
 }

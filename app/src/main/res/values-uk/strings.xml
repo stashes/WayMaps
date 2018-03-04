@@ -15,4 +15,7 @@
     <!--GetTicket list layout -->
     <string name="get_ticket_actionbar_title">Тікет</string>
     <string name="add_comment">Уведіть свій коментар</string>
+
+    <!--GetFirms list layout -->
+    <string name="get_firms_actionbar_title">Список фірм</string>
 </resources>

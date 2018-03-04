@@ -47,4 +47,7 @@
     <string name="get_ticket_actionbar_title">Ticket</string>
     <string name="add_comment">Type to add comment</string>
 
+    <!--GetFirms list layout -->
+    <string name="get_firms_actionbar_title">Firm list</string>
+
 </resources>
