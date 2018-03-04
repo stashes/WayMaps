@@ -87,5 +87,11 @@ public interface WayMapsService {
                              @Field("identificator") String identificator, @Field("user_id") String user_id,
                              @Field("format") String format, @Field("params") String params);
 
+    @FormUrlEncoded
+    @POST("./")
+    Call<Void> addComment(@Field("action") String action, @Field("name") String name,
+                             @Field("identificator") String identificator, @Field("user_id") String user_id,
+                             @Field("format") String format, @Field("params") String params);
+
 
 }

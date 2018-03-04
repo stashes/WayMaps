@@ -24,36 +24,21 @@
         android:layout_below="@id/get_ticket_acc_bar"
         android:id="@+id/get_ticket_table"
         android:layout_width="match_parent"
-        android:layout_height="381dp"
+        android:layout_height="match_parent"
         android:layout_centerHorizontal="true"></ListView>
 
-    <LinearLayout
-        android:gravity="bottom"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <EditText
-            android:gravity="bottom"
-            android:layout_gravity="bottom"
-            android:layout_alignParentBottom="true"
-            android:windowSoftInputMode="adjustPan"
-            android:hint="@string/add_comment"
-            android:id="@+id/text_comment_ticket"
-            android:layout_weight="0.4"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-        <Button
-            android:layout_gravity="bottom"
-            android:windowSoftInputMode="adjustPan"
-            android:layout_margin="10dp"
-            android:textColor="@color/white"
-            android:background="@color/colorPrimary"
-            android:text="@string/send_message"
-            android:id="@+id/send_ticket_comment"
-            android:layout_weight="1"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_comment_dialog"
+        android:layout_alignBottom="@id/get_ticket_table"
+        android:layout_alignEnd="@id/get_ticket_table"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/fab_margin"
+        android:src="@drawable/ic_add_comment"
+        android:layout_alignRight="@id/ticket_table" />
 
-</LinearLayout>
+
 
 
 </RelativeLayout>

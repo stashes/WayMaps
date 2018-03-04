@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/comment_dialog_view"
+    android:background="#FFFFFF"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+        <EditText
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="30dp"
+            android:layout_alignParentTop="true"
+            android:layout_centerInParent="true"
+            android:windowSoftInputMode="adjustPan"
+            android:hint="@string/add_comment"
+            android:id="@+id/text_comment_ticket"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+        <Button
+            android:layout_centerInParent="true"
+            android:layout_below="@+id/text_comment_ticket"
+            android:windowSoftInputMode="adjustPan"
+            android:layout_margin="10dp"
+            android:textColor="@color/white"
+            android:background="@color/colorPrimary"
+            android:text="@string/send_message"
+            android:id="@+id/send_ticket_comment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+
+
+</RelativeLayout>
