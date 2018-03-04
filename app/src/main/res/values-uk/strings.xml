@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <!--Main Activity -->
+    <string name="exit_dialog">Вихід</string>
+    <string name="exit_message">Ви справді хочете вийти ?</string>
+    <string name="yes">Так</string>
+    <string name="no">Ні</string>
+    <string name="cancel">Скасувати</string>
+
     <!--Message Layout-->
     <string name="message_from">Відправник</string>
     <string name="type_your_message">Уведіть своє повідомлення</string>

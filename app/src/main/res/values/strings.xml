@@ -31,6 +31,13 @@
     <string name="error_saving_location">Online screen should be chosen</string>
     <string name="record_not_found">No found any record</string>
 
+    <!--Main Activity -->
+    <string name="exit_dialog">Exit</string>
+    <string name="exit_message">Do you want logout ?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="cancel">Cancel</string>
+
     <!--Message Layout-->
     <string name="message_from">Sender</string>
     <string name="type_your_message">Type your message</string>

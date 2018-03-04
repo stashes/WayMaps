@@ -1,5 +1,8 @@
 package com.waymaps.activity;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -55,7 +58,7 @@ import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
-
+    final int DIALOG_EXIT = 1;
     Logger logger = LoggerFactory.getLogger(this.getClass());
 
     public static User authorisedUser;
@@ -108,12 +111,13 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+      /*  DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
-        }
+        }*/
+      showDialog(DIALOG_EXIT);
     }
 
     @Override
@@ -237,6 +241,38 @@ public class MainActivity extends AppCompatActivity
 
     private LogoutCredentials getLogoutCredential() {
         return new LogoutCredentials(Action.LOGOUT, SystemUtil.getWifiMAC(this), authorisedUser.getId());
+    }
+
+    protected Dialog onCreateDialog(int id) {
+        if (id == DIALOG_EXIT) {
+            AlertDialog.Builder adb = new AlertDialog.Builder(this);
+            adb.setTitle(R.string.exit_dialog);
+            adb.setMessage(R.string.exit_message);
+            adb.setIcon(android.R.drawable.ic_dialog_info);
+            adb.setPositiveButton(R.string.yes, myClickListener);
+            adb.setNegativeButton(R.string.no, myClickListener);
+            return adb.create();
+        }
+        return super.onCreateDialog(id);
+    }
+    DialogInterface.OnClickListener myClickListener = new DialogInterface.OnClickListener() {
+        public void onClick(DialogInterface dialog, int which) {
+            switch (which) {
+                // положительная кнопка
+                case Dialog.BUTTON_POSITIVE:
+                    startActivity();
+                    break;
+                // негативная кнопка
+                case Dialog.BUTTON_NEGATIVE:
+                    break;
+                // нейтральная кнопка
+            }
+        }
+    };
+
+    private void startActivity(){
+        Intent intent = new Intent(this , LoginActivity.class);
+        startActivity(intent);
     }
 
     public void setActionBarTitleColor(String title) {

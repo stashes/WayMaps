@@ -136,4 +136,10 @@ public class FirmListActivity extends AppCompatActivity implements AdapterView.O
         MainActivity.firmId = Arrays.asList(firmLists).get(i).getId_firm();
         startActivity(intent);
     }
+
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(this,LoginActivity.class);
+        startActivity(intent);
+    }
 }
