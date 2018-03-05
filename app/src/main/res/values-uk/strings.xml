@@ -8,6 +8,12 @@
     <string name="no">Ні</string>
     <string name="cancel">Скасувати</string>
 
+    <!--Balance layout -->
+    <string name="column1">Дата</string>
+    <string name="column2">Надходження оплати клієнта</string>
+    <string name="column3">Списання коштів за послуги</string>
+    <string name="column4">Баланс по ос. рахунку</string>
+
     <!--Message Layout-->
     <string name="message_from">Відправник</string>
     <string name="type_your_message">Уведіть своє повідомлення</string>

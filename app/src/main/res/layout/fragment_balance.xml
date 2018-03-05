@@ -1,14 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/balance_scroll"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_alignParentLeft="true">
+    <LinearLayout
+        android:id="@+id/title_balance_table"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    <TextView
+        android:textColor="@color/black"
+        android:layout_weight="1"
+        android:text="@string/column1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+        <TextView
+            android:textColor="@color/black"
+            android:text="@string/column2"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:textColor="@color/black"
+            android:text="@string/column3"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:textColor="@color/black"
+            android:text="@string/column4"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+</LinearLayout>
 
     <ListView
+        android:layout_below="@id/title_balance_table"
         android:id="@+id/balance_table"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_centerHorizontal="true"></ListView>
 
-</LinearLayout>
+</RelativeLayout>
