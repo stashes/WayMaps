@@ -2,6 +2,7 @@ package com.waymaps.activity;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.FragmentManager;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
@@ -35,6 +36,7 @@ import com.waymaps.data.requestEntity.LogoutCredentials;
 import com.waymaps.data.requestEntity.UpdateCredentials;
 import com.waymaps.data.responseEntity.User;
 import com.waymaps.fragment.BalanceFragment;
+import com.waymaps.fragment.FirmListFragment;
 import com.waymaps.fragment.GMapFragment;
 import com.waymaps.fragment.TicketListFragment;
 import com.waymaps.fragment.TrackerListFragment;
@@ -111,13 +113,12 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-      /*  DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+       DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
-        }*/
-      showDialog(DIALOG_EXIT);
+        }
     }
 
     @Override
@@ -193,20 +194,30 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void balance() {
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         currentFragment= new BalanceFragment();
         setActionBarTitleColor("Balance");
-        setFragmentActive(currentFragment);
+        ft.addToBackStack("balance");
+        ft.replace(R.id.content_main, currentFragment);
+        ft.commit();
     }
 
     private void map() {
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         currentFragment= new GMapFragment();
         setActionBarTitleColor("");
-        setFragmentActive(currentFragment);
+        ft.addToBackStack("map");
+        getFragmentManager().popBackStackImmediate("firmList",0);
+        ft.replace(R.id.content_main, currentFragment);
+        ft.commit();
     }
     private void showTicketList(){
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         currentFragment = new TicketListFragment();
         setActionBarTitleColor("");
-        setFragmentActive(currentFragment);
+        ft.addToBackStack("ticketList");
+        ft.replace(R.id.content_main, currentFragment);
+        ft.commit();
     }
 
     private void setFragmentActive(Fragment fragment){
@@ -223,16 +234,18 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 logger.info("Successful logout procedure");
-                LocalPreferencesManagerUtil.clearCredentials(MainActivity.this);
-                setResult(1);
-                finish();
+                startActivity();
+               // LocalPreferencesManagerUtil.clearCredentials(MainActivity.this);
+              //  setResult(1);
+              //  finish();
             }
 
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
                 logger.info("Failed logout procedure");
-                LocalPreferencesManagerUtil.clearCredentials(MainActivity.this);
-                setResult(0);
+//                LocalPreferencesManagerUtil.clearCredentials(MainActivity.this);
+//                setResult(0);
+                startActivity();
                 finish();
             }
         });
@@ -243,7 +256,7 @@ public class MainActivity extends AppCompatActivity
         return new LogoutCredentials(Action.LOGOUT, SystemUtil.getWifiMAC(this), authorisedUser.getId());
     }
 
-    protected Dialog onCreateDialog(int id) {
+ /*   protected Dialog onCreateDialog(int id) {
         if (id == DIALOG_EXIT) {
             AlertDialog.Builder adb = new AlertDialog.Builder(this);
             adb.setTitle(R.string.exit_dialog);
@@ -269,7 +282,7 @@ public class MainActivity extends AppCompatActivity
             }
         }
     };
-
+*/
     private void startActivity(){
         Intent intent = new Intent(this , LoginActivity.class);
         startActivity(intent);

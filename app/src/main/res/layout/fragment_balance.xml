@@ -4,6 +4,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_alignParentLeft="true">
+    <include
+        android:id="@+id/action_bar_balance"
+        layout="@layout/classic_action_bar">
+
+    </include>
+    <RelativeLayout
+        android:layout_below="@id/action_bar_balance"
+        android:id="@+id/balance_contain"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
     <LinearLayout
         android:id="@+id/title_balance_table"
         android:orientation="horizontal"
@@ -41,5 +51,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_centerHorizontal="true"></ListView>
+</RelativeLayout>
 
 </RelativeLayout>

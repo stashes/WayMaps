@@ -138,13 +138,16 @@ public class TicketListFragment extends AbstractFragment implements AdapterView.
         getTicketFragment.setArguments(bundle);
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.replace(R.id.content_main, getTicketFragment);
-        ft.addToBackStack("TicketList");
+        ft.addToBackStack("getTicketList");
+        getFragmentManager().popBackStackImmediate("map",0);
         ft.commit();
 
     }
     private void showTrackerList(){
         TrackerListFragment trackerListFragment = new TrackerListFragment();
         FragmentTransaction ft = getFragmentManager().beginTransaction();
+        ft.addToBackStack("trackerList");
+        getFragmentManager().popBackStackImmediate("getTicketList",0);
         ft.replace(R.id.content_main, trackerListFragment);
         ft.commit();
     }

@@ -84,7 +84,7 @@ public class TrackerListFragment extends AbstractFragment implements AdapterView
         procedure.setIdentficator(SystemUtil.getWifiMAC(getActivity()));
         procedure.setName(Action.TRACKER_LIST);
         procedure.setUser_id(MainActivity.authorisedUser.getId());
-        procedure.setParams(MainActivity.authorisedUser.getId());
+        procedure.setParams(MainActivity.authorisedUser.getId()); //MainActivity.authorisedUser.getId()
         showProgress(true , trackerList , progressBar);
         Call<TrackerList[]> call = RetrofitService.getWayMapsService().trackerProcedure(procedure.getAction(), procedure.getName(),
                 procedure.getIdentficator(), procedure.getUser_id(), procedure.getFormat(), procedure.getParams());

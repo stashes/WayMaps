@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.Gravity;
@@ -29,6 +30,7 @@ import com.waymaps.data.requestEntity.Credentials;
 import com.waymaps.data.responseEntity.GetGroup;
 import com.waymaps.data.responseEntity.User;
 import com.waymaps.fragment.AbstractFragment;
+import com.waymaps.fragment.FirmListFragment;
 import com.waymaps.intent.MainActivityIntent;
 import com.waymaps.util.LocalPreferenceManager;
 import com.waymaps.util.LocalPreferencesManagerUtil;
@@ -183,9 +185,12 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void startActivity(User user) {
-        Intent intent = new Intent(this, FirmListActivity.class);
-            MainActivity.authorisedUser = user;
-            startActivity(intent);
+        MainActivity.authorisedUser = user;
+        FirmListFragment firmListFragment = new FirmListFragment();
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.addToBackStack("firmList");
+        ft.replace(R.id.login_activity_contain, firmListFragment);
+        ft.commit();
     }
 
     @Override
