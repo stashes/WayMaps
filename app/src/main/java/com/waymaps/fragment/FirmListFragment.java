@@ -103,10 +103,12 @@ public class FirmListFragment extends AbstractFragmentWithUser implements Adapte
         String id_firm = Arrays.asList(firms).get(i).getId_firm();
         String id_user = Arrays.asList(firms).get(i).getId_user();
         String title_user = Arrays.asList(firms).get(i).getTitle_user();
+        String firm_title = Arrays.asList(firms).get(i).getTitle_firm();
         MainActivityIntent mainActivityIntent = new MainActivityIntent(getContext());
         authorizedUser.setFirm_id(id_firm);
         authorizedUser.setId(id_user);
         authorizedUser.setUser_title(title_user);
+        authorizedUser.setFirm_title(firm_title);
         try {
             mainActivityIntent.putExtra("user", JSONUtil.getObjectMapper().writeValueAsString(authorizedUser));
         } catch (JsonProcessingException e) {
