@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity
 
         Menu menu = navigationView.getMenu();
 
-        if ("1".equals(authorisedUser.getManager()) || "1".equals(authorisedUser.getDiler()))  {
+        if ("1".equals(authorisedUser.getManager()) & "0".equals(authorisedUser.getDiler()) ) {
             menu.findItem(R.id.nav_balance).setVisible(true);
             menu.findItem(R.id.nav_tech_supp).setVisible(true);
         }else{
@@ -222,12 +222,6 @@ public class MainActivity extends AppCompatActivity
     private void balance() {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         currentFragment= new BalanceFragment();
-        try {
-            currentFragment.setArguments(ApplicationUtil.setValueToBundle
-                    (new Bundle(),"user",authorisedUser));
-        } catch (JsonProcessingException e) {
-            logger.error("Error writing user {}",authorisedUser.toString());
-        }
         setActionBarTitleColor("Balance");
         ft.addToBackStack("balance");
         ft.replace(R.id.content_main, currentFragment);
