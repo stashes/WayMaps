@@ -164,7 +164,7 @@ public class LoginActivity extends AppCompatActivity {
                         showProgress(false);
                     } else {
                         User currentUser = users[0];
-                        LocalPreferencesManagerUtil.saveCredentials(login, password, savePass,LoginActivity.this);
+                        LocalPreferencesManagerUtil.saveCredentials(login, password, savePass, LoginActivity.this);
 
                         Toast toast = Toast.makeText(getApplicationContext(),
                                 "OK",
@@ -193,38 +193,37 @@ public class LoginActivity extends AppCompatActivity {
 
     private void startActivity(User user) {
         MainActivity.authorisedUser = user;
+        if ("1".equals(user.getFirm_blocked())) {
+            NotificationManager.showNotification(this,
+                    getString(R.string.notif_firm_bloked) + "-" + user.getSaldo() + user.getCurrency());
+            return;
+        }
         if ("1".equals(user.getDiler())) {
-            if ("1".equals(user.getFirm_blocked())) {
 
-                NotificationManager.showNotification( this,
-                        getString(R.string.notif_firm_bloked) + "-" + user.getSaldo() + user.getCurrency());
-            }else {
-                if (Double.parseDouble(user.getSaldo())<-20.0){
-                    NotificationManager.showNotification( this,
-                            getString(R.string.notif_saldo_minus) + "-" + user.getSaldo() + user.getCurrency());
-                }
-                FirmListFragment firmListFragment = new FirmListFragment();
-                try {
-                    firmListFragment.setArguments(ApplicationUtil.setValueToBundle(new Bundle(), "user", user));
-                } catch (JsonProcessingException e) {
-                    logger.error("Error writing user {}", user.toString());
-                }
-                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-                ft.addToBackStack("firmList");
-                ft.replace(R.id.login_activity_contain, firmListFragment);
-                ft.commit();
+            FirmListFragment firmListFragment = new FirmListFragment();
+            try {
+                firmListFragment.setArguments(ApplicationUtil.setValueToBundle(new Bundle(), "user", user));
+            } catch (JsonProcessingException e) {
+                logger.error("Error writing user {}", user.toString());
             }
-        } else{
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.addToBackStack("firmList");
+            ft.replace(R.id.login_activity_contain, firmListFragment);
+            ft.commit();
+        } else {
+            if (Double.parseDouble(user.getSaldo()) < -20.0) {
+                NotificationManager.showNotification(this,
+                        getString(R.string.notif_saldo_minus) + "-" + user.getSaldo() + user.getCurrency());
+            }
             MainActivityIntent mainActivityIntent = new MainActivityIntent(this);
-
             try {
                 mainActivityIntent.putExtra("user", JSONUtil.getObjectMapper().writeValueAsString(user));
             } catch (JsonProcessingException e) {
-                logger.error("Error writing user {}",user.toString());
+                logger.error("Error writing user {}", user.toString());
             }
-
             startActivity(mainActivityIntent);
         }
+
     }
 
     @Override
