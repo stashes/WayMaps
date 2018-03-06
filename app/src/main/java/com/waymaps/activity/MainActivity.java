@@ -24,6 +24,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -92,6 +93,17 @@ public class MainActivity extends AppCompatActivity
 
         navigationView.setNavigationItemSelectedListener(this);
 
+        TextView userTitle =  (TextView) navigationView.getHeaderView(0).findViewById(R.id.userTitle_nav_bar);
+        TextView firmTitle = navigationView.getHeaderView(0).findViewById(R.id.firmTitle_nav_bar);
+        userTitle.setText(authorisedUser.getUser_title());
+        firmTitle.setText(authorisedUser.getFirm_title());
+
+        Menu menu = navigationView.getMenu();
+
+        if ("1".equals(authorisedUser.getManager()) || "1".equals(authorisedUser.getDiler()) ) {
+            menu.findItem(R.id.nav_balance).setVisible(false);
+            menu.findItem(R.id.nav_tech_supp).setVisible(false);
+        }
         displaySelectedScreen(R.id.nav_map);
     }
 
@@ -158,6 +170,7 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
+
 
 
         displaySelectedScreen(id);
