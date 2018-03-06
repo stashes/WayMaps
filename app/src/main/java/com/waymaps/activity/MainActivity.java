@@ -40,6 +40,7 @@ import com.waymaps.fragment.FirmListFragment;
 import com.waymaps.fragment.GMapFragment;
 import com.waymaps.fragment.TicketListFragment;
 import com.waymaps.fragment.TrackerListFragment;
+import com.waymaps.intent.LoginActivityIntent;
 import com.waymaps.intent.SessionUpdateServiceIntent;
 import com.waymaps.util.ApplicationUtil;
 import com.waymaps.util.JSONUtil;
@@ -64,7 +65,6 @@ public class MainActivity extends AppCompatActivity
     Logger logger = LoggerFactory.getLogger(this.getClass());
 
     public static User authorisedUser;
-    public static String firmId;
     public static Fragment currentFragment;
 
     @BindView(R.id.toolbar)
@@ -81,7 +81,7 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-
+        getUserFromIntent();
         startServices();
 
         setSupportActionBar(toolbar);
@@ -109,6 +109,16 @@ public class MainActivity extends AppCompatActivity
         }
 
 
+    }
+
+    private void getUserFromIntent() {
+        try {
+            authorisedUser = JSONUtil.getObjectMapper().readValue(getIntent().getExtras()
+                    .getCharSequence("user").toString(), User.class);
+            logger.debug("User {} reads successfully", authorisedUser.getId());
+        } catch (IOException e) {
+            logger.debug("Something went wrong while try to parse user");
+        }
     }
 
     @Override
@@ -205,6 +215,12 @@ public class MainActivity extends AppCompatActivity
     private void map() {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         currentFragment= new GMapFragment();
+        try {
+            currentFragment.setArguments(ApplicationUtil.setValueToBundle
+                    (new Bundle(),"user",authorisedUser));
+        } catch (JsonProcessingException e) {
+            logger.error("Error writing user {}",authorisedUser.toString());
+        }
         setActionBarTitleColor("");
         ft.addToBackStack("map");
         getFragmentManager().popBackStackImmediate("firmList",0);
@@ -234,8 +250,8 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 logger.info("Successful logout procedure");
-                startActivity();
-               // LocalPreferencesManagerUtil.clearCredentials(MainActivity.this);
+                LocalPreferencesManagerUtil.clearCredentials(MainActivity.this);
+                startActivity(new LoginActivityIntent(MainActivity.this));
               //  setResult(1);
               //  finish();
             }
@@ -243,9 +259,9 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
                 logger.info("Failed logout procedure");
-//                LocalPreferencesManagerUtil.clearCredentials(MainActivity.this);
+                LocalPreferencesManagerUtil.clearCredentials(MainActivity.this);
 //                setResult(0);
-                startActivity();
+                startActivity(new LoginActivityIntent(MainActivity.this));
                 finish();
             }
         });
@@ -271,22 +287,18 @@ public class MainActivity extends AppCompatActivity
     DialogInterface.OnClickListener myClickListener = new DialogInterface.OnClickListener() {
         public void onClick(DialogInterface dialog, int which) {
             switch (which) {
-                // положительная кнопка
+                // +
                 case Dialog.BUTTON_POSITIVE:
                     startActivity();
                     break;
-                // негативная кнопка
+                // -
                 case Dialog.BUTTON_NEGATIVE:
                     break;
-                // нейтральная кнопка
+                // +-
             }
         }
     };
 */
-    private void startActivity(){
-        Intent intent = new Intent(this , LoginActivity.class);
-        startActivity(intent);
-    }
 
     public void setActionBarTitleColor(String title) {
         getSupportActionBar().setTitle(title);

@@ -10,6 +10,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.waymaps.R;
 import com.waymaps.activity.MainActivity;
 import com.waymaps.adapter.FirmListAdapter;
@@ -18,6 +19,8 @@ import com.waymaps.api.WayMapsService;
 import com.waymaps.data.requestEntity.Action;
 import com.waymaps.data.requestEntity.Procedure;
 import com.waymaps.data.responseEntity.FirmList;
+import com.waymaps.intent.MainActivityIntent;
+import com.waymaps.util.JSONUtil;
 import com.waymaps.util.SystemUtil;
 
 import org.slf4j.Logger;
@@ -33,7 +36,7 @@ import retrofit2.Response;
  * Created by nazar on 05.03.2018.
  */
 
-public class FirmListFragment extends AbstractFragment implements AdapterView.OnItemClickListener {
+public class FirmListFragment extends AbstractFragmentWithUser implements AdapterView.OnItemClickListener {
     private FirmList[] firms;
     private ListView listView;
     private Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -97,8 +100,14 @@ public class FirmListFragment extends AbstractFragment implements AdapterView.On
 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-        MainActivity.firmId = Arrays.asList(firms).get(i).getId_firm();
-        Intent intent = new Intent(getContext() , MainActivity.class);
-        startActivity(intent);
+        String id_firm = Arrays.asList(firms).get(i).getId_firm();
+        MainActivityIntent mainActivityIntent = new MainActivityIntent(getContext());
+        authorizedUser.setFirm_id(id_firm);
+        try {
+            mainActivityIntent.putExtra("user", JSONUtil.getObjectMapper().writeValueAsString(authorizedUser));
+        } catch (JsonProcessingException e) {
+            logger.error("Error writing user {}",authorizedUser.toString());
+        }
+        startActivity(mainActivityIntent);
     }
 }

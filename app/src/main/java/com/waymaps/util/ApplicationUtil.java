@@ -21,12 +21,16 @@ import com.waymaps.R;
 import com.waymaps.activity.MainActivity;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 
 /**
  * Created by Admin on 11.02.2018.
  */
 
 public class ApplicationUtil {
+
+    public static String datePattern = "yyyy-MM-dd HH:mm:ss";
+    public static SimpleDateFormat simpleDateFormat = new SimpleDateFormat(datePattern);
 
     public static Bundle setValueToBundle(Bundle bundle, String key, Object value) throws JsonProcessingException {
         bundle.putString(key, JSONUtil.getObjectMapper().writeValueAsString(value));

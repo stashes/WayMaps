@@ -32,7 +32,7 @@ import retrofit2.Response;
  * Created by Admin on 11.02.2018.
  */
 
-public class BalanceFragment extends AbstractFragment {
+public class BalanceFragment extends AbstractFragmentWithUser {
 
     private FinGet[] finGets;
     private Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -58,8 +58,8 @@ public class BalanceFragment extends AbstractFragment {
         procedure.setFormat(WayMapsService.DEFAULT_FORMAT);
         procedure.setIdentficator(SystemUtil.getWifiMAC(getActivity()));
         procedure.setName(Action.FIN_GET);
-        procedure.setUser_id(MainActivity.authorisedUser.getId());
-        procedure.setParams(MainActivity.firmId);
+        procedure.setUser_id(authorizedUser.getId());
+        procedure.setParams(authorizedUser.getFirm_id());
         Call<FinGet[]> call = RetrofitService.getWayMapsService().finGetProcedure(procedure.getAction(), procedure.getName(),
                 procedure.getIdentficator(), procedure.getUser_id(), procedure.getFormat(), procedure.getParams());
         call.enqueue(new Callback<FinGet[]>() {

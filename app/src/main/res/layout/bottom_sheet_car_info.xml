@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp">
+
+        <LinearLayout
+            android:id="@+id/car_state_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                style="@style/CarLabel"
+                android:text="@string/state" />
+
+            <TextView
+                android:id="@+id/car_state"
+                style="@style/CarLabel"
+                android:text="Online" />
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:id="@+id/car_actual_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+
+            <TextView
+                style="@style/CarLabel"
+                android:text="@string/actual" />
+
+            <TextView
+                android:id="@+id/car_actual"
+                style="@style/CarLabel"
+                android:text="1 minute" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/car_stop_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+
+            <TextView
+                style="@style/CarLabel"
+                android:text="@string/stop" />
+
+            <TextView
+                android:id="@+id/car_stop"
+                style="@style/CarLabel"
+                android:text="2 min" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/car_speed_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+
+            <TextView
+                style="@style/CarLabel"
+                android:text="@string/speed" />
+
+            <TextView
+                android:id="@+id/car_speed"
+                style="@style/CarLabel"
+                android:text="10km/per hour" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/car_ignition_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                style="@style/CarLabel"
+                android:text="@string/ignition" />
+
+            <TextView
+                android:id="@+id/car_ignition"
+                style="@style/CarLabel"
+                android:text="true" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/car_engine_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                style="@style/CarLabel"
+                android:text="@string/engine" />
+
+            <TextView
+                android:id="@+id/car_engine"
+                style="@style/CarLabel"
+                android:text="true" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/car_voltage_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+
+            <TextView
+                style="@style/CarLabel"
+                android:text="@string/voltage" />
+
+            <TextView
+                android:id="@+id/car_voltage"
+                style="@style/CarLabel"
+                android:text="122" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/car_volume_fuel_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                style="@style/CarLabel"
+                android:text="@string/volume_fuel" />
+
+            <TextView
+                android:id="@+id/car_volume_fuel"
+                style="@style/CarLabel"
+                android:text="11" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/car_fuel_consumption_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                style="@style/CarLabel"
+                android:text="@string/fuel_consumption" />
+
+            <TextView
+                android:id="@+id/car_fuel_consumption"
+                style="@style/CarLabel"
+                android:text="9" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/car_gps_satellite_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                style="@style/CarLabel"
+                android:text="@string/satellite" />
+
+            <TextView
+                android:id="@+id/car_gps_satellite"
+                style="@style/CarLabel"
+                android:text="12" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/car_gps_signal_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                style="@style/CarLabel"
+                android:text="@string/signal" />
+
+            <TextView
+                android:id="@+id/car_gps_signal"
+                style="@style/CarLabel"
+                android:text="1" />
+        </LinearLayout>
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/car_note_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp">
+        <View
+            style="@style/SingleLine"
+            android:layout_marginTop="10dp" />
+
+        <TextView
+            android:id="@+id/car_note"
+            style="@style/CarLabel"
+            android:layout_width="wrap_content"
+            android:layout_weight="0"
+            android:text="texttxexesxgadsgadsgdsahdahdfshfdhfsdhsdfhfdshfdshdftsxextextsxxxtextxte" />
+    </LinearLayout>
+
+</LinearLayout>

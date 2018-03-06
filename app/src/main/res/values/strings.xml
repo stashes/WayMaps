@@ -55,6 +55,37 @@
 
     <!--Ticket list layout-->
     <string name="ticket_list_actionbar_title">Tickets</string>
+    <string name="state">State</string>
+    <string name="actual">Actual</string>
+    <string name="stop">Stop</string>
+    <string name="speed">Speed</string>
+    <string name="ignition">Ignition</string>
+    <string name="engine">Engine</string>
+    <string name="voltage">Voltage</string>
+    <string name="satellite">Satellite</string>
+    <string name="signal">Signal</string>
+    <string name="volume_fuel">Volume of fuel</string>
+    <string name="fuel_consumption">Fuel consumption</string>
+    <string name="kmperhour">km/hr</string>
+    <string name="statusonline">Online</string>
+    <string name="statusoffline">Offline</string>
+    <string name="on">On</string>
+    <string name="off">Off</string>
+    <string name="lperkm">l/ 100 km</string>
+    <string name="l">l</string>
+    <string name="very_well">Very well</string>
+    <string name="good">Good</string>
+    <string name="normal">normal</string>
+    <string name="bad">Bad</string>
+    <string name="absent">Absent</string>
+    <string name="pieces">pc</string>
+    <string name="battery">Battery</string>
+    <string name="v">V</string>
+    <string name="day">d</string>
+    <string name="hour">h</string>
+    <string name="minute">m</string>
+    <string name="second">s</string>
+    <string name="all">All</string>
 
     <!--GetTicket list layout -->
     <string name="get_ticket_actionbar_title">Ticket</string>

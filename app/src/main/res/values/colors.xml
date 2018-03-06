@@ -7,5 +7,6 @@
     <color name="fail">#e11a24</color>
     <color name="transparent">#00000000</color>
     <color name="black">#F000</color>
+    <color name="warning">#ff8316</color>
     <color name="white">#FFFFFFFF</color>
 </resources>

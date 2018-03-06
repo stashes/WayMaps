@@ -121,6 +121,7 @@
     <orderEntry type="library" name="com.squareup.retrofit2:converter-jackson:2.3.0@jar" level="project" />
     <orderEntry type="library" scope="TEST" name="com.squareup:javawriter:2.1.1@jar" level="project" />
     <orderEntry type="library" name="android.arch.lifecycle:runtime-1.0.0" level="project" />
+    <orderEntry type="library" name="com.amulyakhare:com.amulyakhare.textdrawable-1.0.1" level="project" />
     <orderEntry type="library" name="com.android.support:appcompat-v7-26.1.0" level="project" />
     <orderEntry type="library" name="org.slf4j:slf4j-api:1.7.7@jar" level="project" />
     <orderEntry type="library" name="com.google.android.gms:play-services-basement-license-11.8.0" level="project" />

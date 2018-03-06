@@ -27,14 +27,18 @@ import com.waymaps.api.RetrofitService;
 import com.waymaps.api.WayMapsService;
 import com.waymaps.data.requestEntity.Action;
 import com.waymaps.data.requestEntity.Credentials;
-import com.waymaps.data.responseEntity.GetGroup;
 import com.waymaps.data.responseEntity.User;
 import com.waymaps.fragment.AbstractFragment;
 import com.waymaps.fragment.FirmListFragment;
 import com.waymaps.intent.MainActivityIntent;
+import com.waymaps.util.ApplicationUtil;
+import com.waymaps.util.JSONUtil;
 import com.waymaps.util.LocalPreferenceManager;
 import com.waymaps.util.LocalPreferencesManagerUtil;
 import com.waymaps.util.SystemUtil;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -67,6 +71,8 @@ public class LoginActivity extends AppCompatActivity {
 
     @BindView(R.id.pass_save)
     CheckBox mPassSave;
+
+    protected Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -186,11 +192,28 @@ public class LoginActivity extends AppCompatActivity {
 
     private void startActivity(User user) {
         MainActivity.authorisedUser = user;
-        FirmListFragment firmListFragment = new FirmListFragment();
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.addToBackStack("firmList");
-        ft.replace(R.id.login_activity_contain, firmListFragment);
-        ft.commit();
+        if ("1".equals(user.getDiler())) {
+            FirmListFragment firmListFragment = new FirmListFragment();
+            try {
+                firmListFragment.setArguments(ApplicationUtil.setValueToBundle(new Bundle(),"user",user));
+            } catch (JsonProcessingException e) {
+                logger.error("Error writing user {}",user.toString());
+            }
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.addToBackStack("firmList");
+            ft.replace(R.id.login_activity_contain, firmListFragment);
+            ft.commit();
+        } else{
+            MainActivityIntent mainActivityIntent = new MainActivityIntent(this);
+
+            try {
+                mainActivityIntent.putExtra("user", JSONUtil.getObjectMapper().writeValueAsString(user));
+            } catch (JsonProcessingException e) {
+                logger.error("Error writing user {}",user.toString());
+            }
+
+            startActivity(mainActivityIntent);
+        }
     }
 
     @Override

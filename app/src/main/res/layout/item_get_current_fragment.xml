@@ -16,10 +16,10 @@
 
         <ImageView
             android:id="@+id/get_current_image"
-            android:layout_width="48dp"
+            android:layout_width="24dp"
             android:layout_height="match_parent"
             android:layout_gravity="center"
-            android:layout_weight="1"
+            android:layout_weight="0"
             app:srcCompat="@drawable/ic_circle" />
 
         <TextView

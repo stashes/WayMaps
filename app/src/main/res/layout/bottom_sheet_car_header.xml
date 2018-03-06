@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="left"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:clickable="true"
+                android:id="@+id/back_to_all"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_weight="0"
+                app:srcCompat="@drawable/ic_back" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="right"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:clickable="true"
+                android:id="@+id/filter_car"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                app:srcCompat="@drawable/ic_filter" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="left"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:clickable="true"
+                android:id="@+id/lock_car"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_weight="0"
+                app:srcCompat="@drawable/ic_unlock" />
+        </LinearLayout>
+    </LinearLayout>
+
+
+</LinearLayout>
