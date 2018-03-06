@@ -31,6 +31,7 @@ import com.waymaps.data.responseEntity.User;
 import com.waymaps.fragment.AbstractFragment;
 import com.waymaps.fragment.FirmListFragment;
 import com.waymaps.intent.MainActivityIntent;
+import com.waymaps.notification.NotificationManager;
 import com.waymaps.util.ApplicationUtil;
 import com.waymaps.util.JSONUtil;
 import com.waymaps.util.LocalPreferenceManager;
@@ -193,16 +194,26 @@ public class LoginActivity extends AppCompatActivity {
     private void startActivity(User user) {
         MainActivity.authorisedUser = user;
         if ("1".equals(user.getDiler())) {
-            FirmListFragment firmListFragment = new FirmListFragment();
-            try {
-                firmListFragment.setArguments(ApplicationUtil.setValueToBundle(new Bundle(),"user",user));
-            } catch (JsonProcessingException e) {
-                logger.error("Error writing user {}",user.toString());
+            if ("1".equals(user.getFirm_blocked())) {
+
+                NotificationManager.showNotification( this,
+                        getString(R.string.notif_firm_bloked) + "-" + user.getSaldo() + user.getCurrency());
+            }else {
+                if (Double.parseDouble(user.getSaldo())<-20.0){
+                    NotificationManager.showNotification( this,
+                            getString(R.string.notif_saldo_minus) + "-" + user.getSaldo() + user.getCurrency());
+                }
+                FirmListFragment firmListFragment = new FirmListFragment();
+                try {
+                    firmListFragment.setArguments(ApplicationUtil.setValueToBundle(new Bundle(), "user", user));
+                } catch (JsonProcessingException e) {
+                    logger.error("Error writing user {}", user.toString());
+                }
+                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                ft.addToBackStack("firmList");
+                ft.replace(R.id.login_activity_contain, firmListFragment);
+                ft.commit();
             }
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.addToBackStack("firmList");
-            ft.replace(R.id.login_activity_contain, firmListFragment);
-            ft.commit();
         } else{
             MainActivityIntent mainActivityIntent = new MainActivityIntent(this);
 
