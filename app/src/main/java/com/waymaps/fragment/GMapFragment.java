@@ -33,6 +33,7 @@ import com.waymaps.data.requestEntity.Action;
 import com.waymaps.data.requestEntity.Procedure;
 import com.waymaps.data.responseEntity.GetCurrent;
 import com.waymaps.util.ApplicationUtil;
+import com.waymaps.util.DateTimeUtil;
 import com.waymaps.util.LocalPreferenceManager;
 import com.waymaps.util.SystemUtil;
 
@@ -494,22 +495,43 @@ public class GMapFragment extends AbstractFragmentWithUser {
             carVoltage.setTextColor(getResources().getColor(R.color.success));
         }
 
+        //ignition
+        String ignition = tag.getIgnition();
+        if ("1".equals(ignition)) {
+            ignition = getResources().getString(R.string.on);
+            carIgnition.setTextColor(getResources().getColor(R.color.success));
+        } else {
+            ignition = getResources().getString(R.string.off);
+            carIgnition.setTextColor(getResources().getColor(R.color.fail));
+        }
+        carIgnition.setText(ignition);
+
+        //stop
+        String stop = tag.getLast_parking_start();
+        final Date stopDate;
+        if (stop == null){
+            carStopView.setVisibility(View.GONE);
+        } else {
+            try {
+                stopDate = ApplicationUtil.simpleDateFormat.parse(stop);
+                Date currentDate = new Date();
+                String diff = DateTimeUtil.getDiffBetweenDate(currentDate,stopDate,getContext());
+                carStop.setText(diff);
+                carStopView.setVisibility(View.VISIBLE);
+
+            } catch (ParseException e) {
+                carStopView.setVisibility(View.GONE);
+            }
+        }
+
         //actual
         String actual = tag.getL_date();
         final Date updateDate;
         try {
             updateDate = ApplicationUtil.simpleDateFormat.parse(actual);
             Date currentDate = new Date();
-            long diff = (currentDate.getTime() - updateDate.getTime());
-            long diffSeconds = diff / 1000 % 60;
-            long diffMinutes = diff / (60 * 1000) % 60;
-            long diffHours = diff / (60 * 60 * 1000) % 60;
-            long diffDays = diff / (24 * 60 * 60 * 1000) % 60;
-
-            carActual.setText((diffDays == 0 ? "" : (diffDays + getResources().getString(R.string.day) + " ")) +
-                    (diffHours == 0 ? "" : (diffHours + getResources().getString(R.string.hour) + " ")) +
-                    (diffMinutes == 0 ? "" : (diffMinutes + getResources().getString(R.string.minute) + " ")) +
-                    (diffSeconds == 0 ? "" : (diffSeconds + getResources().getString(R.string.second))));
+            String diff = DateTimeUtil.getDiffBetweenDate(currentDate,updateDate,getContext());
+            carActual.setText(diff);
             carActualView.setVisibility(View.VISIBLE);
 
         } catch (ParseException e) {

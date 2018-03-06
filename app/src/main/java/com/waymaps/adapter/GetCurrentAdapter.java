@@ -15,7 +15,10 @@ import com.waymaps.R;
 import com.waymaps.data.responseEntity.FinGet;
 import com.waymaps.data.responseEntity.GetCurrent;
 import com.waymaps.util.ApplicationUtil;
+import com.waymaps.util.DateTimeUtil;
 
+import java.text.ParseException;
+import java.util.Date;
 import java.util.List;
 
 import butterknife.BindView;
@@ -78,7 +81,28 @@ public class GetCurrentAdapter extends BaseAdapter {
 
         icon.setImageBitmap(bitmap);
         name.setText(getCurrent.getTracker_title());
-        status.setText(getCurrent.getStatus());
+        if ("0".equals(getCurrent.getSpeed()) || getCurrent.getSpeed()==null){
+            Date date1 = new Date();
+            try {
+                Date date2 = ApplicationUtil.simpleDateFormat.parse(getCurrent.getLast_parking_start());
+                String diffBetweenDate = DateTimeUtil.getDiffBetweenDate(date1, date2,context);
+                status.setText(context.getResources().getString(R.string.stop) + " " + diffBetweenDate);
+                status.setTextColor(context.getResources().getColor(R.color.success));
+            } catch (Exception e) {
+                status.setText(context.getResources().getString(R.string.stop));
+                status.setTextColor(context.getResources().getColor(R.color.fail));
+            }
+        } else {
+            String speedText= "";
+            speedText+=context.getResources().getString(R.string.moving);
+            speedText+=", ";
+            speedText+=context.getResources().getString(R.string.speedsmall);
+            speedText+=" ";
+            speedText+=getCurrent.getSpeed();
+            speedText+=context.getResources().getString(R.string.kmperhour);
+            status.setText(speedText);
+            status.setTextColor(context.getResources().getColor(R.color.success));
+        }
 
         return view;
     }

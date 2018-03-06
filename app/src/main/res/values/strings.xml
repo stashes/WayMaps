@@ -95,5 +95,7 @@
 
     <!--GetFirms list layout -->
     <string name="get_firms_actionbar_title">Firm list</string>
+    <string name="moving">Moving</string>
+    <string name="speedsmall">speed</string>
 
 </resources>
