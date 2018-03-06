@@ -222,6 +222,12 @@ public class MainActivity extends AppCompatActivity
     private void balance() {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         currentFragment= new BalanceFragment();
+        try {
+            currentFragment.setArguments(ApplicationUtil.setValueToBundle
+                    (new Bundle(),"user",authorisedUser));
+        } catch (JsonProcessingException e) {
+            logger.error("Error writing user {}",authorisedUser.toString());
+        }
         setActionBarTitleColor("Balance");
         ft.addToBackStack("balance");
         ft.replace(R.id.content_main, currentFragment);
