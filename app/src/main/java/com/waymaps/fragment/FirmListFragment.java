@@ -101,8 +101,12 @@ public class FirmListFragment extends AbstractFragmentWithUser implements Adapte
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
         String id_firm = Arrays.asList(firms).get(i).getId_firm();
+        String id_user = Arrays.asList(firms).get(i).getId_user();
+        String title_user = Arrays.asList(firms).get(i).getTitle_user();
         MainActivityIntent mainActivityIntent = new MainActivityIntent(getContext());
         authorizedUser.setFirm_id(id_firm);
+        authorizedUser.setId(id_user);
+        authorizedUser.setUser_title(title_user);
         try {
             mainActivityIntent.putExtra("user", JSONUtil.getObjectMapper().writeValueAsString(authorizedUser));
         } catch (JsonProcessingException e) {
