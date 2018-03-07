@@ -100,10 +100,7 @@ public class MainActivity extends AppCompatActivity
 
         Menu menu = navigationView.getMenu();
 
-        if ("1".equals(authorisedUser.getManager()) & "0".equals(authorisedUser.getDiler()) ) {
-            menu.findItem(R.id.nav_balance).setVisible(true);
-            menu.findItem(R.id.nav_tech_supp).setVisible(true);
-        }else{
+        if ("0".equals(authorisedUser.getManager()) & "0".equals(authorisedUser.getDiler()) ) {
             menu.findItem(R.id.nav_balance).setVisible(false);
             menu.findItem(R.id.nav_tech_supp).setVisible(false);
         }
