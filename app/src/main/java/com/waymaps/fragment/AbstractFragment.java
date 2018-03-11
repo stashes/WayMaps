@@ -1,6 +1,5 @@
 package com.waymaps.fragment;
 
-
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
@@ -20,19 +19,26 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
-
 /**
- * Created by Admin on 25.02.2018.
+ * Created by Admin on 06.03.2018.
  */
 
-public abstract class AbstractFragment extends Fragment {
-
+public class AbstractFragment extends Fragment {
+    protected User authorizedUser;
     protected Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    @Nullable
-    @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        getAttrFromBundle();
         return super.onCreateView(inflater, container, savedInstanceState);
+    }
+
+    private void getAttrFromBundle() {
+        try {
+            authorizedUser = ApplicationUtil.getObjectFromBundle(getArguments(), "user", User.class);
+        } catch (IOException e) {
+            logger.error("Error while trying to parse parameters {}", this.getClass());
+            authorizedUser = null;
+        }
     }
 
     /**
@@ -51,15 +57,15 @@ public abstract class AbstractFragment extends Fragment {
             for(int i = 0; i<view.length ; i++) {
                 view[i].setVisibility(show ? View.GONE : View.VISIBLE);
             }
-                view[0].animate().setDuration(shortAnimTime).alpha(
-                        show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
-                    @Override
-                    public void onAnimationEnd(Animator animation) {
-                        for (int i = 0 ; i<view.length ; i++) {
-                            view[i].setVisibility(show ? View.GONE : View.VISIBLE);
-                        }
+            view[0].animate().setDuration(shortAnimTime).alpha(
+                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    for (int i = 0 ; i<view.length ; i++) {
+                        view[i].setVisibility(show ? View.GONE : View.VISIBLE);
                     }
-                });
+                }
+            });
 
 
             view[0].animate().setDuration(shortAnimTime).alpha(
@@ -87,5 +93,4 @@ public abstract class AbstractFragment extends Fragment {
             view[1].setVisibility(show ? View.GONE : View.VISIBLE);
         }
     }
-
 }

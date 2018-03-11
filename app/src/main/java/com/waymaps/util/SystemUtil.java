@@ -5,6 +5,9 @@ import android.content.Context;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.util.DisplayMetrics;
+import android.view.View;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 
 /**
  * Created by Admin on 03.02.2018.
@@ -26,6 +29,11 @@ public class SystemUtil {
         activity.getWindowManager().getDefaultDisplay().getMetrics(metrics);
         return metrics.heightPixels;
     }
+
+    public static void hideKeyboard(Activity activity) {
+        activity.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+    }
+
 
 
 }

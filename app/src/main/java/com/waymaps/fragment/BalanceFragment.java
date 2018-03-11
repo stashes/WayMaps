@@ -8,14 +8,11 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 
 import com.waymaps.R;
-import com.waymaps.activity.MainActivity;
 import com.waymaps.adapter.BalanceAdapter;
 import com.waymaps.api.RetrofitService;
 import com.waymaps.api.WayMapsService;
 import com.waymaps.data.requestEntity.Action;
 import com.waymaps.data.requestEntity.Procedure;
-import com.waymaps.data.requestEntity.parameters.IdParam;
-import com.waymaps.data.requestEntity.parameters.Parameter;
 import com.waymaps.data.responseEntity.FinGet;
 import com.waymaps.util.SystemUtil;
 
@@ -32,7 +29,7 @@ import retrofit2.Response;
  * Created by Admin on 11.02.2018.
  */
 
-public class BalanceFragment extends AbstractFragmentWithUser {
+public class BalanceFragment extends AbstractFragment {
 
     private FinGet[] finGets;
     private Logger logger = LoggerFactory.getLogger(this.getClass());

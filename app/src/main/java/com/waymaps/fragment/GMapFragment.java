@@ -42,7 +42,6 @@ import org.slf4j.LoggerFactory;
 
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -56,13 +55,14 @@ import retrofit2.Response;
  * Created by Admin on 11.02.2018.
  */
 
-public class GMapFragment extends AbstractFragmentWithUser {
+public class GMapFragment extends AbstractFragment {
 
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
     private GoogleMap mMap;
     private MapView mapView;
-    private GetCurrent[] getCurrents;
+    private GetCurrent[] getCurrentsResponse;
+    private List<GetCurrent> getCurrents;
     private Marker[] markers;
     private Procedure procedure;
     private Marker currentMarker;
@@ -218,7 +218,13 @@ public class GMapFragment extends AbstractFragmentWithUser {
                 getCurrent.enqueue(new Callback<GetCurrent[]>() {
                     @Override
                     public void onResponse(Call<GetCurrent[]> call, Response<GetCurrent[]> response) {
-                        getCurrents = response.body();
+                        getCurrentsResponse = response.body();
+                        getCurrents = new ArrayList<>();
+                        for (GetCurrent getCurrent1 : getCurrentsResponse){
+                            if (!(getCurrent1.getLat() == null || getCurrent1.getLon() == null)){
+                                getCurrents.add(getCurrent1);
+                            }
+                        }
                         updateMarkers();
                     }
 
@@ -244,42 +250,42 @@ public class GMapFragment extends AbstractFragmentWithUser {
     }
 
     private void updateMarkers() {
-        int numMarkers = getCurrents.length;
+        int numMarkers = getCurrents.size();
         markers = new Marker[numMarkers];
         int active = 0;
         int inActive = 0;
         if (isAdded() && getActivity() != null)
             for (int i = 0; i < numMarkers; i++) {
                 markers[i] = mMap.addMarker(new MarkerOptions().position(
-                        new LatLng(Double.parseDouble(getCurrents[i].getLat())
-                                , Double.parseDouble(getCurrents[i].getLon()))));
+                        new LatLng(Double.parseDouble(getCurrents.get(i).getLat())
+                                , Double.parseDouble(getCurrents.get(i).getLon()))));
                 double speed = 0;
-                if (getCurrents[i].getSpeed() != null) {
-                    speed = Double.parseDouble(getCurrents[i].getSpeed());
+                if (getCurrents.get(i).getSpeed() != null) {
+                    speed = Double.parseDouble(getCurrents.get(i).getSpeed());
                 } else
                     speed = 0;
 
-                if (getCurrents[i].getStatus().equals("1")) {
+                if (getCurrents.get(i).getStatus().equals("1")) {
                     active++;
                 } else {
                     inActive++;
                 }
 
-                String marker = getCurrents[i].getMarker();
-                String color = getCurrents[i].getColor();
+                String marker = getCurrents.get(i).getMarker();
+                String color = getCurrents.get(i).getColor();
 
                 Bitmap markerIcon = pickImage(speed, marker, color);
 
                 float vector = 0;
-                if (getCurrents[i].getVector() != null) {
-                    vector = Float.parseFloat(getCurrents[i].getVector());
+                if (getCurrents.get(i).getVector() != null) {
+                    vector = Float.parseFloat(getCurrents.get(i).getVector());
                 }
 
                 markers[i].setIcon(BitmapDescriptorFactory.fromBitmap(markerIcon));
                 if (speed > 5) {
                     markers[i].setRotation(vector);
                 }
-                markers[i].setTag(getCurrents[i]);
+                markers[i].setTag(getCurrents.get(i));
             }
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
@@ -291,7 +297,7 @@ public class GMapFragment extends AbstractFragmentWithUser {
 
         sheetBehaviorCar = BottomSheetBehavior.from(linearLayoutCar);
         sheetBehavior = BottomSheetBehavior.from(linearLayout);
-        final GetCurrentAdapter getCurrentAdapter = new GetCurrentAdapter(getContext(), Arrays.asList(getCurrents));
+        final GetCurrentAdapter getCurrentAdapter = new GetCurrentAdapter(getContext(), getCurrents);
         listView.setAdapter(getCurrentAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -625,7 +631,7 @@ public class GMapFragment extends AbstractFragmentWithUser {
         procedure.setIdentficator(SystemUtil.getWifiMAC(getActivity()));
         procedure.setName(Action.GET_CURRENT);
         procedure.setUser_id(authorizedUser.getId());
-        procedure.setParams(authorizedUser.getFirm_id());
+        procedure.setParams(authorizedUser.getId());
         return procedure;
     }
 

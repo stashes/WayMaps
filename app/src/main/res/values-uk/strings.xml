@@ -34,4 +34,9 @@
 
     <!--GetFirms list layout -->
     <string name="get_firms_actionbar_title">Список фірм</string>
+    <string name="app_name">WayMaps</string>
+    <string name="login">Логін</string>
+    <string name="pass">Пароль</string>
+    <string name="log_in">Увійти</string>
+    <string name="error_field_pass">Помилка перевірки пароля</string>
 </resources>

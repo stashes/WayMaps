@@ -67,6 +67,7 @@ public class TicketListFragment extends AbstractFragment implements AdapterView.
     @Override
     @Nullable
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
+        super.onCreateView(inflater, container, savedInstanceState);
         View view = inflater.inflate(R.layout.ticket_list_layout, container, false);
         ticketListView = view.findViewById(R.id.ticket_table);
         progressBar = view.findViewById(R.id.progress_bar_ticket_list);
@@ -93,8 +94,8 @@ public class TicketListFragment extends AbstractFragment implements AdapterView.
         procedure.setFormat(WayMapsService.DEFAULT_FORMAT);
         procedure.setIdentficator(SystemUtil.getWifiMAC(getActivity()));
         procedure.setName(Action.TICKET_LIST);
-        procedure.setUser_id(MainActivity.authorisedUser.getId());
-        procedure.setParams(MainActivity.authorisedUser.getId());
+        procedure.setUser_id(authorizedUser.getId());
+        procedure.setParams(authorizedUser.getId());
         showProgress(true , ticketListView , progressBar , fab);
         Call<TicketList[]> call = RetrofitService.getWayMapsService().tickerListProcedure(procedure.getAction(), procedure.getName(),
                 procedure.getIdentficator(), procedure.getUser_id() , procedure.getFormat(), procedure.getParams());
@@ -145,6 +146,13 @@ public class TicketListFragment extends AbstractFragment implements AdapterView.
     }
     private void showTrackerList(){
         TrackerListFragment trackerListFragment = new TrackerListFragment();
+        Bundle bundle = null;
+        try{
+            bundle = ApplicationUtil.setValueToBundle(new Bundle(),"user", authorizedUser);
+        }catch (JsonProcessingException e){
+            logger.debug("Error while trying write to bundle");
+        }
+        trackerListFragment.setArguments(bundle);
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.addToBackStack("trackerList");
         getFragmentManager().popBackStackImmediate("getTicketList",0);

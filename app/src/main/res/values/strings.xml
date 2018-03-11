@@ -97,5 +97,9 @@
     <string name="get_firms_actionbar_title">Firm list</string>
     <string name="moving">Moving</string>
     <string name="speedsmall">speed</string>
+    <string name="history_date_from">Date from</string>
+    <string name="history">History</string>
+    <string name="pick_end_date">Pick end date</string>
+    <string name="pick_start_date">Pick start date</string>
 
 </resources>

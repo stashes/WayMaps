@@ -1,6 +1,5 @@
 package com.waymaps.fragment;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
@@ -12,7 +11,6 @@ import android.widget.ProgressBar;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.waymaps.R;
-import com.waymaps.activity.MainActivity;
 import com.waymaps.adapter.FirmListAdapter;
 import com.waymaps.api.RetrofitService;
 import com.waymaps.api.WayMapsService;
@@ -36,7 +34,7 @@ import retrofit2.Response;
  * Created by nazar on 05.03.2018.
  */
 
-public class FirmListFragment extends AbstractFragmentWithUser implements AdapterView.OnItemClickListener {
+public class FirmListFragment extends AbstractFragment implements AdapterView.OnItemClickListener {
     private FirmList[] firms;
     private ListView listView;
     private Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -46,6 +44,7 @@ public class FirmListFragment extends AbstractFragmentWithUser implements Adapte
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater,container,savedInstanceState);
+        SystemUtil.hideKeyboard(getActivity());
         View view = inflater.inflate(R.layout.activity_firm_list, container, false);
         listView = view.findViewById(R.id.firm_table);
         progressBar = view.findViewById(R.id.progress_bar_firm_list);
@@ -64,8 +63,8 @@ public class FirmListFragment extends AbstractFragmentWithUser implements Adapte
         procedure.setFormat(WayMapsService.DEFAULT_FORMAT);
         procedure.setIdentficator(SystemUtil.getWifiMAC(getActivity()));
         procedure.setName(Action.FIRM_LIST);
-        procedure.setUser_id(MainActivity.authorisedUser.getId());
-        procedure.setParams(MainActivity.authorisedUser.getId());
+        procedure.setUser_id(authorizedUser.getId());
+        procedure.setParams(authorizedUser.getId());
         showProgress(true ,listView,progressBar );
         Call<FirmList[]> call = RetrofitService.getWayMapsService().getFirmList(procedure.getAction(), procedure.getName(),
                 procedure.getIdentficator(), procedure.getFormat(), procedure.getParams());

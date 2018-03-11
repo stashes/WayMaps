@@ -14,6 +14,7 @@ import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.WindowManager;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -21,14 +22,12 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.waymaps.R;
 import com.waymaps.api.RetrofitService;
 import com.waymaps.api.WayMapsService;
 import com.waymaps.data.requestEntity.Action;
 import com.waymaps.data.requestEntity.Credentials;
 import com.waymaps.data.responseEntity.User;
-import com.waymaps.fragment.AbstractFragment;
 import com.waymaps.fragment.FirmListFragment;
 import com.waymaps.intent.MainActivityIntent;
 import com.waymaps.notification.NotificationManager;
@@ -162,7 +161,8 @@ public class LoginActivity extends AppCompatActivity {
                         toast.setGravity(Gravity.CENTER, 0, 0);
                         toast.show();
                         showProgress(false);
-                    } else {
+                    } else{
+                        LoginActivity.this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
                         User currentUser = users[0];
                         LocalPreferencesManagerUtil.saveCredentials(login, password, savePass, LoginActivity.this);
 
@@ -198,6 +198,7 @@ public class LoginActivity extends AppCompatActivity {
                     getString(R.string.notif_firm_bloked) + "-" + user.getSaldo() + user.getCurrency());
             return;
         }
+        //todo change to 1
         if ("1".equals(user.getDiler())) {
 
             FirmListFragment firmListFragment = new FirmListFragment();

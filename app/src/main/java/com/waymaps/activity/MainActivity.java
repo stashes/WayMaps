@@ -1,20 +1,9 @@
 package com.waymaps.activity;
 
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.app.FragmentManager;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.view.Gravity;
-import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -23,12 +12,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.android.gms.maps.model.LatLng;
 import com.waymaps.R;
 import com.waymaps.api.RetrofitService;
@@ -37,10 +24,9 @@ import com.waymaps.data.requestEntity.LogoutCredentials;
 import com.waymaps.data.requestEntity.UpdateCredentials;
 import com.waymaps.data.responseEntity.User;
 import com.waymaps.fragment.BalanceFragment;
-import com.waymaps.fragment.FirmListFragment;
 import com.waymaps.fragment.GMapFragment;
+import com.waymaps.fragment.HistoryFragment;
 import com.waymaps.fragment.TicketListFragment;
-import com.waymaps.fragment.TrackerListFragment;
 import com.waymaps.intent.LoginActivityIntent;
 import com.waymaps.intent.SessionUpdateServiceIntent;
 import com.waymaps.util.ApplicationUtil;
@@ -181,7 +167,7 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.nav_map) {
             map();
         } else if (id == R.id.nav_history) {
-
+            history();
         } else if (id == R.id.nav_settings) {
 
         } else if (id == R.id.nav_save_location) {
@@ -195,6 +181,21 @@ public class MainActivity extends AppCompatActivity
         }
 
         drawer.closeDrawer(GravityCompat.START);
+    }
+
+    private void history() {
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        currentFragment= new HistoryFragment();
+        try {
+            currentFragment.setArguments(ApplicationUtil.setValueToBundle
+                    (new Bundle(),"user",authorisedUser));
+        } catch (JsonProcessingException e) {
+            logger.error("Error writing user {}",authorisedUser.toString());
+        }
+        setActionBarTitle(getResources().getString(R.string.history));
+        ft.addToBackStack("history");
+        ft.replace(R.id.content_main, currentFragment);
+        ft.commit();
     }
 
     private void saveLocation() {
@@ -225,7 +226,7 @@ public class MainActivity extends AppCompatActivity
         } catch (JsonProcessingException e) {
             logger.error("Error writing user {}",authorisedUser.toString());
         }
-        setActionBarTitleColor("Balance");
+        setActionBarTitle("Balance");
         ft.addToBackStack("balance");
         ft.replace(R.id.content_main, currentFragment);
         ft.commit();
@@ -240,7 +241,7 @@ public class MainActivity extends AppCompatActivity
         } catch (JsonProcessingException e) {
             logger.error("Error writing user {}",authorisedUser.toString());
         }
-        setActionBarTitleColor("");
+        setActionBarTitle("");
         ft.addToBackStack("map");
         getFragmentManager().popBackStackImmediate("firmList",0);
         ft.replace(R.id.content_main, currentFragment);
@@ -249,7 +250,13 @@ public class MainActivity extends AppCompatActivity
     private void showTicketList(){
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         currentFragment = new TicketListFragment();
-        setActionBarTitleColor("");
+        try {
+            currentFragment.setArguments(ApplicationUtil.setValueToBundle
+                    (new Bundle(),"user",authorisedUser));
+        } catch (JsonProcessingException e) {
+            logger.error("Error writing user {}",authorisedUser.toString());
+        }
+        setActionBarTitle("");
         ft.addToBackStack("ticketList");
         ft.replace(R.id.content_main, currentFragment);
         ft.commit();
@@ -319,7 +326,7 @@ public class MainActivity extends AppCompatActivity
     };
 */
 
-    public void setActionBarTitleColor(String title) {
+    public void setActionBarTitle(String title) {
         getSupportActionBar().setTitle(title);
     }
 }

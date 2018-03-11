@@ -7,7 +7,6 @@
     <include
         android:id="@+id/action_bar_balance"
         layout="@layout/classic_action_bar">
-
     </include>
     <RelativeLayout
         android:layout_below="@id/action_bar_balance"
