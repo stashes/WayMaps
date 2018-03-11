@@ -2,6 +2,7 @@ package com.waymaps.activity;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.view.Gravity;
 import android.support.design.widget.NavigationView;
@@ -10,6 +11,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
@@ -79,6 +81,7 @@ public class MainActivity extends AppCompatActivity
 
         navigationView.setNavigationItemSelectedListener(this);
 
+
         TextView userTitle =  (TextView) navigationView.getHeaderView(0).findViewById(R.id.userTitle_nav_bar);
         TextView firmTitle = navigationView.getHeaderView(0).findViewById(R.id.firmTitle_nav_bar);
         userTitle.setText(authorisedUser.getUser_title());
@@ -132,7 +135,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-  //      getMenuInflater().inflate(R.menu.main, menu);
+        //getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
 
@@ -234,6 +237,7 @@ public class MainActivity extends AppCompatActivity
 
     private void map() {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        boolean firstLaunch = currentFragment==null;
         currentFragment= new GMapFragment();
         try {
             currentFragment.setArguments(ApplicationUtil.setValueToBundle
@@ -242,10 +246,14 @@ public class MainActivity extends AppCompatActivity
             logger.error("Error writing user {}",authorisedUser.toString());
         }
         setActionBarTitle("");
-        ft.addToBackStack("map");
-        getFragmentManager().popBackStackImmediate("firmList",0);
+        if (firstLaunch){
+            getFragmentManager().popBackStackImmediate();
+        } else {
+            ft.addToBackStack("map");
+        }
         ft.replace(R.id.content_main, currentFragment);
         ft.commit();
+
     }
     private void showTicketList(){
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
