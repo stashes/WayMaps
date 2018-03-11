@@ -11,11 +11,6 @@
     tools:layout_editor_absoluteY="25dp"
     tools:showIn="@layout/app_bar_main">
 
-    <FrameLayout
-        android:id="@+id/content_main"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        tools:layout_editor_absoluteY="8dp"></FrameLayout>
+    <include android:id="@+id/content_main" layout="@layout/fragment_map"></include>
 
 </LinearLayout>
