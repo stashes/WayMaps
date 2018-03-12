@@ -5,6 +5,8 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -37,6 +39,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 
+import butterknife.ButterKnife;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -64,9 +67,19 @@ public class GetTicketFragment extends AbstractFragment implements AdapterView.O
         progressBar = view.findViewById(R.id.progress_bar_get_ticket);
         fab = view.findViewById(R.id.fab_comment_dialog);
         fab.setOnClickListener(this);
+        ButterKnife.bind(this, view);
+
+        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
+        DrawerLayout drawer = ((MainActivity) getActivity()).getDrawer();
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                getActivity(), drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+        toolbar.setTitle(fragmentName());
+
+
+
         getTickets();
-        android.support.v7.app.ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
-        actionBar.setTitle(R.string.get_ticket_actionbar_title);
         return view;
     }
     @Override
@@ -105,6 +118,12 @@ public class GetTicketFragment extends AbstractFragment implements AdapterView.O
             logger.error("Error while trying to parse parameters {}", this.getClass());
         }
     }
+
+    @Override
+    protected String fragmentName() {
+        return getResources().getString(R.string.get_ticket_actionbar_title);
+    }
+
     public void populateTable() {
         if (tickets == null){
             tickets = new Ticket[0];

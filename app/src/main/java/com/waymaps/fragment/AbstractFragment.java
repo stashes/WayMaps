@@ -7,10 +7,19 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.waymaps.R;
+import com.waymaps.activity.MainActivity;
 import com.waymaps.data.responseEntity.User;
 import com.waymaps.util.ApplicationUtil;
 
@@ -19,16 +28,23 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 /**
  * Created by Admin on 06.03.2018.
  */
 
-public class AbstractFragment extends Fragment {
+public abstract class AbstractFragment extends Fragment  {
     protected User authorizedUser;
     protected Logger logger = LoggerFactory.getLogger(this.getClass());
 
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         getAttrFromBundle();
+        ButterKnife.bind(getActivity());
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 
@@ -40,6 +56,8 @@ public class AbstractFragment extends Fragment {
             authorizedUser = null;
         }
     }
+
+    protected abstract String fragmentName();
 
     /**
      * Shows the progress UI and hides the login form.

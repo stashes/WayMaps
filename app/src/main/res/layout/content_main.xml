@@ -11,6 +11,9 @@
     tools:layout_editor_absoluteY="25dp"
     tools:showIn="@layout/app_bar_main">
 
-    <include android:id="@+id/content_main" layout="@layout/fragment_map"></include>
+    <android.support.design.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/content_main"></android.support.design.widget.CoordinatorLayout>
 
 </LinearLayout>

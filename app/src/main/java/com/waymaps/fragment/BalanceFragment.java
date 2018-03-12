@@ -2,12 +2,16 @@ package com.waymaps.fragment;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
 import com.waymaps.R;
+import com.waymaps.activity.MainActivity;
 import com.waymaps.adapter.BalanceAdapter;
 import com.waymaps.api.RetrofitService;
 import com.waymaps.api.WayMapsService;
@@ -21,6 +25,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 
+import butterknife.ButterKnife;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -39,8 +44,24 @@ public class BalanceFragment extends AbstractFragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater,container,savedInstanceState);
         View view = inflater.inflate(R.layout.fragment_balance, container, false);
+        ButterKnife.bind(this,view);
+
+        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
+        DrawerLayout drawer = ((MainActivity) getActivity()).getDrawer();
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                getActivity(), drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+        toolbar.setTitle(fragmentName());
+
+
         getBalance();
         return view;
+    }
+
+    @Override
+    protected String fragmentName() {
+        return getResources().getString(R.string.balance);
     }
 
     @Override

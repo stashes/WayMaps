@@ -3,8 +3,12 @@ package com.waymaps.fragment;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,6 +28,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.waymaps.R;
+import com.waymaps.activity.MainActivity;
 import com.waymaps.adapter.GetCurrentAdapter;
 import com.waymaps.api.RetrofitService;
 import com.waymaps.api.WayMapsService;
@@ -192,6 +197,15 @@ public class GMapFragment extends AbstractFragment {
         super.onCreateView(inflater, container, savedInstanceState);
         View rootView = inflater.inflate(R.layout.fragment_map, container, false);
         ButterKnife.bind(this, rootView);
+
+        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
+        DrawerLayout drawer = ((MainActivity) getActivity()).getDrawer();
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                getActivity(), drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+        ((MainActivity) getActivity()).getSupportActionBar().setTitle(fragmentName());
+
         mapView = (MapView) rootView.findViewById(R.id.map);
         mapView.onCreate(savedInstanceState);
 
@@ -236,6 +250,11 @@ public class GMapFragment extends AbstractFragment {
             }
         });
         return rootView;
+    }
+
+    @Override
+    protected String fragmentName() {
+        return "";
     }
 
     @Override
@@ -310,6 +329,32 @@ public class GMapFragment extends AbstractFragment {
                 }
             }
         });
+        sheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(@NonNull View bottomSheet, int newState) {
+                mapView.setPadding(0,0,0,SystemUtil.getIntHeight(getActivity())-SystemUtil.getStatusBarHeight(getActivity())-bottomSheet.getTop());
+
+            }
+
+            @Override
+            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+                mapView.setPadding(0,0,0,SystemUtil.getIntHeight(getActivity())-SystemUtil.getStatusBarHeight(getActivity())-bottomSheet.getTop());
+
+            }
+        });
+        sheetBehaviorCar.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(@NonNull View bottomSheet, int newState) {
+                mapView.setPadding(0,0,0,SystemUtil.getIntHeight(getActivity())-SystemUtil.getStatusBarHeight(getActivity())-bottomSheet.getTop());
+
+            }
+
+            @Override
+            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+                mapView.setPadding(0,0,0,SystemUtil.getIntHeight(getActivity())-SystemUtil.getStatusBarHeight(getActivity())-bottomSheet.getTop());
+
+            }
+        });
 
         TextView text = (TextView) filterAll.getChildAt(0);
         TextView count = (TextView) filterAll.getChildAt(1);
@@ -338,6 +383,9 @@ public class GMapFragment extends AbstractFragment {
                     getCurrents.add(tag);
                 }
                 listView.setAdapter(new GetCurrentAdapter(getContext(),getCurrents));
+                sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+
+
             }
         });
 
@@ -353,8 +401,11 @@ public class GMapFragment extends AbstractFragment {
                     } else {
                         getCurrents.add(tag);
                     }
+
                 }
                 listView.setAdapter(new GetCurrentAdapter(getContext(),getCurrents));
+                sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+
             }
         });
 
@@ -372,6 +423,8 @@ public class GMapFragment extends AbstractFragment {
                     }
                 }
                 listView.setAdapter(new GetCurrentAdapter(getContext(),getCurrents));
+                sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+
 
             }
         });
@@ -564,6 +617,8 @@ public class GMapFragment extends AbstractFragment {
             public void onClick(View v) {
                 linearLayout.setVisibility(View.VISIBLE);
                 linearLayoutCar.setVisibility(View.GONE);
+                sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                sheetBehaviorCar.setState(BottomSheetBehavior.STATE_COLLAPSED);
                 filtered = false;
                 locked = false;
                 currentMarker = null;
@@ -606,6 +661,8 @@ public class GMapFragment extends AbstractFragment {
 
         linearLayout.setVisibility(View.GONE);
         linearLayoutCar.setVisibility(View.VISIBLE);
+        sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        sheetBehaviorCar.setState(BottomSheetBehavior.STATE_COLLAPSED);
     }
 
     private Bitmap pickImage(double speed, String marker, String color) {

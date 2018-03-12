@@ -9,6 +9,8 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -44,6 +46,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
+import butterknife.ButterKnife;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -73,8 +76,6 @@ public class TicketListFragment extends AbstractFragment implements AdapterView.
         progressBar = view.findViewById(R.id.progress_bar_ticket_list);
         fab = view.findViewById(R.id.fab);
         getTickers(ticketListView);
-        android.support.v7.app.ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
-        actionBar.setTitle(R.string.ticket_list_actionbar_title);
         ticketListView.setOnItemClickListener(this);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -82,8 +83,26 @@ public class TicketListFragment extends AbstractFragment implements AdapterView.
                 showTrackerList();
             }
         });
+
+        ButterKnife.bind(this, view);
+
+        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
+        DrawerLayout drawer = ((MainActivity) getActivity()).getDrawer();
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                getActivity(), drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+        toolbar.setTitle(fragmentName());
+
+
         return view;
     }
+
+    @Override
+    protected String fragmentName() {
+        return getString(R.string.ticket_list_actionbar_title);
+    }
+
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);

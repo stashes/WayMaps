@@ -56,8 +56,6 @@ public class MainActivity extends AppCompatActivity
     public static User authorisedUser;
     public static Fragment currentFragment;
 
-    @BindView(R.id.toolbar)
-    Toolbar toolbar;
 
     @BindView(R.id.nav_view)
     NavigationView navigationView;
@@ -73,11 +71,6 @@ public class MainActivity extends AppCompatActivity
         getUserFromIntent();
         startServices();
 
-        setSupportActionBar(toolbar);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.addDrawerListener(toggle);
-        toggle.syncState();
 
         navigationView.setNavigationItemSelectedListener(this);
 
@@ -195,7 +188,6 @@ public class MainActivity extends AppCompatActivity
         } catch (JsonProcessingException e) {
             logger.error("Error writing user {}",authorisedUser.toString());
         }
-        setActionBarTitle(getResources().getString(R.string.history));
         ft.addToBackStack("history");
         ft.replace(R.id.content_main, currentFragment);
         ft.commit();
@@ -229,7 +221,6 @@ public class MainActivity extends AppCompatActivity
         } catch (JsonProcessingException e) {
             logger.error("Error writing user {}",authorisedUser.toString());
         }
-        setActionBarTitle("Balance");
         ft.addToBackStack("balance");
         ft.replace(R.id.content_main, currentFragment);
         ft.commit();
@@ -245,7 +236,6 @@ public class MainActivity extends AppCompatActivity
         } catch (JsonProcessingException e) {
             logger.error("Error writing user {}",authorisedUser.toString());
         }
-        setActionBarTitle("");
         if (firstLaunch){
             getFragmentManager().popBackStackImmediate();
         } else {
@@ -264,10 +254,10 @@ public class MainActivity extends AppCompatActivity
         } catch (JsonProcessingException e) {
             logger.error("Error writing user {}",authorisedUser.toString());
         }
-        setActionBarTitle("");
-        ft.addToBackStack("ticketList");
+
         ft.replace(R.id.content_main, currentFragment);
         ft.commit();
+        ft.addToBackStack("ticketList");
     }
 
     private void setFragmentActive(Fragment fragment){
@@ -306,7 +296,11 @@ public class MainActivity extends AppCompatActivity
         return new LogoutCredentials(Action.LOGOUT, SystemUtil.getWifiMAC(this), authorisedUser.getId());
     }
 
- /*   protected Dialog onCreateDialog(int id) {
+    public DrawerLayout getDrawer() {
+        return drawer;
+    }
+
+    /*   protected Dialog onCreateDialog(int id) {
         if (id == DIALOG_EXIT) {
             AlertDialog.Builder adb = new AlertDialog.Builder(this);
             adb.setTitle(R.string.exit_dialog);
@@ -334,8 +328,5 @@ public class MainActivity extends AppCompatActivity
     };
 */
 
-    public void setActionBarTitle(String title) {
-        getSupportActionBar().setTitle(title);
-    }
 }
 

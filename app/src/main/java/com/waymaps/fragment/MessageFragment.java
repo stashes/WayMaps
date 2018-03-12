@@ -3,6 +3,8 @@ package com.waymaps.fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -12,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.waymaps.R;
 import com.waymaps.activity.MainActivity;
 import com.waymaps.api.RetrofitService;
@@ -32,6 +35,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
+import butterknife.ButterKnife;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -57,6 +61,15 @@ public class MessageFragment extends AbstractFragment implements View.OnClickLis
         ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle(R.string.message_actionbar_title);
         initViewElement(view);
         getAttrFromBundle();
+        ButterKnife.bind(this, view);
+
+
+        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
+        DrawerLayout drawer = ((MainActivity) getActivity()).getDrawer();
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                getActivity(), drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
         mess_person_from.setText(tracker.getTitle());
         return view;
     }
@@ -72,6 +85,12 @@ public class MessageFragment extends AbstractFragment implements View.OnClickLis
             logger.error("Error while trying to parse parameters {}", this.getClass());
         }
     }
+
+    @Override
+    protected String fragmentName() {
+        return "";
+    }
+
     private void initViewElement(View view){
         mess_person_from = view.findViewById(R.id.mess_person_from);
         mess_text = view.findViewById(R.id.mess_text);
@@ -87,7 +106,7 @@ public class MessageFragment extends AbstractFragment implements View.OnClickLis
         }else {
             sendMessage();
             NotificationManager.showNotification(getActivity(), "SMS sended");
-         //   goToMapfragment();
+            goToMapfragment();
         }
     }
     private void sendMessage(){
@@ -97,7 +116,7 @@ public class MessageFragment extends AbstractFragment implements View.OnClickLis
         procedure.setFormat(WayMapsService.DEFAULT_FORMAT);
         procedure.setIdentficator(SystemUtil.getWifiMAC(getActivity()));
         procedure.setName(Action.TICKET_ADD);
-        procedure.setUser_id(MainActivity.authorisedUser.getId());
+        procedure.setUser_id(authorizedUser.getId());
         procedure.setParams(p.getParameters());
         Call<Void> call = RetrofitService.getWayMapsService().sendMessage(procedure.getAction(), procedure.getName(),
                 procedure.getIdentficator(), procedure.getFormat(), procedure.getParams());
@@ -113,9 +132,15 @@ public class MessageFragment extends AbstractFragment implements View.OnClickLis
        });
     }
     private void goToMapfragment(){
-        GMapFragment gMapFragment =  new GMapFragment();
+        TicketListFragment ticketListFragment =  new TicketListFragment();
+        try {
+            ticketListFragment.setArguments(ApplicationUtil.setValueToBundle
+                    (new Bundle(),"user",authorizedUser));
+        } catch (JsonProcessingException e) {
+            logger.error("Error writing user {}",authorizedUser.toString());
+        }
         FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.replace(R.id.content_main, gMapFragment);
+        ft.replace(R.id.content_main, ticketListFragment);
         ft.remove(this);
         ft.commit();
     }

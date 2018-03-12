@@ -2,6 +2,9 @@ package com.waymaps.fragment;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +14,7 @@ import android.widget.ProgressBar;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.waymaps.R;
+import com.waymaps.activity.MainActivity;
 import com.waymaps.adapter.FirmListAdapter;
 import com.waymaps.api.RetrofitService;
 import com.waymaps.api.WayMapsService;
@@ -51,6 +55,11 @@ public class FirmListFragment extends AbstractFragment implements AdapterView.On
         listView.setOnItemClickListener(this);
         getFirms();
         return view;
+    }
+
+    @Override
+    protected String fragmentName() {
+        return getResources().getString(R.string.get_firms_actionbar_title);
     }
 
     @Override
