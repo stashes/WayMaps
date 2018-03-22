@@ -6,8 +6,11 @@ import com.waymaps.data.responseEntity.FinGet;
 import com.waymaps.data.responseEntity.FirmList;
 import com.waymaps.data.responseEntity.GetCurrent;
 import com.waymaps.data.responseEntity.GetGroup;
+import com.waymaps.data.responseEntity.GetTrack;
+import com.waymaps.data.responseEntity.Report;
 import com.waymaps.data.responseEntity.Ticket;
 import com.waymaps.data.responseEntity.TicketList;
+import com.waymaps.data.responseEntity.TrackCount;
 import com.waymaps.data.responseEntity.TrackerList;
 import com.waymaps.data.responseEntity.User;
 
@@ -64,11 +67,11 @@ public interface WayMapsService {
                                                @Field("format") String format, @Field("params") String params);
 
 
-    @FormUrlEncoded
+    /*@FormUrlEncoded
     @POST("./")
     <T>Call<T[]> defaultProcedure(@Field("action") String action, @Field("name") String name,
                                         @Field("identificator") String identificator, @Field("user_id") String user_id,
-                                        @Field("format") String format,@Field("params") String params);
+                                        @Field("format") String format,@Field("params") String params);*/
 
     @FormUrlEncoded
     @POST("./")
@@ -99,6 +102,18 @@ public interface WayMapsService {
     Call<FirmList[]> getFirmList(@Field("action") String action, @Field("name") String name,
                                @Field("identificator") String identificator,
                                @Field("format") String format, @Field("params") String params);
+
+    @FormUrlEncoded
+    @POST("./")
+    Call<TrackCount[]> getTrackCount(@Field("action") String action, @Field("name") String name,
+                                   @Field("identificator") String identificator,
+                                   @Field("format") String format, @Field("params") String params);
+
+    @FormUrlEncoded
+    @POST("./")
+    Call<Report[]> getReport(@Field("action") String action, @Field("name") String name,
+                                 @Field("identificator") String identificator,
+                                 @Field("format") String format, @Field("params") String params);
 
 
 }

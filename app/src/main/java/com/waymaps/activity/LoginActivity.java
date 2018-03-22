@@ -81,6 +81,9 @@ public class LoginActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         initializeViews();
         initializeButtons();
+        if (mPassSave.isChecked()){
+            attemptLogin();
+        }
     }
 
     private void initializeViews() {

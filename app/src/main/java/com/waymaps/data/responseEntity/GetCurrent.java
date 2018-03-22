@@ -26,11 +26,12 @@ public class GetCurrent {
     private String color;
     private String marker;
     private String note;
+    private String driver;
 
     public GetCurrent() {
     }
 
-    public GetCurrent(String id, String l_date, String lat, String lon, String speed, String sat, String gsm, String power, String ignition, String vector, String motor, String voltage, String dff, String q_dff, String last_parking_start, String status, String tracker_title, String group_id, String color, String marker, String note) {
+    public GetCurrent(String id, String l_date, String lat, String lon, String speed, String sat, String gsm, String power, String ignition, String vector, String motor, String voltage, String dff, String q_dff, String last_parking_start, String status, String tracker_title, String group_id, String color, String marker, String note, String driver) {
         this.id = id;
         this.l_date = l_date;
         this.lat = lat;
@@ -52,6 +53,7 @@ public class GetCurrent {
         this.color = color;
         this.marker = marker;
         this.note = note;
+        this.driver = driver;
     }
 
     public String getId() {
@@ -220,5 +222,13 @@ public class GetCurrent {
 
     public void setVector(String vector) {
         this.vector = vector;
+    }
+
+    public String getDriver() {
+        return driver;
+    }
+
+    public void setDriver(String driver) {
+        this.driver = driver;
     }
 }

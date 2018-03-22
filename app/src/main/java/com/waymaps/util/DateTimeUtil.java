@@ -15,9 +15,16 @@ import java.util.Date;
 public class DateTimeUtil {
     public static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
+    public static SimpleDateFormat dateFormatForReport = new SimpleDateFormat("HH:mm dd-MM-yyyy");
+
     public static String dateToString(Date date){
         return dateFormat.format(date);
     }
+
+    public static String dateToStringForReport(Date date){
+        return dateFormatForReport.format(date);
+    }
+
 
     public static String dateToStringWrapQuates(Date date){
         return "\'" + dateFormat.format(date) + "\'";
@@ -34,5 +41,26 @@ public class DateTimeUtil {
                 (diffHours == 0 ? "" : (diffHours + context.getResources().getString(R.string.hour) + " ")) +
                 (diffMinutes == 0 ? "" : (diffMinutes + context.getResources().getString(R.string.minute) + " ")) +
                 (diffSeconds == 0 ? "" : (diffSeconds + context.getResources().getString(R.string.second))));
+    }
+
+    public static String longToStringDate(long diff,Context context){
+        long diffSeconds = diff  % 60;
+        long diffMinutes = diff / (60 ) % 60;
+        long diffHours = diff / (60 * 60 ) % 24;
+        long diffDays = diff / (24 * 60 * 60 ) % 1000;
+
+        return new String((diffDays == 0 ? "" : (diffDays + context.getResources().getString(R.string.day) + " ")) +
+                (diffHours == 0 ? "" : (diffHours + context.getResources().getString(R.string.hour) + " ")) +
+                (diffMinutes == 0 ? "" : (diffMinutes + context.getResources().getString(R.string.minute) + " ")) +
+                (diffSeconds == 0 ? "" : (diffSeconds + context.getResources().getString(R.string.second))));
+    }
+    public static String longMinToStringDate(long diff,Context context){
+        long diffMinutes = diff % 60;
+        long diffHours = diff / (60) % 24;
+        long diffDays = diff / (24 * 60 ) % 1000;
+
+        return new String((diffDays == 0 ? "" : (diffDays + context.getResources().getString(R.string.day) + " ")) +
+                (diffHours == 0 ? "" : (diffHours + context.getResources().getString(R.string.hour) + " ")) +
+                (diffMinutes == 0 ? "" : (diffMinutes + context.getResources().getString(R.string.minute) + " ")));
     }
 }

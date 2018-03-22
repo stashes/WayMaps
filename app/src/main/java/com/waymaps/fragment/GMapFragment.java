@@ -1,11 +1,15 @@
 package com.waymaps.fragment;
 
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -198,7 +202,7 @@ public class GMapFragment extends AbstractFragment {
         View rootView = inflater.inflate(R.layout.fragment_map, container, false);
         ButterKnife.bind(this, rootView);
 
-        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
+        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
         DrawerLayout drawer = ((MainActivity) getActivity()).getDrawer();
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 getActivity(), drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -208,7 +212,6 @@ public class GMapFragment extends AbstractFragment {
 
         mapView = (MapView) rootView.findViewById(R.id.map);
         mapView.onCreate(savedInstanceState);
-
 
         mapView.onResume(); // needed to get the map to display immediately
 
@@ -224,6 +227,7 @@ public class GMapFragment extends AbstractFragment {
             @Override
             public void onMapReady(GoogleMap googleMap) {
                 mMap = googleMap;
+                mMap.getUiSettings().setRotateGesturesEnabled(false);
                 LatLng location = getLatLng();
                 Float zoom = getZoom();
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location, zoom));
@@ -234,8 +238,8 @@ public class GMapFragment extends AbstractFragment {
                     public void onResponse(Call<GetCurrent[]> call, Response<GetCurrent[]> response) {
                         getCurrentsResponse = response.body();
                         getCurrents = new ArrayList<>();
-                        for (GetCurrent getCurrent1 : getCurrentsResponse){
-                            if (!(getCurrent1.getLat() == null || getCurrent1.getLon() == null)){
+                        for (GetCurrent getCurrent1 : getCurrentsResponse) {
+                            if (!(getCurrent1.getLat() == null || getCurrent1.getLon() == null)) {
                                 getCurrents.add(getCurrent1);
                             }
                         }
@@ -295,15 +299,20 @@ public class GMapFragment extends AbstractFragment {
 
                 Bitmap markerIcon = pickImage(speed, marker, color);
 
-                float vector = 0;
-                if (getCurrents.get(i).getVector() != null) {
-                    vector = Float.parseFloat(getCurrents.get(i).getVector());
+                if (speed > 5) {
+                    float vector = 0;
+                    if (getCurrents.get(i).getVector() != null) {
+                        vector = Float.parseFloat(getCurrents.get(i).getVector());
+                    }
+                    markers[i].setIcon(BitmapDescriptorFactory.fromBitmap(markerIcon));
+                    if (speed > 5) {
+                        markers[i].setRotation(vector);
+                    }
+
+                } else {
+                    markers[i].setIcon(BitmapDescriptorFactory.fromBitmap(markerIcon));
                 }
 
-                markers[i].setIcon(BitmapDescriptorFactory.fromBitmap(markerIcon));
-                if (speed > 5) {
-                    markers[i].setRotation(vector);
-                }
                 markers[i].setTag(getCurrents.get(i));
             }
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
@@ -321,7 +330,7 @@ public class GMapFragment extends AbstractFragment {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-              GetCurrent getCurrent = (GetCurrent) listView.getItemAtPosition(position);
+                GetCurrent getCurrent = (GetCurrent) listView.getItemAtPosition(position);
                 for (Marker m : markers) {
                     if (m.getTag() == getCurrent) {
                         markerClick(m);
@@ -332,33 +341,33 @@ public class GMapFragment extends AbstractFragment {
         sheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
             public void onStateChanged(@NonNull View bottomSheet, int newState) {
-                mapView.setPadding(0,0,0,SystemUtil.getIntHeight(getActivity())-SystemUtil.getStatusBarHeight(getActivity())-bottomSheet.getTop());
+                mapView.setPadding(0, 0, 0, SystemUtil.getIntHeight(getActivity()) - SystemUtil.getStatusBarHeight(getActivity()) - bottomSheet.getTop());
 
             }
 
             @Override
             public void onSlide(@NonNull View bottomSheet, float slideOffset) {
-                mapView.setPadding(0,0,0,SystemUtil.getIntHeight(getActivity())-SystemUtil.getStatusBarHeight(getActivity())-bottomSheet.getTop());
+                mapView.setPadding(0, 0, 0, SystemUtil.getIntHeight(getActivity()) - SystemUtil.getStatusBarHeight(getActivity()) - bottomSheet.getTop());
 
             }
         });
         sheetBehaviorCar.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
             public void onStateChanged(@NonNull View bottomSheet, int newState) {
-                mapView.setPadding(0,0,0,SystemUtil.getIntHeight(getActivity())-SystemUtil.getStatusBarHeight(getActivity())-bottomSheet.getTop());
+                mapView.setPadding(0, 0, 0, SystemUtil.getIntHeight(getActivity()) - SystemUtil.getStatusBarHeight(getActivity()) - bottomSheet.getTop());
 
             }
 
             @Override
             public void onSlide(@NonNull View bottomSheet, float slideOffset) {
-                mapView.setPadding(0,0,0,SystemUtil.getIntHeight(getActivity())-SystemUtil.getStatusBarHeight(getActivity())-bottomSheet.getTop());
+                mapView.setPadding(0, 0, 0, SystemUtil.getIntHeight(getActivity()) - SystemUtil.getStatusBarHeight(getActivity()) - bottomSheet.getTop());
 
             }
         });
 
         TextView text = (TextView) filterAll.getChildAt(0);
         TextView count = (TextView) filterAll.getChildAt(1);
-        text.setText(getResources().getString(R.string.all)+ ": ");
+        text.setText(getResources().getString(R.string.all) + ": ");
         count.setText(Integer.toString(active + inActive));
 
         text = (TextView) filterInActive.getChildAt(0);
@@ -369,7 +378,7 @@ public class GMapFragment extends AbstractFragment {
 
         text = (TextView) filterActive.getChildAt(0);
         count = (TextView) filterActive.getChildAt(1);
-        text.setText(getResources().getString(R.string.statusonline)+ ": ");
+        text.setText(getResources().getString(R.string.statusonline) + ": ");
         count.setText(Integer.toString(active));
         count.setTextColor(getResources().getColor(R.color.success));
 
@@ -382,7 +391,7 @@ public class GMapFragment extends AbstractFragment {
                     GetCurrent tag = (GetCurrent) m.getTag();
                     getCurrents.add(tag);
                 }
-                listView.setAdapter(new GetCurrentAdapter(getContext(),getCurrents));
+                listView.setAdapter(new GetCurrentAdapter(getContext(), getCurrents));
                 sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 
 
@@ -403,7 +412,7 @@ public class GMapFragment extends AbstractFragment {
                     }
 
                 }
-                listView.setAdapter(new GetCurrentAdapter(getContext(),getCurrents));
+                listView.setAdapter(new GetCurrentAdapter(getContext(), getCurrents));
                 sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 
             }
@@ -422,7 +431,7 @@ public class GMapFragment extends AbstractFragment {
                         getCurrents.add(tag);
                     }
                 }
-                listView.setAdapter(new GetCurrentAdapter(getContext(),getCurrents));
+                listView.setAdapter(new GetCurrentAdapter(getContext(), getCurrents));
                 sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 
 
@@ -568,13 +577,13 @@ public class GMapFragment extends AbstractFragment {
         //stop
         String stop = tag.getLast_parking_start();
         final Date stopDate;
-        if (stop == null){
+        if (stop == null) {
             carStopView.setVisibility(View.GONE);
         } else {
             try {
                 stopDate = ApplicationUtil.simpleDateFormat.parse(stop);
                 Date currentDate = new Date();
-                String diff = DateTimeUtil.getDiffBetweenDate(currentDate,stopDate,getContext());
+                String diff = DateTimeUtil.getDiffBetweenDate(currentDate, stopDate, getContext());
                 carStop.setText(diff);
                 carStopView.setVisibility(View.VISIBLE);
 
@@ -589,7 +598,7 @@ public class GMapFragment extends AbstractFragment {
         try {
             updateDate = ApplicationUtil.simpleDateFormat.parse(actual);
             Date currentDate = new Date();
-            String diff = DateTimeUtil.getDiffBetweenDate(currentDate,updateDate,getContext());
+            String diff = DateTimeUtil.getDiffBetweenDate(currentDate, updateDate, getContext());
             carActual.setText(diff);
             carActualView.setVisibility(View.VISIBLE);
 
@@ -599,7 +608,9 @@ public class GMapFragment extends AbstractFragment {
 
 
         //username
-        String userName = authorizedUser.getUser_title();
+        String userName = "";
+        if (tag.getDriver() != null)
+            userName = tag.getDriver();
         carUser.setText(userName);
 
         //car name
@@ -670,17 +681,30 @@ public class GMapFragment extends AbstractFragment {
         if (speed > 5) {
             drawable = getResources().getDrawable(R.drawable.ic_marker_navigation);
         } else {
-            if (marker != null) {
-
+            if ("0".equals(marker)) {
+                drawable = getResources().getDrawable(R.drawable.ic_0);
+            } else if ("1".equals(marker)) {
+                drawable = getResources().getDrawable(R.drawable.ic_1);
+            } else if ("2".equals(marker)) {
+                drawable = getResources().getDrawable(R.drawable.ic_2);
+            } else if ("3".equals(marker)) {
+                drawable = getResources().getDrawable(R.drawable.ic_3);
+            } else if ("4".equals(marker)) {
+                drawable = getResources().getDrawable(R.drawable.ic_4);
+            } else if ("5".equals(marker)) {
+                drawable = getResources().getDrawable(R.drawable.ic_5);
+            } else if ("6".equals(marker)) {
+                drawable = getResources().getDrawable(R.drawable.ic_6);
+            } else {
+                drawable = getResources().getDrawable(R.drawable.ic_0);
             }
-            drawable = getResources().getDrawable(R.drawable.ic_marker_stay);
         }
 
         int bitmapColor = ApplicationUtil.changeColorScaleTo16Int(color);
 
-
         return ApplicationUtil.changeIconColor(drawable, bitmapColor);
     }
+
 
     private Procedure configureProcedure() {
         Procedure procedure = new Procedure(Action.CALL);

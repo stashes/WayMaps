@@ -101,5 +101,31 @@
     <string name="history">History</string>
     <string name="pick_end_date">Pick end date</string>
     <string name="pick_start_date">Pick start date</string>
+    <string name="picked_period">Picked period</string>
+    <string name="object">Object</string>
+    <string name="driver">Driver</string>
+    <string name="select_time_period">Select time period:</string>
+    <string name="track_length">Track length:</string>
+    <string name="calculate">Calculate</string>
+    <string name="show_track">Show track</string>
+    <string name="show_report">Show report</string>
+    <string name="no_data_found">No data found</string>
+    <string name="km">km</string>
+    <string name="somethin_went_wrong">Something went wrong</string>
+    <string name="total_time">Total time</string>
+    <string name="traffic_time">Traffic time</string>
+    <string name="trafic_time">Trafic time</string>
+    <string name="total_distance">Total distance</string>
+    <string name="average_speed">Average speed</string>
+    <string name="average_speed_include_parking">Average speed include parking</string>
+    <string name="parking_count">Parking count</string>
+    <string name="parking_time">Parking time</string>
+    <string name="max_speed">Max speed</string>
+    <string name="speed_limit">Speed limit</string>
+    <string name="excesses_total_count">Excesses total count</string>
+    <string name="excesses_total_time">Excesses total time</string>
+    <string name="excesses_percentage">Excesses percentage</string>
+    <string name="ok">Ok!</string>
+    <string name="min_stop_time">Min stop time</string>
 
 </resources>

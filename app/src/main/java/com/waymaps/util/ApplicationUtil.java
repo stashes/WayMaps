@@ -1,6 +1,8 @@
 package com.waymaps.util;
 
+import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.ColorFilter;
@@ -11,6 +13,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListAdapter;
@@ -42,18 +45,34 @@ public class ApplicationUtil {
     }
 
     public static Bitmap changeIconColor(Drawable drawable, int color) {
-        BitmapDrawable bitmapdraw = (BitmapDrawable) drawable;
-        Bitmap b = bitmapdraw.getBitmap();
+        if (!(drawable instanceof BitmapDrawable)) {
+            Drawable mWrappedDrawable = drawable.mutate();
+            mWrappedDrawable = DrawableCompat.wrap(mWrappedDrawable);
+            DrawableCompat.setTint(mWrappedDrawable, color);
+            DrawableCompat.setTintMode(mWrappedDrawable, PorterDuff.Mode.SRC_IN);
 
-        Bitmap mutableBitmap = b.copy(Bitmap.Config.ARGB_8888, true);
+            Bitmap bitmap = Bitmap.createBitmap(mWrappedDrawable.getIntrinsicWidth(),
+                    mWrappedDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas(bitmap);
+            drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+            drawable.draw(canvas);
+            return bitmap;
 
-        Paint paint = new Paint();
-        ColorFilter filter = new PorterDuffColorFilter(color, PorterDuff.Mode.SRC_IN);
-        paint.setColorFilter(filter);
+        } else {
+            BitmapDrawable bitmapdraw = (BitmapDrawable) drawable;
+            Bitmap b = bitmapdraw.getBitmap();
 
-        Canvas canvas = new Canvas(mutableBitmap);
-        canvas.drawBitmap(b, 0, 0, paint);
-        return mutableBitmap;
+            Bitmap mutableBitmap = b.copy(Bitmap.Config.ARGB_8888, true);
+
+            Paint paint = new Paint();
+            ColorFilter filter = new PorterDuffColorFilter(color, PorterDuff.Mode.SRC_IN);
+            paint.setColorFilter(filter);
+
+            Canvas canvas = new Canvas(mutableBitmap);
+            canvas.drawBitmap(b, 0, 0, paint);
+            return mutableBitmap;
+
+        }
     }
 
     public static int changeColorScaleTo16Int(String color) {
