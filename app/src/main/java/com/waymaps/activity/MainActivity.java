@@ -27,6 +27,8 @@ import com.waymaps.data.requestEntity.UpdateCredentials;
 import com.waymaps.data.responseEntity.User;
 import com.waymaps.fragment.BalanceFragment;
 import com.waymaps.fragment.GMapFragment;
+import com.waymaps.fragment.GetCurrentFragment;
+import com.waymaps.fragment.GroupFragment;
 import com.waymaps.fragment.HistoryFragment;
 import com.waymaps.fragment.TicketListFragment;
 import com.waymaps.intent.LoginActivityIntent;
@@ -50,11 +52,12 @@ import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
-    final int DIALOG_EXIT = 1;
     Logger logger = LoggerFactory.getLogger(this.getClass());
 
     public static User authorisedUser;
     public static Fragment currentFragment;
+
+    public static Boolean isGroupAvaible;
 
 
     @BindView(R.id.nav_view)
@@ -117,7 +120,6 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-       DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -132,6 +134,8 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -140,10 +144,6 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.search_button) {
-            return true;
-        }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -164,9 +164,9 @@ public class MainActivity extends AppCompatActivity
             map();
         } else if (id == R.id.nav_history) {
             history();
-        } else if (id == R.id.nav_settings) {
+        } /*else if (id == R.id.nav_settings) {
 
-        } else if (id == R.id.nav_save_location) {
+        } */else if (id == R.id.nav_save_location) {
             saveLocation();
         } else if (id == R.id.nav_balance) {
             balance();
@@ -181,7 +181,10 @@ public class MainActivity extends AppCompatActivity
 
     private void history() {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        currentFragment= new HistoryFragment();
+        if (isGroupAvaible){
+            currentFragment = new GroupFragment(new GetCurrentFragment());
+        } else
+            currentFragment = new GetCurrentFragment();
         try {
             currentFragment.setArguments(ApplicationUtil.setValueToBundle
                     (new Bundle(),"user",authorisedUser));
@@ -236,7 +239,7 @@ public class MainActivity extends AppCompatActivity
         } catch (JsonProcessingException e) {
             logger.error("Error writing user {}",authorisedUser.toString());
         }
-        if (firstLaunch){
+        if (firstLaunch && !"1".equals(authorisedUser.getDiler())){
             getFragmentManager().popBackStackImmediate();
         } else {
             ft.addToBackStack("map");

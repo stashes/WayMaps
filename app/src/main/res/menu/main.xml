@@ -5,5 +5,5 @@
         android:id="@+id/search_button"
         android:icon="@drawable/ic_search_btn"
         app:showAsAction="ifRoom"
-        android:title="test" />
+        android:title="Groups" />
 </menu>

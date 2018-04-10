@@ -6,6 +6,7 @@ import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -20,6 +21,7 @@ import android.widget.LinearLayout;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.waymaps.R;
 import com.waymaps.activity.MainActivity;
 import com.waymaps.api.RetrofitService;
@@ -32,12 +34,15 @@ import com.waymaps.data.requestEntity.parameters.Parameter;
 import com.waymaps.data.requestEntity.parameters.StartEndDate;
 import com.waymaps.data.requestEntity.parameters.StringParam;
 import com.waymaps.data.responseEntity.GetCurrent;
+import com.waymaps.data.responseEntity.GetGroup;
 import com.waymaps.data.responseEntity.GetTrack;
 import com.waymaps.data.responseEntity.Report;
 import com.waymaps.data.responseEntity.TrackCount;
 import com.waymaps.dialog.ReportDialog;
+import com.waymaps.util.ApplicationUtil;
 import com.waymaps.util.SystemUtil;
 
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -107,6 +112,7 @@ public class HistoryFragment extends AbstractFragment {
         super.onCreateView(inflater, container, savedInstanceState);
         View rootView = inflater.inflate(R.layout.fragment_history, container, false);
         ButterKnife.bind(this, rootView);
+        getFromBundle();
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
         DrawerLayout drawer = ((MainActivity) getActivity()).getDrawer();
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -119,9 +125,15 @@ public class HistoryFragment extends AbstractFragment {
 
         setDefaultDate();
         updateButtonText();
-
-
         return rootView;
+    }
+
+    private void getFromBundle() {
+        try {
+            getCurrent = ApplicationUtil.getObjectFromBundle(getArguments(), "car", GetCurrent.class);
+        } catch (IOException e) {
+            logger.error("Error while trying to parse parameters {}", this.getClass());
+        }
     }
 
     private void setDefaultDate() {
@@ -141,6 +153,25 @@ public class HistoryFragment extends AbstractFragment {
     @Override
     protected String fragmentName() {
         return getResources().getString(R.string.history);
+    }
+
+    @OnClick(R.id.history_show_track)
+    protected void showTrack(){
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        HistoryMapFragment fragment = new HistoryMapFragment();
+        try {
+            Bundle bundle = ApplicationUtil.setValueToBundle(new Bundle(), "user", authorizedUser);
+            ApplicationUtil.setValueToBundle(bundle, "trackCount", trackCount);
+            ApplicationUtil.setValueToBundle(bundle, "getCurrent", getCurrent);
+            ApplicationUtil.setValueToBundle(bundle, "from", dateFromD);
+            ApplicationUtil.setValueToBundle(bundle, "to", dateToD);
+            fragment.setArguments(bundle);
+        } catch (JsonProcessingException e) {
+            logger.error("Error writing user {}",authorizedUser.toString());
+        }
+        ft.replace(R.id.content_main, fragment);
+        ft.commit();
+        ft.addToBackStack("HistoryFragment");
     }
 
     @OnClick(R.id.history_show_report)
@@ -174,12 +205,9 @@ public class HistoryFragment extends AbstractFragment {
                 } else{
                     report = reports[0];
                     //todo change
-                    GetCurrent gc = new GetCurrent();
-                    gc.setDriver("12");
-                    gc.setTracker_title("MAGNUM");
-                    gc.setSpeed("120");
+
                     //
-                    ReportDialog reportDialog = new ReportDialog(getContext(),authorizedUser,gc,report,trackCount,dateFromD,dateToD);
+                    ReportDialog reportDialog = new ReportDialog(getContext(),authorizedUser,getCurrent,report,trackCount,dateFromD,dateToD);
                     reportDialog.getWindow().setLayout((int) (SystemUtil.getIntWidth(getActivity())*0.9), (int) (SystemUtil.getIntHeight(getActivity())*0.9));
                     reportDialog.show();
                 }
@@ -270,6 +298,8 @@ public class HistoryFragment extends AbstractFragment {
         dateTo.setText(message);
         message = (hour_from<10?"0":"") + hour_from + ":" + (minute_from<10?"0":"") +  minute_from + " " +
                 (day_from<10?"0":"") + day_from + "."+ ((month_from+1)<10?"0":"") + (month_from+1) + "." + year_from;
+        dateToD = new GregorianCalendar(year_to,month_to,day_to,hour_to,minute_to).getTime();
+        dateFromD = new GregorianCalendar(year_from,month_from,day_from,hour_from,minute_from).getTime();
         dateFrom.setText(message);
         historyCalculateView.setVisibility(View.VISIBLE);
         hisoryShowInfoView.setVisibility(View.GONE);

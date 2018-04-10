@@ -127,5 +127,18 @@
     <string name="excesses_percentage">Excesses percentage</string>
     <string name="ok">Ok!</string>
     <string name="min_stop_time">Min stop time</string>
+    <string name="chosen_period">Chosen period</string>
+    <string name="distance_for_period">Distance for period</string>
+    <string name="fuel_burned">Fuel burned</string>
+    <string name="network">Network</string>
+    <string name="error_loading_point">Error while trying to load point</string>
+    <string name="from">from</string>
+    <string name="to">to</string>
+    <string name="duration">Duration</string>
+    <string name="distance">Distance</string>
+    <string name="date_from">Date from</string>
+    <string name="date_to">Date to</string>
+    <string name="group_list">Group list</string>
+    <string name="get_tracker">Trackers</string>
 
 </resources>

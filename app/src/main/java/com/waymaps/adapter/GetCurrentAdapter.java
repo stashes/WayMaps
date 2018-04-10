@@ -74,10 +74,14 @@ public class GetCurrentAdapter extends BaseAdapter {
         ButterKnife.bind(this,view);
         GetCurrent getCurrent = getGetCurrent(position);
 
-        Drawable drawable = icon.getDrawable();
-        int color = ApplicationUtil.changeColorScaleTo16Int(getCurrent.getColor());
+        Double speed;
+        if (getCurrent.getSpeed() != null) {
+            speed = Double.parseDouble(getCurrent.getSpeed());
+        } else
+            speed = 0.0;
 
-        Bitmap bitmap = ApplicationUtil.changeIconColor(drawable,color);
+        Bitmap bitmap = ApplicationUtil.pickImage(view.getContext(), speed
+                ,getCurrent.getMarker(),getCurrent.getColor());
 
         icon.setImageBitmap(bitmap);
         name.setText(getCurrent.getTracker_title());

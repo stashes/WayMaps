@@ -1,20 +1,26 @@
 package com.waymaps.fragment;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -22,6 +28,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -34,6 +41,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.waymaps.R;
 import com.waymaps.activity.MainActivity;
 import com.waymaps.adapter.GetCurrentAdapter;
+import com.waymaps.adapter.GroupAdapter;
 import com.waymaps.api.RetrofitService;
 import com.waymaps.api.WayMapsService;
 import com.waymaps.components.BottomSheetListView;
@@ -41,6 +49,8 @@ import com.waymaps.components.MaxHeightLinearView;
 import com.waymaps.data.requestEntity.Action;
 import com.waymaps.data.requestEntity.Procedure;
 import com.waymaps.data.responseEntity.GetCurrent;
+import com.waymaps.data.responseEntity.GetGroup;
+import com.waymaps.data.responseEntity.TrackCount;
 import com.waymaps.util.ApplicationUtil;
 import com.waymaps.util.DateTimeUtil;
 import com.waymaps.util.LocalPreferenceManager;
@@ -49,6 +59,7 @@ import com.waymaps.util.SystemUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -75,8 +86,10 @@ public class GMapFragment extends AbstractFragment {
     private Marker[] markers;
     private Procedure procedure;
     private Marker currentMarker;
+    private GetGroup pickedGroup;
     private boolean filtered;
     private boolean locked;
+    private Boolean isActive;
 
     @BindView(R.id.bottom_sheet_map_tracker_list)
     MaxHeightLinearView linearLayout;
@@ -195,13 +208,42 @@ public class GMapFragment extends AbstractFragment {
 
     BottomSheetBehavior sheetBehaviorCar;
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        //getActivity().getMenuInflater().inflate(R.menu.main, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.search_button) {
+            FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+            GroupFragment fragment= new GroupFragment(new GMapFragment());
+            try {
+                fragment.setArguments(ApplicationUtil.setValueToBundle
+                        (new Bundle(),"user",authorizedUser));
+            } catch (JsonProcessingException e) {
+                logger.error("Error writing user {}",authorizedUser.toString());
+            }
+            ft.replace(R.id.content_main, fragment);
+            ft.commit();
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         View rootView = inflater.inflate(R.layout.fragment_map, container, false);
         ButterKnife.bind(this, rootView);
-
+        getAttrFromBundle();
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
         DrawerLayout drawer = ((MainActivity) getActivity()).getDrawer();
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -210,6 +252,7 @@ public class GMapFragment extends AbstractFragment {
         toggle.syncState();
         ((MainActivity) getActivity()).getSupportActionBar().setTitle(fragmentName());
 
+        setHasOptionsMenu(true);
         mapView = (MapView) rootView.findViewById(R.id.map);
         mapView.onCreate(savedInstanceState);
 
@@ -238,10 +281,20 @@ public class GMapFragment extends AbstractFragment {
                     public void onResponse(Call<GetCurrent[]> call, Response<GetCurrent[]> response) {
                         getCurrentsResponse = response.body();
                         getCurrents = new ArrayList<>();
+                        if (MainActivity.isGroupAvaible==null){
+                            MainActivity.isGroupAvaible = new Boolean(false);
+                        }
                         for (GetCurrent getCurrent1 : getCurrentsResponse) {
-                            if (!(getCurrent1.getLat() == null || getCurrent1.getLon() == null)) {
+                            if ((!(getCurrent1.getLat() == null || getCurrent1.getLon() == null)
+                                    && (pickedGroup == null || pickedGroup.getId().equals(getCurrent1.getGroup_id())))) {
                                 getCurrents.add(getCurrent1);
+                                if (getCurrent1.getGroup_id()!=null){
+                                    MainActivity.isGroupAvaible = new Boolean(true);
+                                }
                             }
+                        }
+                        if (MainActivity.isGroupAvaible == true){
+                            getActivity().getMenuInflater().inflate(R.menu.main, toolbar.getMenu());
                         }
                         updateMarkers();
                     }
@@ -253,7 +306,33 @@ public class GMapFragment extends AbstractFragment {
                 });
             }
         });
+
+        //updateMethod();
         return rootView;
+    }
+
+    private void updateMethod() {
+        final Handler handler = new Handler();
+        final int delay = 1000; //milliseconds
+
+        handler.postDelayed(new Runnable(){
+            public void run(){
+                if (currentMarker != null){
+                    GetCurrent tag = (GetCurrent) currentMarker.getTag();
+                    updateMarkerState(tag);
+                } else {
+                    updateListState();
+                    if (isActive == null){
+                        all();
+                    } else if (isActive == true){
+                        active();
+                    } else {
+                        inActive();
+                    }
+                }
+                handler.postDelayed(this, delay);
+            }
+        }, delay);
     }
 
     @Override
@@ -279,41 +358,41 @@ public class GMapFragment extends AbstractFragment {
         int inActive = 0;
         if (isAdded() && getActivity() != null)
             for (int i = 0; i < numMarkers; i++) {
-                markers[i] = mMap.addMarker(new MarkerOptions().position(
-                        new LatLng(Double.parseDouble(getCurrents.get(i).getLat())
-                                , Double.parseDouble(getCurrents.get(i).getLon()))));
-                double speed = 0;
-                if (getCurrents.get(i).getSpeed() != null) {
-                    speed = Double.parseDouble(getCurrents.get(i).getSpeed());
-                } else
-                    speed = 0;
+                    markers[i] = mMap.addMarker(new MarkerOptions().position(
+                            new LatLng(Double.parseDouble(getCurrents.get(i).getLat())
+                                    , Double.parseDouble(getCurrents.get(i).getLon()))));
+                    double speed = 0;
+                    if (getCurrents.get(i).getSpeed() != null) {
+                        speed = Double.parseDouble(getCurrents.get(i).getSpeed());
+                    } else
+                        speed = 0;
 
-                if (getCurrents.get(i).getStatus().equals("1")) {
-                    active++;
-                } else {
-                    inActive++;
-                }
-
-                String marker = getCurrents.get(i).getMarker();
-                String color = getCurrents.get(i).getColor();
-
-                Bitmap markerIcon = pickImage(speed, marker, color);
-
-                if (speed > 5) {
-                    float vector = 0;
-                    if (getCurrents.get(i).getVector() != null) {
-                        vector = Float.parseFloat(getCurrents.get(i).getVector());
+                    if (getCurrents.get(i).getStatus().equals("1")) {
+                        active++;
+                    } else {
+                        inActive++;
                     }
-                    markers[i].setIcon(BitmapDescriptorFactory.fromBitmap(markerIcon));
+
+                    String marker = getCurrents.get(i).getMarker();
+                    String color = getCurrents.get(i).getColor();
+
+                    Bitmap markerIcon = ApplicationUtil.pickImage(getContext(),speed, marker, color);
+
                     if (speed > 5) {
-                        markers[i].setRotation(vector);
+                        float vector = 0;
+                        if (getCurrents.get(i).getVector() != null) {
+                            vector = Float.parseFloat(getCurrents.get(i).getVector());
+                        }
+                        markers[i].setIcon(BitmapDescriptorFactory.fromBitmap(markerIcon));
+                        if (speed > 5) {
+                            markers[i].setRotation(vector);
+                        }
+
+                    } else {
+                        markers[i].setIcon(BitmapDescriptorFactory.fromBitmap(markerIcon));
                     }
 
-                } else {
-                    markers[i].setIcon(BitmapDescriptorFactory.fromBitmap(markerIcon));
-                }
-
-                markers[i].setTag(getCurrents.get(i));
+                    markers[i].setTag(getCurrents.get(i));
             }
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
@@ -325,19 +404,7 @@ public class GMapFragment extends AbstractFragment {
 
         sheetBehaviorCar = BottomSheetBehavior.from(linearLayoutCar);
         sheetBehavior = BottomSheetBehavior.from(linearLayout);
-        final GetCurrentAdapter getCurrentAdapter = new GetCurrentAdapter(getContext(), getCurrents);
-        listView.setAdapter(getCurrentAdapter);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                GetCurrent getCurrent = (GetCurrent) listView.getItemAtPosition(position);
-                for (Marker m : markers) {
-                    if (m.getTag() == getCurrent) {
-                        markerClick(m);
-                    }
-                }
-            }
-        });
+        updateListState();
         sheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
             public void onStateChanged(@NonNull View bottomSheet, int newState) {
@@ -385,14 +452,7 @@ public class GMapFragment extends AbstractFragment {
         filterAll.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                List<GetCurrent> getCurrents = new ArrayList<>();
-                for (Marker m : markers) {
-                    m.setVisible(true);
-                    GetCurrent tag = (GetCurrent) m.getTag();
-                    getCurrents.add(tag);
-                }
-                listView.setAdapter(new GetCurrentAdapter(getContext(), getCurrents));
-                sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                all();
 
 
             }
@@ -401,43 +461,80 @@ public class GMapFragment extends AbstractFragment {
         filterInActive.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                List<GetCurrent> getCurrents = new ArrayList<>();
-                for (Marker m : markers) {
-                    m.setVisible(true);
-                    GetCurrent tag = (GetCurrent) m.getTag();
-                    if (!"0".equals(tag.getStatus())) {
-                        m.setVisible(false);
-                    } else {
-                        getCurrents.add(tag);
-                    }
-
-                }
-                listView.setAdapter(new GetCurrentAdapter(getContext(), getCurrents));
-                sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-
+                inActive();
             }
         });
 
         filterActive.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                List<GetCurrent> getCurrents = new ArrayList<>();
-                for (Marker m : markers) {
-                    m.setVisible(true);
-                    GetCurrent tag = (GetCurrent) m.getTag();
-                    if ("0".equals(tag.getStatus())) {
-                        m.setVisible(false);
-                    } else {
-                        getCurrents.add(tag);
-                    }
-                }
-                listView.setAdapter(new GetCurrentAdapter(getContext(), getCurrents));
-                sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                active();
 
 
             }
         });
 
+    }
+
+    private void all() {
+        isActive = null;
+        List<GetCurrent> getCurrents = new ArrayList<>();
+        for (Marker m : markers) {
+            m.setVisible(true);
+            GetCurrent tag = (GetCurrent) m.getTag();
+            getCurrents.add(tag);
+        }
+        listView.setAdapter(new GetCurrentAdapter(getContext(), getCurrents));
+        sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+    }
+
+    private void active() {
+        isActive = new Boolean(true);
+        List<GetCurrent> getCurrents = new ArrayList<>();
+        for (Marker m : markers) {
+            m.setVisible(true);
+            GetCurrent tag = (GetCurrent) m.getTag();
+            if ("0".equals(tag.getStatus())) {
+                m.setVisible(false);
+            } else {
+                getCurrents.add(tag);
+            }
+        }
+        listView.setAdapter(new GetCurrentAdapter(getContext(), getCurrents));
+        sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+    }
+
+    private void inActive() {
+        isActive = new Boolean(false);
+        List<GetCurrent> getCurrents = new ArrayList<>();
+        for (Marker m : markers) {
+            m.setVisible(true);
+            GetCurrent tag = (GetCurrent) m.getTag();
+            if (!"0".equals(tag.getStatus())) {
+                m.setVisible(false);
+            } else {
+                getCurrents.add(tag);
+            }
+
+        }
+        listView.setAdapter(new GetCurrentAdapter(getContext(), getCurrents));
+        sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+    }
+
+    private void updateListState() {
+        final GetCurrentAdapter getCurrentAdapter = new GetCurrentAdapter(getContext(), getCurrents);
+        listView.setAdapter(getCurrentAdapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                GetCurrent getCurrent = (GetCurrent) listView.getItemAtPosition(position);
+                for (Marker m : markers) {
+                    if (m.getTag() == getCurrent) {
+                        markerClick(m);
+                    }
+                }
+            }
+        });
     }
 
     private void onMarkerOrListViewClick(Marker marker) {
@@ -451,6 +548,67 @@ public class GMapFragment extends AbstractFragment {
             lockCar.setImageDrawable(getResources().getDrawable(R.drawable.ic_unlock));
         }
         GetCurrent tag = (GetCurrent) currentMarker.getTag();
+        mMap.animateCamera(CameraUpdateFactory.newLatLng(new LatLng(Double.parseDouble(tag.getLat())
+                ,Double.parseDouble(tag.getLon()))));
+        updateMarkerState(tag);
+
+
+        backTaAll.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                linearLayout.setVisibility(View.VISIBLE);
+                linearLayoutCar.setVisibility(View.GONE);
+                sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                sheetBehaviorCar.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                filtered = false;
+                locked = false;
+                currentMarker = null;
+                for (Marker m : markers) {
+                    if (m!=null){
+                        m.remove();
+                    }
+                }
+                updateMarkers();
+            }
+        });
+
+        filterCar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                filtered = !filtered;
+                if (filtered) {
+                    for (Marker m : markers) {
+                        m.setVisible(false);
+                    }
+                    currentMarker.setVisible(true);
+                } else {
+                    for (Marker m : markers) {
+                        m.setVisible(true);
+                    }
+                }
+            }
+        });
+
+        lockCar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                locked = !locked;
+                if (locked) {
+                    mMap.moveCamera(CameraUpdateFactory.newLatLng(currentMarker.getPosition()));
+                    lockCar.setImageDrawable(getResources().getDrawable(R.drawable.ic_lock));
+                } else {
+                    lockCar.setImageDrawable(getResources().getDrawable(R.drawable.ic_unlock));
+                }
+            }
+        });
+
+        linearLayout.setVisibility(View.GONE);
+        linearLayoutCar.setVisibility(View.VISIBLE);
+        sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        sheetBehaviorCar.setState(BottomSheetBehavior.STATE_COLLAPSED);
+    }
+
+    private void updateMarkerState(GetCurrent tag) {
         //speed
         String speed = tag.getSpeed();
         if (speed == null || speed == "-1") speed = "0";
@@ -558,7 +716,12 @@ public class GMapFragment extends AbstractFragment {
         if ("-1".equals(voltage)) {
             carVoltageView.setVisibility(View.GONE);
         } else {
-            carVoltage.setText(getResources().getString(R.string.battery)
+            String power = tag.getPower();
+            if (power != null || "1".equals(power)) {
+                power = getResources().getString(R.string.network);
+            } else
+                power = getResources().getString(R.string.battery);
+            carVoltage.setText(power
                     + " (" + voltage + getResources().getString(R.string.v) + ")");
             carVoltage.setTextColor(getResources().getColor(R.color.success));
         }
@@ -622,87 +785,6 @@ public class GMapFragment extends AbstractFragment {
         int color = ApplicationUtil.changeColorScaleTo16Int(tag.getColor());
         Bitmap bitmap = ApplicationUtil.changeIconColor(drawable, color);
         carImage.setImageBitmap(bitmap);
-
-        backTaAll.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                linearLayout.setVisibility(View.VISIBLE);
-                linearLayoutCar.setVisibility(View.GONE);
-                sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-                sheetBehaviorCar.setState(BottomSheetBehavior.STATE_COLLAPSED);
-                filtered = false;
-                locked = false;
-                currentMarker = null;
-                for (Marker m : markers) {
-                    m.remove();
-                }
-                updateMarkers();
-            }
-        });
-
-        filterCar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                filtered = !filtered;
-                if (filtered) {
-                    for (Marker m : markers) {
-                        m.setVisible(false);
-                    }
-                    currentMarker.setVisible(true);
-                } else {
-                    for (Marker m : markers) {
-                        m.setVisible(true);
-                    }
-                }
-            }
-        });
-
-        lockCar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                locked = !locked;
-                if (locked) {
-                    mMap.moveCamera(CameraUpdateFactory.newLatLng(currentMarker.getPosition()));
-                    lockCar.setImageDrawable(getResources().getDrawable(R.drawable.ic_lock));
-                } else {
-                    lockCar.setImageDrawable(getResources().getDrawable(R.drawable.ic_unlock));
-                }
-            }
-        });
-
-        linearLayout.setVisibility(View.GONE);
-        linearLayoutCar.setVisibility(View.VISIBLE);
-        sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-        sheetBehaviorCar.setState(BottomSheetBehavior.STATE_COLLAPSED);
-    }
-
-    private Bitmap pickImage(double speed, String marker, String color) {
-        Drawable drawable;
-        if (speed > 5) {
-            drawable = getResources().getDrawable(R.drawable.ic_marker_navigation);
-        } else {
-            if ("0".equals(marker)) {
-                drawable = getResources().getDrawable(R.drawable.ic_0);
-            } else if ("1".equals(marker)) {
-                drawable = getResources().getDrawable(R.drawable.ic_1);
-            } else if ("2".equals(marker)) {
-                drawable = getResources().getDrawable(R.drawable.ic_2);
-            } else if ("3".equals(marker)) {
-                drawable = getResources().getDrawable(R.drawable.ic_3);
-            } else if ("4".equals(marker)) {
-                drawable = getResources().getDrawable(R.drawable.ic_4);
-            } else if ("5".equals(marker)) {
-                drawable = getResources().getDrawable(R.drawable.ic_5);
-            } else if ("6".equals(marker)) {
-                drawable = getResources().getDrawable(R.drawable.ic_6);
-            } else {
-                drawable = getResources().getDrawable(R.drawable.ic_0);
-            }
-        }
-
-        int bitmapColor = ApplicationUtil.changeColorScaleTo16Int(color);
-
-        return ApplicationUtil.changeIconColor(drawable, bitmapColor);
     }
 
 
@@ -729,6 +811,20 @@ public class GMapFragment extends AbstractFragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        mMap.clear();
+    }
+
+    private void getAttrFromBundle(){
+        try {
+            pickedGroup = ApplicationUtil.getObjectFromBundle(getArguments(), "group", GetGroup.class);
+        } catch (IOException e) {
+            logger.error("Error while trying to parse parameters {}", this.getClass());
+        }
     }
 
     public GoogleMap getmMap() {

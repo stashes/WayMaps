@@ -34,9 +34,6 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-/**
- * Created by nazar on 05.03.2018.
- */
 
 public class FirmListFragment extends AbstractFragment implements AdapterView.OnItemClickListener {
     private FirmList[] firms;
@@ -83,6 +80,7 @@ public class FirmListFragment extends AbstractFragment implements AdapterView.On
                 firms = response.body();
                 populateTable();
                 showProgress(false , listView,progressBar);
+                getFragmentManager().popBackStackImmediate("maps",0);
             }
 
             @Override
@@ -90,7 +88,6 @@ public class FirmListFragment extends AbstractFragment implements AdapterView.On
                 logger.debug("Failed while trying to load balance.");
             }
         });
-
     }
 
     public void populateTable() {

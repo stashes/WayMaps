@@ -57,12 +57,13 @@ import retrofit2.Response;
 
 
 public class TrackerListFragment extends AbstractFragment implements AdapterView.OnItemClickListener {
-    ListView trackerList;
 
     private TrackerList[] tracker;
     private Logger logger = LoggerFactory.getLogger(this.getClass());
     private HashMap trackerId = new HashMap();
+
     ProgressBar progressBar;
+    ListView trackerList;
 
     @Override
     @Nullable

@@ -14,10 +14,12 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.waymaps.R;
@@ -41,7 +43,9 @@ public class ApplicationUtil {
     }
 
     public static <T> T getObjectFromBundle(Bundle bundle, String key, Class<T> tClass) throws IOException {
+        if (bundle.getString(key)!=null)
         return JSONUtil.getObjectMapper().readValue(bundle.getString(key), tClass);
+        else return null;
     }
 
     public static Bitmap changeIconColor(Drawable drawable, int color) {
@@ -67,6 +71,33 @@ public class ApplicationUtil {
             Paint paint = new Paint();
             ColorFilter filter = new PorterDuffColorFilter(color, PorterDuff.Mode.SRC_IN);
             paint.setColorFilter(filter);
+
+            Canvas canvas = new Canvas(mutableBitmap);
+            canvas.drawBitmap(b, 0, 0, paint);
+            return mutableBitmap;
+
+        }
+    }
+
+    public static Bitmap drawToBitmap(Drawable drawable) {
+        if (!(drawable instanceof BitmapDrawable)) {
+            Drawable mWrappedDrawable = drawable.mutate();
+            mWrappedDrawable = DrawableCompat.wrap(mWrappedDrawable);
+
+            Bitmap bitmap = Bitmap.createBitmap(mWrappedDrawable.getIntrinsicWidth(),
+                    mWrappedDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas(bitmap);
+            drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+            drawable.draw(canvas);
+            return bitmap;
+
+        } else {
+            BitmapDrawable bitmapdraw = (BitmapDrawable) drawable;
+            Bitmap b = bitmapdraw.getBitmap();
+
+            Bitmap mutableBitmap = b.copy(Bitmap.Config.ARGB_8888, true);
+
+            Paint paint = new Paint();
 
             Canvas canvas = new Canvas(mutableBitmap);
             canvas.drawBitmap(b, 0, 0, paint);
@@ -114,6 +145,43 @@ public class ApplicationUtil {
         } else {
             return false;
         }
+    }
+
+    public static Bitmap pickImage(Context context, double speed, String marker, String color) {
+        Drawable drawable;
+        if (speed > 5) {
+            drawable = context.getResources().getDrawable(R.drawable.ic_marker_navigation);
+        } else {
+            if ("0".equals(marker)) {
+                drawable = context.getResources().getDrawable(R.drawable.ic_0);
+            } else if ("1".equals(marker)) {
+                drawable = context.getResources().getDrawable(R.drawable.ic_1);
+            } else if ("2".equals(marker)) {
+                drawable = context.getResources().getDrawable(R.drawable.ic_2);
+            } else if ("3".equals(marker)) {
+                drawable = context.getResources().getDrawable(R.drawable.ic_3);
+            } else if ("4".equals(marker)) {
+                drawable = context.getResources().getDrawable(R.drawable.ic_4);
+            } else if ("5".equals(marker)) {
+                drawable = context.getResources().getDrawable(R.drawable.ic_5);
+            } else if ("6".equals(marker)) {
+                drawable = context.getResources().getDrawable(R.drawable.ic_6);
+            } else {
+                drawable = context.getResources().getDrawable(R.drawable.ic_0);
+            }
+        }
+
+        int bitmapColor = ApplicationUtil.changeColorScaleTo16Int(color);
+
+        return ApplicationUtil.changeIconColor(drawable, bitmapColor);
+    }
+
+    public static void showToast(Context context,String text) {
+        Toast toast = Toast.makeText(context,
+                text,
+                Toast.LENGTH_SHORT);
+        toast.setGravity(Gravity.CENTER, 0, 0);
+        toast.show();
     }
 
 }

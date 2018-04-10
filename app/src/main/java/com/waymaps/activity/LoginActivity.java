@@ -84,6 +84,7 @@ public class LoginActivity extends AppCompatActivity {
         if (mPassSave.isChecked()){
             attemptLogin();
         }
+        getFragmentManager().popBackStackImmediate();
     }
 
     private void initializeViews() {
