@@ -60,6 +60,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -306,14 +307,15 @@ public class GMapFragment extends AbstractFragment {
                 });
             }
         });
-
-        //updateMethod();
+        updateMethod();
         return rootView;
     }
 
     private void updateMethod() {
         final Handler handler = new Handler();
+
         final int delay = 1000; //milliseconds
+        ((MainActivity)getActivity()).registerHandler(handler);
 
         handler.postDelayed(new Runnable(){
             public void run(){
@@ -322,13 +324,7 @@ public class GMapFragment extends AbstractFragment {
                     updateMarkerState(tag);
                 } else {
                     updateListState();
-                    if (isActive == null){
-                        all();
-                    } else if (isActive == true){
-                        active();
-                    } else {
-                        inActive();
-                    }
+
                 }
                 handler.postDelayed(this, delay);
             }
@@ -408,26 +404,26 @@ public class GMapFragment extends AbstractFragment {
         sheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
             public void onStateChanged(@NonNull View bottomSheet, int newState) {
-                mapView.setPadding(0, 0, 0, SystemUtil.getIntHeight(getActivity()) - SystemUtil.getStatusBarHeight(getActivity()) - bottomSheet.getTop());
+                resizeMap(bottomSheet);
 
             }
 
             @Override
             public void onSlide(@NonNull View bottomSheet, float slideOffset) {
-                mapView.setPadding(0, 0, 0, SystemUtil.getIntHeight(getActivity()) - SystemUtil.getStatusBarHeight(getActivity()) - bottomSheet.getTop());
+                resizeMap(bottomSheet);
 
             }
         });
         sheetBehaviorCar.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
             public void onStateChanged(@NonNull View bottomSheet, int newState) {
-                mapView.setPadding(0, 0, 0, SystemUtil.getIntHeight(getActivity()) - SystemUtil.getStatusBarHeight(getActivity()) - bottomSheet.getTop());
+                resizeMap(bottomSheet);
 
             }
 
             @Override
             public void onSlide(@NonNull View bottomSheet, float slideOffset) {
-                mapView.setPadding(0, 0, 0, SystemUtil.getIntHeight(getActivity()) - SystemUtil.getStatusBarHeight(getActivity()) - bottomSheet.getTop());
+                resizeMap(bottomSheet);
 
             }
         });
@@ -452,7 +448,7 @@ public class GMapFragment extends AbstractFragment {
         filterAll.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                all();
+                all(true);
 
 
             }
@@ -461,14 +457,14 @@ public class GMapFragment extends AbstractFragment {
         filterInActive.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                inActive();
+                inActive(true);
             }
         });
 
         filterActive.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                active();
+                active(true);
 
 
             }
@@ -476,7 +472,11 @@ public class GMapFragment extends AbstractFragment {
 
     }
 
-    private void all() {
+    private void resizeMap(@NonNull View bottomSheet) {
+        mapView.setPadding(0, 0, 0, SystemUtil.getIntHeight(getActivity()) - SystemUtil.getStatusBarHeight(getActivity()) - bottomSheet.getTop());
+    }
+
+    private void all(boolean collapse) {
         isActive = null;
         List<GetCurrent> getCurrents = new ArrayList<>();
         for (Marker m : markers) {
@@ -485,10 +485,22 @@ public class GMapFragment extends AbstractFragment {
             getCurrents.add(tag);
         }
         listView.setAdapter(new GetCurrentAdapter(getContext(), getCurrents));
-        sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        if (collapse){
+            changeBSheetState(BottomSheetBehavior.STATE_COLLAPSED,sheetBehavior);
+        }
     }
 
-    private void active() {
+    private void changeBSheetState(int stateCollapsed, BottomSheetBehavior sheetBehavior) {
+        if (stateCollapsed == BottomSheetBehavior.STATE_COLLAPSED){
+            sheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+            sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        } else if (stateCollapsed == BottomSheetBehavior.STATE_EXPANDED){
+            sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+            sheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+        }
+    }
+
+    private void active(boolean collapse) {
         isActive = new Boolean(true);
         List<GetCurrent> getCurrents = new ArrayList<>();
         for (Marker m : markers) {
@@ -501,10 +513,11 @@ public class GMapFragment extends AbstractFragment {
             }
         }
         listView.setAdapter(new GetCurrentAdapter(getContext(), getCurrents));
-        sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        if (collapse)
+            changeBSheetState(BottomSheetBehavior.STATE_COLLAPSED,sheetBehavior);
     }
 
-    private void inActive() {
+    private void inActive(boolean collapse) {
         isActive = new Boolean(false);
         List<GetCurrent> getCurrents = new ArrayList<>();
         for (Marker m : markers) {
@@ -518,12 +531,20 @@ public class GMapFragment extends AbstractFragment {
 
         }
         listView.setAdapter(new GetCurrentAdapter(getContext(), getCurrents));
-        sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        if (collapse)
+            changeBSheetState(BottomSheetBehavior.STATE_COLLAPSED,sheetBehavior);
     }
 
     private void updateListState() {
         final GetCurrentAdapter getCurrentAdapter = new GetCurrentAdapter(getContext(), getCurrents);
         listView.setAdapter(getCurrentAdapter);
+        if (isActive == null){
+            all(false);
+        } else if (isActive == true){
+            active(false);
+        } else {
+            inActive(false);
+        }
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -556,19 +577,7 @@ public class GMapFragment extends AbstractFragment {
         backTaAll.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                linearLayout.setVisibility(View.VISIBLE);
-                linearLayoutCar.setVisibility(View.GONE);
-                sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-                sheetBehaviorCar.setState(BottomSheetBehavior.STATE_COLLAPSED);
-                filtered = false;
-                locked = false;
-                currentMarker = null;
-                for (Marker m : markers) {
-                    if (m!=null){
-                        m.remove();
-                    }
-                }
-                updateMarkers();
+                backToAll();
             }
         });
 
@@ -604,8 +613,25 @@ public class GMapFragment extends AbstractFragment {
 
         linearLayout.setVisibility(View.GONE);
         linearLayoutCar.setVisibility(View.VISIBLE);
-        sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-        sheetBehaviorCar.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        changeBSheetState(BottomSheetBehavior.STATE_COLLAPSED,sheetBehavior);
+        changeBSheetState(BottomSheetBehavior.STATE_COLLAPSED,sheetBehaviorCar);
+
+    }
+
+    private void backToAll() {
+        linearLayout.setVisibility(View.VISIBLE);
+        linearLayoutCar.setVisibility(View.GONE);
+        changeBSheetState(BottomSheetBehavior.STATE_COLLAPSED,sheetBehaviorCar);
+        changeBSheetState(BottomSheetBehavior.STATE_COLLAPSED,sheetBehavior);
+        filtered = false;
+        locked = false;
+        currentMarker = null;
+        for (Marker m : markers) {
+            if (m!=null){
+                m.remove();
+            }
+        }
+        updateMarkers();
     }
 
     private void updateMarkerState(GetCurrent tag) {
@@ -713,7 +739,7 @@ public class GMapFragment extends AbstractFragment {
         //voltage
         String voltage = tag.getVoltage();
         carVoltageView.setVisibility(View.VISIBLE);
-        if ("-1".equals(voltage)) {
+        if ("-1".equals(voltage) || voltage==null) {
             carVoltageView.setVisibility(View.GONE);
         } else {
             String power = tag.getPower();
@@ -721,6 +747,7 @@ public class GMapFragment extends AbstractFragment {
                 power = getResources().getString(R.string.network);
             } else
                 power = getResources().getString(R.string.battery);
+            voltage = new DecimalFormat("0.00").format(Double.parseDouble(voltage));
             carVoltage.setText(power
                     + " (" + voltage + getResources().getString(R.string.v) + ")");
             carVoltage.setTextColor(getResources().getColor(R.color.success));
@@ -829,5 +856,10 @@ public class GMapFragment extends AbstractFragment {
 
     public GoogleMap getmMap() {
         return mMap;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
     }
 }

@@ -118,7 +118,8 @@ public class GetCurrentFragment extends AbstractFragment {
         }
         List<GetCurrent> list = new ArrayList<>();
         for (GetCurrent gc : getCurrents){
-            if (currentGroup == null || gc.getGroup_id().equals(currentGroup.getId())){
+            if (!(gc.getLon() == null || gc.getLat()==null)
+                    && (currentGroup == null || gc.getGroup_id().equals(currentGroup.getId()))){
                 list.add(gc);
             }
         }

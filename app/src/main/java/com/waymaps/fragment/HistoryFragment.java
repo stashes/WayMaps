@@ -18,6 +18,7 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
@@ -84,6 +85,11 @@ public class HistoryFragment extends AbstractFragment {
     @BindView(R.id.history_show_info_view)
     LinearLayout hisoryShowInfoView;
 
+    @BindView(R.id.history_driver)
+    TextView driver;
+
+    @BindView(R.id.history_object)
+    TextView object;
 
     private static final int DIALOG_DATE_FROM = 1;
     private static final int DIALOG_DATE_TO = 2;
@@ -121,7 +127,9 @@ public class HistoryFragment extends AbstractFragment {
         toggle.syncState();
         toolbar.setTitle(fragmentName());
 
-        distance.setText("0.0 " + getString(R.string.km));
+        driver.setText(getCurrent.getDriver());
+        object.setText(getCurrent.getTracker_title());
+        distance.setText("");
 
         setDefaultDate();
         updateButtonText();
@@ -236,7 +244,7 @@ public class HistoryFragment extends AbstractFragment {
     protected void calculate(){
         Procedure procedure = new Procedure(Action.CALL);
         //todo change
-        Parameter parameter = new IdParam("955");
+        Parameter parameter = new IdParam(getCurrent.getId() );
         //
         StartEndDate startEndDate = new StartEndDate(new GregorianCalendar(year_from,month_from,day_from,hour_from,minute_from).getTime(),
                 new GregorianCalendar(year_to,month_to,day_to,hour_to,minute_to).getTime());

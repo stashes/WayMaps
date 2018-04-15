@@ -121,4 +121,6 @@ public class FirmListFragment extends AbstractFragment implements AdapterView.On
         }
         startActivity(mainActivityIntent);
     }
+
+
 }

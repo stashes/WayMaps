@@ -1,6 +1,8 @@
 package com.waymaps.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -43,6 +45,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -59,6 +62,10 @@ public class MainActivity extends AppCompatActivity
 
     public static Boolean isGroupAvaible;
 
+    public static Boolean firstLaunch;
+
+    public ArrayList<Handler> handlers;
+
 
     @BindView(R.id.nav_view)
     NavigationView navigationView;
@@ -73,6 +80,7 @@ public class MainActivity extends AppCompatActivity
         ButterKnife.bind(this);
         getUserFromIntent();
         startServices();
+        firstLaunch = true;
 
 
         navigationView.setNavigationItemSelectedListener(this);
@@ -160,6 +168,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void displaySelectedScreen(int id) {
+        deleteAllBackgroundTasks();
         if (id == R.id.nav_map) {
             map();
         } else if (id == R.id.nav_history) {
@@ -231,7 +240,6 @@ public class MainActivity extends AppCompatActivity
 
     private void map() {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        boolean firstLaunch = currentFragment==null;
         currentFragment= new GMapFragment();
         try {
             currentFragment.setArguments(ApplicationUtil.setValueToBundle
@@ -239,13 +247,16 @@ public class MainActivity extends AppCompatActivity
         } catch (JsonProcessingException e) {
             logger.error("Error writing user {}",authorisedUser.toString());
         }
+
+
+        ft.replace(R.id.content_main, currentFragment);
         if (firstLaunch && !"1".equals(authorisedUser.getDiler())){
             getFragmentManager().popBackStackImmediate();
-        } else {
+        } else if (!firstLaunch){
             ft.addToBackStack("map");
         }
-        ft.replace(R.id.content_main, currentFragment);
         ft.commit();
+
 
     }
     private void showTicketList(){
@@ -278,7 +289,11 @@ public class MainActivity extends AppCompatActivity
             public void onResponse(Call<Void> call, Response<Void> response) {
                 logger.info("Successful logout procedure");
                 LocalPreferencesManagerUtil.clearCredentials(MainActivity.this);
-                startActivity(new LoginActivityIntent(MainActivity.this));
+                LoginActivityIntent intent = new LoginActivityIntent(MainActivity.this);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+
               //  setResult(1);
               //  finish();
             }
@@ -303,6 +318,22 @@ public class MainActivity extends AppCompatActivity
         return drawer;
     }
 
+
+    public void registerHandler(Handler handler){
+        if (handlers == null){
+            handlers = new ArrayList<>();
+        }
+        handlers.add(handler);
+    }
+
+    private void deleteAllBackgroundTasks(){
+        if (handlers == null || handlers.size()==0){
+            return;
+        }
+        for (Handler h : handlers){
+            h.removeCallbacksAndMessages(null);
+        }
+    }
     /*   protected Dialog onCreateDialog(int id) {
         if (id == DIALOG_EXIT) {
             AlertDialog.Builder adb = new AlertDialog.Builder(this);

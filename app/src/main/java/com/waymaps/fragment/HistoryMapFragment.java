@@ -59,6 +59,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -435,13 +436,16 @@ public class HistoryMapFragment extends AbstractFragment {
 
         //voltage
         String voltage = point.getVoltage();
-
+        if (voltage == null || "-1".equals(voltage)){
+            voltage = "0";
+        }
             String power = point.getPower();
             if (power != null || "1".equals(power)) {
                 power = getResources().getString(R.string.network);
             } else
                 power = getResources().getString(R.string.battery);
-            historyVoltage.setText(power
+        voltage = new DecimalFormat("0.00").format(Double.parseDouble(voltage));
+        historyVoltage.setText(power
                     + " (" + voltage + getResources().getString(R.string.v) + ")");
         historyVoltage.setTextColor(getResources().getColor(R.color.success));
 

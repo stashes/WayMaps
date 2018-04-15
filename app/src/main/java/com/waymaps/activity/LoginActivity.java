@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
@@ -84,7 +85,7 @@ public class LoginActivity extends AppCompatActivity {
         if (mPassSave.isChecked()){
             attemptLogin();
         }
-        getFragmentManager().popBackStackImmediate();
+        getFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
     }
 
     private void initializeViews() {
@@ -212,7 +213,7 @@ public class LoginActivity extends AppCompatActivity {
                 logger.error("Error writing user {}", user.toString());
             }
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.addToBackStack("firmList");
+            /*ft.addToBackStack("firmList");*/
             ft.replace(R.id.login_activity_contain, firmListFragment);
             ft.commit();
         } else {
