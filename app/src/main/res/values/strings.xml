@@ -140,5 +140,8 @@
     <string name="date_to">Date to</string>
     <string name="group_list">Group list</string>
     <string name="get_tracker">Trackers</string>
+    <string name="personal_account">Personal account</string>
+    <string name="uah">UAH</string>
+    <string name="balancesmall">balance</string>
 
 </resources>

@@ -21,6 +21,18 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+        <TextView
+            android:id="@+id/balance_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:gravity="left"
+            android:layout_gravity="center"
+            android:textColor="@color/black"
+            android:textSize="15dp"
+            android:padding="10dp"
+            android:paddingBottom="20dp"
+            android:layout_weight="0"/>
         <LinearLayout
             android:id="@+id/title_balance_table"
             android:layout_width="match_parent"

@@ -4,7 +4,9 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.content.Intent;
+import android.inputmethodservice.InputMethodService;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -16,6 +18,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -152,6 +155,9 @@ public class LoginActivity extends AppCompatActivity {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
+            closeKeyBoard();
+            mLoginView.clearFocus();
+            mPasswordView.clearFocus();
             Credentials credentials = getCredentials(login, password);
             RetrofitService.getWayMapsService().loginProcedure(credentials.getAction(), credentials.getPass(), credentials.getOs(),
                     credentials.getLogin(), credentials.getIdentificator(), credentials.getFormat()).enqueue(new Callback<User[]>() {
@@ -193,6 +199,15 @@ public class LoginActivity extends AppCompatActivity {
                 }
             });
 
+        }
+    }
+
+    private void closeKeyBoard() {
+        View view = this.getCurrentFocus();
+        if (view!=null) {
+            ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE))
+                    .toggleSoftInput(InputMethodManager.SHOW_FORCED,
+                            InputMethodManager.HIDE_IMPLICIT_ONLY);
         }
     }
 
@@ -299,6 +314,8 @@ public class LoginActivity extends AppCompatActivity {
             mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
         }
     }
+
+
 
 }
 

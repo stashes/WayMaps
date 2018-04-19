@@ -66,6 +66,8 @@ public class MainActivity extends AppCompatActivity
 
     public ArrayList<Handler> handlers;
 
+    public Boolean backgroundTaskExecuting=false;
+
 
     @BindView(R.id.nav_view)
     NavigationView navigationView;
@@ -169,6 +171,16 @@ public class MainActivity extends AppCompatActivity
 
     private void displaySelectedScreen(int id) {
         deleteAllBackgroundTasks();
+        if (backgroundTaskExecuting) {
+            do {
+                try {
+                    Thread.sleep(5);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            } while (backgroundTaskExecuting);
+        }
+
         if (id == R.id.nav_map) {
             map();
         } else if (id == R.id.nav_history) {
@@ -326,7 +338,7 @@ public class MainActivity extends AppCompatActivity
         handlers.add(handler);
     }
 
-    private void deleteAllBackgroundTasks(){
+    public void deleteAllBackgroundTasks(){
         if (handlers == null || handlers.size()==0){
             return;
         }
@@ -334,6 +346,15 @@ public class MainActivity extends AppCompatActivity
             h.removeCallbacksAndMessages(null);
         }
     }
+
+    public Boolean getBackgroundTaskExecuting() {
+        return backgroundTaskExecuting;
+    }
+
+    public void setBackgroundTaskExecuting(Boolean backgroundTaskExecuting) {
+        this.backgroundTaskExecuting = backgroundTaskExecuting;
+    }
+
     /*   protected Dialog onCreateDialog(int id) {
         if (id == DIALOG_EXIT) {
             AlertDialog.Builder adb = new AlertDialog.Builder(this);

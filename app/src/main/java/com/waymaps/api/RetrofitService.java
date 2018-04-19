@@ -45,4 +45,8 @@ public class RetrofitService {
         }
         return WAY_MAPS_SERVICE;
     }
+
+    public static Retrofit getRetrofit(){
+        return retrofit;
+    }
 }

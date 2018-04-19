@@ -42,6 +42,7 @@ import com.waymaps.R;
 import com.waymaps.activity.MainActivity;
 import com.waymaps.adapter.GetCurrentAdapter;
 import com.waymaps.adapter.GroupAdapter;
+import com.waymaps.api.CancelableCallback;
 import com.waymaps.api.RetrofitService;
 import com.waymaps.api.WayMapsService;
 import com.waymaps.components.BottomSheetListView;
@@ -87,10 +88,13 @@ public class GMapFragment extends AbstractFragment {
     private Marker[] markers;
     private Procedure procedure;
     private Marker currentMarker;
+    private Object currentTag;
     private GetGroup pickedGroup;
     private boolean filtered;
     private boolean locked;
     private Boolean isActive;
+    private long timesMarkerUpdate;
+    private int pickedId;
 
     @BindView(R.id.bottom_sheet_map_tracker_list)
     MaxHeightLinearView linearLayout;
@@ -275,40 +279,56 @@ public class GMapFragment extends AbstractFragment {
                 LatLng location = getLatLng();
                 Float zoom = getZoom();
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location, zoom));
-                Call<GetCurrent[]> getCurrent = RetrofitService.getWayMapsService().getCurrentProcedure(procedure.getAction(), procedure.getName(),
-                        procedure.getIdentficator(), procedure.getUser_id(), procedure.getFormat(), procedure.getParams());
-                getCurrent.enqueue(new Callback<GetCurrent[]>() {
-                    @Override
-                    public void onResponse(Call<GetCurrent[]> call, Response<GetCurrent[]> response) {
-                        getCurrentsResponse = response.body();
-                        getCurrents = new ArrayList<>();
-                        if (MainActivity.isGroupAvaible==null){
-                            MainActivity.isGroupAvaible = new Boolean(false);
-                        }
-                        for (GetCurrent getCurrent1 : getCurrentsResponse) {
-                            if ((!(getCurrent1.getLat() == null || getCurrent1.getLon() == null)
-                                    && (pickedGroup == null || pickedGroup.getId().equals(getCurrent1.getGroup_id())))) {
-                                getCurrents.add(getCurrent1);
-                                if (getCurrent1.getGroup_id()!=null){
-                                    MainActivity.isGroupAvaible = new Boolean(true);
-                                }
-                            }
-                        }
-                        if (MainActivity.isGroupAvaible == true){
-                            getActivity().getMenuInflater().inflate(R.menu.main, toolbar.getMenu());
-                        }
-                        updateMarkers();
-                    }
+                updateMarkersPosition();
 
-                    @Override
-                    public void onFailure(Call<GetCurrent[]> call, Throwable t) {
-
-                    }
-                });
             }
         });
-        updateMethod();
         return rootView;
+    }
+
+    private void addSearchGroup() {
+        if (timesMarkerUpdate == 0)
+        if (MainActivity.isGroupAvaible == true){
+            getActivity().getMenuInflater().inflate(R.menu.main, toolbar.getMenu());
+        }
+    }
+
+    private void updateMarkersPosition() {
+        Call<GetCurrent[]> getCurrent = RetrofitService.getWayMapsService().getCurrentProcedure(procedure.getAction(), procedure.getName(),
+                procedure.getIdentficator(), procedure.getUser_id(), procedure.getFormat(), procedure.getParams());
+        getCurrent.enqueue(new CancelableCallback<GetCurrent[]>() {
+            @Override
+            public void success(Call<GetCurrent[]> call, Response<GetCurrent[]> response) {
+
+                getCurrentsResponse = response.body();
+                getCurrents = new ArrayList<>();
+                if (MainActivity.isGroupAvaible==null){
+                    MainActivity.isGroupAvaible = new Boolean(false);
+                }
+                for (GetCurrent getCurrent1 : getCurrentsResponse) {
+                    if ((!(getCurrent1.getLat() == null || getCurrent1.getLon() == null)
+                            && (pickedGroup == null || pickedGroup.getId().equals(getCurrent1.getGroup_id())))) {
+                        getCurrents.add(getCurrent1);
+                        if (getCurrent1.getGroup_id()!=null){
+                            MainActivity.isGroupAvaible = new Boolean(true);
+                        }
+                    }
+                }
+                addSearchGroup();
+                mMap.clear();
+                updateMarkers();
+                if (timesMarkerUpdate == 0){
+                    updateMethod();
+                }
+                timesMarkerUpdate++;
+            }
+
+            @Override
+            public void failure(Call<GetCurrent[]> call, Throwable t) {
+
+            }
+        });
+
     }
 
     private void updateMethod() {
@@ -316,16 +336,24 @@ public class GMapFragment extends AbstractFragment {
 
         final int delay = 1000; //milliseconds
         ((MainActivity)getActivity()).registerHandler(handler);
-
+        final int[] i = new int[1];
         handler.postDelayed(new Runnable(){
             public void run(){
-                if (currentMarker != null){
+                ((MainActivity)getActivity()).setBackgroundTaskExecuting(true);
+                i[0]++;
+
+                if (i[0] % 5 == 0) {
+                    updateMarkersPosition();
+                }
+                if (currentMarker != null) {
                     GetCurrent tag = (GetCurrent) currentMarker.getTag();
-                    updateMarkerState(tag);
+                    updateMarkerState((GetCurrent)currentTag);
                 } else {
                     updateListState();
-
                 }
+
+
+                ((MainActivity)getActivity()).setBackgroundTaskExecuting(false);
                 handler.postDelayed(this, delay);
             }
         }, delay);
@@ -349,6 +377,7 @@ public class GMapFragment extends AbstractFragment {
 
     private void updateMarkers() {
         int numMarkers = getCurrents.size();
+        currentTag = getCurrents.get(pickedId);
         markers = new Marker[numMarkers];
         int active = 0;
         int inActive = 0;
@@ -569,6 +598,8 @@ public class GMapFragment extends AbstractFragment {
             lockCar.setImageDrawable(getResources().getDrawable(R.drawable.ic_unlock));
         }
         GetCurrent tag = (GetCurrent) currentMarker.getTag();
+        pickedId = getCurrents.indexOf(tag);
+        currentTag = currentMarker.getTag();
         mMap.animateCamera(CameraUpdateFactory.newLatLng(new LatLng(Double.parseDouble(tag.getLat())
                 ,Double.parseDouble(tag.getLon()))));
         updateMarkerState(tag);
@@ -603,9 +634,11 @@ public class GMapFragment extends AbstractFragment {
             public void onClick(View v) {
                 locked = !locked;
                 if (locked) {
+                    mMap.getUiSettings().setScrollGesturesEnabled(false);
                     mMap.moveCamera(CameraUpdateFactory.newLatLng(currentMarker.getPosition()));
                     lockCar.setImageDrawable(getResources().getDrawable(R.drawable.ic_lock));
                 } else {
+                    mMap.getUiSettings().setScrollGesturesEnabled(true);
                     lockCar.setImageDrawable(getResources().getDrawable(R.drawable.ic_unlock));
                 }
             }
@@ -613,7 +646,6 @@ public class GMapFragment extends AbstractFragment {
 
         linearLayout.setVisibility(View.GONE);
         linearLayoutCar.setVisibility(View.VISIBLE);
-        changeBSheetState(BottomSheetBehavior.STATE_COLLAPSED,sheetBehavior);
         changeBSheetState(BottomSheetBehavior.STATE_COLLAPSED,sheetBehaviorCar);
 
     }
@@ -621,7 +653,6 @@ public class GMapFragment extends AbstractFragment {
     private void backToAll() {
         linearLayout.setVisibility(View.VISIBLE);
         linearLayoutCar.setVisibility(View.GONE);
-        changeBSheetState(BottomSheetBehavior.STATE_COLLAPSED,sheetBehaviorCar);
         changeBSheetState(BottomSheetBehavior.STATE_COLLAPSED,sheetBehavior);
         filtered = false;
         locked = false;
@@ -844,6 +875,8 @@ public class GMapFragment extends AbstractFragment {
     public void onStop() {
         super.onStop();
         mMap.clear();
+        ((MainActivity)getActivity()).deleteAllBackgroundTasks();
+        CancelableCallback.cancelAll();
     }
 
     private void getAttrFromBundle(){

@@ -134,4 +134,7 @@
     <string name="date_to">Дата до</string>
     <string name="group_list">Список груп</string>
     <string name="get_tracker">Трекери</string>
+    <string name="personal_account">Особовий рахунок</string>
+    <string name="balancesmall">баланс</string>
+    <string name="uah">грн</string>
 </resources>

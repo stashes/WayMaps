@@ -37,6 +37,7 @@ public class BalanceAdapter extends BaseAdapter {
     @BindView(R.id.balance_credit)
     TextView credit;
 
+
     public BalanceAdapter(Context context, List<FinGet> finGets) {
         this.context = context;
         objects = finGets;
@@ -70,10 +71,10 @@ public class BalanceAdapter extends BaseAdapter {
         ButterKnife.bind(this,view);
         FinGet finGet = getFinGet(position);
 
-        balance.setText(finGet.getBalance()== null ? "" : finGet.getBalance());
-        debet.setText(finGet.getDebet() == null ? "" : finGet.getDebet());
+        balance.setText(finGet.getBalance()== null ? "" : (finGet.getBalance()));
+        debet.setText(finGet.getDebet() == null ? "" : (finGet.getDebet()));
         date.setText(finGet.getDate() == null ? "" : finGet.getDate());
-        credit.setText(finGet.getCredit() == null ? "" : finGet.getCredit());
+        credit.setText(finGet.getCredit() == null ? "" : (finGet.getCredit()));
 
         if (Double.valueOf(finGet.getBalance()) >=  0){
             balance.setTextColor(context.getResources().getColor(R.color.success));

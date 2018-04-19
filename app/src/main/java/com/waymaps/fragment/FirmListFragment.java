@@ -1,5 +1,6 @@
 package com.waymaps.fragment;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.DrawerLayout;
@@ -8,6 +9,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -50,6 +53,7 @@ public class FirmListFragment extends AbstractFragment implements AdapterView.On
         listView = view.findViewById(R.id.firm_table);
         progressBar = view.findViewById(R.id.progress_bar_firm_list);
         listView.setOnItemClickListener(this);
+        closeKeyBoard();
         getFirms();
         return view;
     }
@@ -120,6 +124,14 @@ public class FirmListFragment extends AbstractFragment implements AdapterView.On
             logger.error("Error writing user {}",authorizedUser.toString());
         }
         startActivity(mainActivityIntent);
+    }
+
+    private void closeKeyBoard() {
+        View view = getActivity().getCurrentFocus();
+        if (view!=null) {
+            InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromInputMethod(view.getWindowToken(),0);
+        }
     }
 
 

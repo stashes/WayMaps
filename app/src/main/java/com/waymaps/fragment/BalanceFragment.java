@@ -5,10 +5,12 @@ import android.support.annotation.Nullable;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.waymaps.R;
 import com.waymaps.activity.MainActivity;
@@ -25,6 +27,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -37,7 +40,10 @@ import retrofit2.Response;
 public class BalanceFragment extends AbstractFragment {
 
     private FinGet[] finGets;
+    private double balance;
     private Logger logger = LoggerFactory.getLogger(this.getClass());
+    @BindView(R.id.balance_info)
+    TextView info;
 
     @Nullable
     @Override
@@ -100,6 +106,23 @@ public class BalanceFragment extends AbstractFragment {
         if (finGets == null){
             finGets = new FinGet[0];
         }
+        balance = new Double(finGets[0].getBalance());
+        String accNo = "15" + String.format("%05d",new Integer(authorizedUser.getFirm_id()));
+        String text = getResources().getString(R.string.personal_account) + " " + "№" + accNo +
+                " - " + getString(R.string.balancesmall) + " ";
+        String saldo = balance + " " + getString(R.string.uah);
+
+        String html1 = "<font>" + text + "</font>";
+        String html2 = null;
+
+
+        if (balance > 0) {
+            html2 = "<font color=#12b90f>" + saldo + "</font>";
+        } else {
+            html2 = "<font color=#e11a24>" + saldo + "</font>";
+        }
+
+        info.setText(Html.fromHtml((html1 + html2)));
         BalanceAdapter balanceAdapter = new BalanceAdapter(getContext(), Arrays.asList(finGets));
         ListView lvMain = (ListView) getActivity().findViewById(R.id.balance_table);
         lvMain.setAdapter(balanceAdapter);
