@@ -17,6 +17,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -377,15 +378,17 @@ public class GMapFragment extends AbstractFragment {
 
     private void updateMarkers() {
         int numMarkers = getCurrents.size();
-        currentTag = getCurrents.get(pickedId);
+        if (currentMarker != null) currentTag = getCurrents.get(pickedId);
         markers = new Marker[numMarkers];
         int active = 0;
         int inActive = 0;
+
         if (isAdded() && getActivity() != null)
             for (int i = 0; i < numMarkers; i++) {
                     markers[i] = mMap.addMarker(new MarkerOptions().position(
                             new LatLng(Double.parseDouble(getCurrents.get(i).getLat())
-                                    , Double.parseDouble(getCurrents.get(i).getLon()))));
+                                    , Double.parseDouble(getCurrents.get(i).getLon())))
+                            .anchor(0.5f,0.5f));
                     double speed = 0;
                     if (getCurrents.get(i).getSpeed() != null) {
                         speed = Double.parseDouble(getCurrents.get(i).getSpeed());
@@ -418,6 +421,11 @@ public class GMapFragment extends AbstractFragment {
                     }
 
                     markers[i].setTag(getCurrents.get(i));
+                    if (currentMarker!= null &&  ((GetCurrent) currentTag).getTracker_title()
+                            .equals(getCurrents.get(i).getTracker_title())){
+                        currentMarker = markers[i];
+                        if (locked) mMap.moveCamera(CameraUpdateFactory.newLatLng(currentMarker.getPosition()));
+                    }
             }
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override

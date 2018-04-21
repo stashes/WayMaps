@@ -106,16 +106,21 @@ public class BalanceFragment extends AbstractFragment {
         if (finGets == null){
             finGets = new FinGet[0];
         }
-        balance = new Double(finGets[0].getBalance());
+        String html1 = null;
+        String html2 = null;
+        String saldo = null;
         String accNo = "15" + String.format("%05d",new Integer(authorizedUser.getFirm_id()));
         String text = getResources().getString(R.string.personal_account) + " " + "№" + accNo +
                 " - " + getString(R.string.balancesmall) + " ";
-        String saldo = balance + " " + getString(R.string.uah);
-
-        String html1 = "<font>" + text + "</font>";
-        String html2 = null;
-
-
+        if (finGets.length == 0){
+            balance = 0;
+            saldo = balance + " " + getString(R.string.uah);
+            html1 = "<font>" + text + "</font>";
+        } else {
+            balance = new Double(finGets[0].getBalance());
+            saldo = balance + " " + getString(R.string.uah);
+            html1 = "<font>" + text + "</font>";
+        }
         if (balance > 0) {
             html2 = "<font color=#12b90f>" + saldo + "</font>";
         } else {
