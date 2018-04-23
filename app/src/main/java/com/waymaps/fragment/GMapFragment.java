@@ -39,6 +39,12 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.mikepenz.materialdrawer.Drawer;
+import com.mikepenz.materialdrawer.DrawerBuilder;
+import com.mikepenz.materialdrawer.model.DividerDrawerItem;
+import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
+import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
+import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.waymaps.R;
 import com.waymaps.activity.MainActivity;
 import com.waymaps.adapter.GetCurrentAdapter;
@@ -65,6 +71,7 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -96,6 +103,9 @@ public class GMapFragment extends AbstractFragment {
     private Boolean isActive;
     private long timesMarkerUpdate;
     private int pickedId;
+    private Drawer drawer;
+    private GetGroup[] getGroups;
+
 
     @BindView(R.id.bottom_sheet_map_tracker_list)
     MaxHeightLinearView linearLayout;
@@ -288,9 +298,56 @@ public class GMapFragment extends AbstractFragment {
     }
 
     private void addSearchGroup() {
-        if (timesMarkerUpdate == 0)
         if (MainActivity.isGroupAvaible == true){
             getActivity().getMenuInflater().inflate(R.menu.main, toolbar.getMenu());
+            Procedure procedure = new Procedure(Action.CALL);
+            procedure.setFormat(WayMapsService.DEFAULT_FORMAT);
+            procedure.setIdentficator(SystemUtil.getWifiMAC(getActivity()));
+            procedure.setName(Action.GET_GROUPS);
+            procedure.setUser_id(authorizedUser.getId());
+            procedure.setParams(authorizedUser.getFirm_id());
+
+            Call<GetGroup[]> group = RetrofitService.getWayMapsService().getGroup(procedure.getAction(), procedure.getName(),
+                    procedure.getIdentficator(), procedure.getFormat(), procedure.getParams());
+
+            group.enqueue(new Callback<GetGroup[]>() {
+                @Override
+                public void onResponse(Call<GetGroup[]> call, Response<GetGroup[]> response) {
+                    getGroups = response.body();
+
+                    Drawer build = new DrawerBuilder(getActivity())
+                            .withToolbar(toolbar)
+                            .withActionBarDrawerToggle(false)
+                            .withDrawerGravity(Gravity.END)
+                            .addDrawerItems(new PrimaryDrawerItem().withName(R.string.all).withTag(null), new DividerDrawerItem())
+                            .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+                                @Override
+                                public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+                                    if (drawerItem.getTag()==null){
+                                        pickedGroup = null;
+                                    } else {
+                                        pickedGroup = (GetGroup) drawerItem.getTag();
+                                    }
+                                    updateMarkersPosition();
+                                    return true;
+                                }
+                            })
+                            .build();
+
+                    for (int i = 0 ; i < getGroups.length;i++){
+                        build.addItem(new SecondaryDrawerItem().withName(getGroups[i].getTitle()).withTag(getGroups[i]));
+                    }
+
+
+                }
+
+                @Override
+                public void onFailure(Call<GetGroup[]> call, Throwable t) {
+                    ApplicationUtil.showToast(getContext(),getString(R.string.somethin_went_wrong));
+                }
+            });
+
+
         }
     }
 
@@ -315,7 +372,8 @@ public class GMapFragment extends AbstractFragment {
                         }
                     }
                 }
-                addSearchGroup();
+                if (timesMarkerUpdate == 0)
+                    addSearchGroup();
                 mMap.clear();
                 updateMarkers();
                 if (timesMarkerUpdate == 0){
