@@ -27,6 +27,7 @@ import com.waymaps.data.requestEntity.Action;
 import com.waymaps.data.requestEntity.LogoutCredentials;
 import com.waymaps.data.requestEntity.UpdateCredentials;
 import com.waymaps.data.responseEntity.User;
+import com.waymaps.fragment.AbstractFragment;
 import com.waymaps.fragment.BalanceFragment;
 import com.waymaps.fragment.GMapFragment;
 import com.waymaps.fragment.GetCurrentFragment;
@@ -46,6 +47,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -130,11 +132,26 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
+        List fragmentList = getSupportFragmentManager().getFragments();
+
+        boolean handled = false;
+        for(Object f : fragmentList) {
+            if(f instanceof AbstractFragment) {
+                handled = ((AbstractFragment)f).onBackPressed();
+
+                if(handled) {
+                    break;
+                }
+            }
+        }
+
+        if(!handled) {
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
         }
+            }
     }
 
     @Override

@@ -444,7 +444,7 @@ public class HistoryMapFragment extends AbstractFragment {
                 power = getResources().getString(R.string.network);
             } else
                 power = getResources().getString(R.string.battery);
-        voltage = new DecimalFormat("0.00").format(Double.parseDouble(voltage));
+        voltage = new DecimalFormat("0.0").format(Double.parseDouble(voltage));
         historyVoltage.setText(power
                     + " (" + voltage + getResources().getString(R.string.v) + ")");
         historyVoltage.setTextColor(getResources().getColor(R.color.success));
@@ -485,7 +485,7 @@ public class HistoryMapFragment extends AbstractFragment {
             try {
                 Double b1 = Double.parseDouble(burnFuel);
                 Double b2 = Double.parseDouble(burnFuelStart);
-                historyBurnFuel.setText((b1-b2) +  " " + getResources().getString(R.string.l));
+                historyBurnFuel.setText(((b1-b2)/10) +  " " + getResources().getString(R.string.l));
             } catch (Exception e){
                 historyBurnFuel.setText("-");
             }

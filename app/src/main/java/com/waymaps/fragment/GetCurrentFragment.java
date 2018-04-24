@@ -88,27 +88,16 @@ public class GetCurrentFragment extends AbstractFragment {
         toolbar.setTitle(fragmentName());
         addSearchGroup();
         getCurrentList();
-        onKeyBack();
         return view;
     }
 
-    private void onKeyBack() {
-        this.getView().setOnKeyListener( new View.OnKeyListener()
-        {
-            @Override
-            public boolean onKey( View v, int keyCode, KeyEvent event )
-            {
-                if( keyCode == KeyEvent.KEYCODE_BACK )
-                {
-                    if (drawerSecond!=null || drawerSecond.isDrawerOpen()){
-                        drawerSecond.closeDrawer();
-                    }
-                    return true;
-                }
-                return false;
-            }
-        } );
-
+    @Override
+    public boolean onBackPressed() {
+        if (drawerSecond!=null || drawerSecond.isDrawerOpen()){
+            drawerSecond.closeDrawer();
+            return true;
+        }
+        return super.onBackPressed();
     }
 
     @Override
@@ -219,7 +208,7 @@ public class GetCurrentFragment extends AbstractFragment {
         List<GetCurrent> list = new ArrayList<>();
         for (GetCurrent gc : getCurrents){
             if (!(gc.getLon() == null || gc.getLat()==null)
-                    && (currentGroup == null || pickedGroup.getId().equals(gc.getGroup_id()))){
+                    && (pickedGroup == null || pickedGroup.getId().equals(gc.getGroup_id()))){
                 list.add(gc);
             }
         }
@@ -252,7 +241,8 @@ public class GetCurrentFragment extends AbstractFragment {
 
     @Override
     protected String fragmentName() {
-        return getResources().getString(R.string.get_tracker);
+        return "";
+                /*getResources().getString(R.string.get_tracker)*/
     }
 
     private void getAttrFromBundle() {

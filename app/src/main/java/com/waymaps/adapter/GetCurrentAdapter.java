@@ -18,6 +18,7 @@ import com.waymaps.util.ApplicationUtil;
 import com.waymaps.util.DateTimeUtil;
 
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -115,6 +116,11 @@ public class GetCurrentAdapter extends BaseAdapter {
     @Override
     public CharSequence[] getAutofillOptions() {
         return new CharSequence[0];
+    }
+
+    public void updateList(ArrayList<GetCurrent> data) {
+        objects = data;
+        notifyDataSetChanged();
     }
 
     public GetCurrent getGetCurrent(int position) {

@@ -111,4 +111,10 @@ public abstract class AbstractFragment extends Fragment  {
             view[1].setVisibility(show ? View.GONE : View.VISIBLE);
         }
     }
+
+    public boolean onBackPressed() {
+        return false;
+    }
+
+
 }

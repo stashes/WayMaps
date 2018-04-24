@@ -1,6 +1,7 @@
 package com.waymaps.fragment;
 
 import android.graphics.Bitmap;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -96,6 +97,7 @@ public class GMapFragment extends AbstractFragment {
     private int pickedId;
     private Drawer drawerSecond;
     private GetGroup[] getGroups;
+    private GetCurrentAdapter adapter;
 
 
     @BindView(R.id.bottom_sheet_map_tracker_list)
@@ -286,24 +288,7 @@ public class GMapFragment extends AbstractFragment {
 
             }
         });
-        this.getView().setOnKeyListener( new View.OnKeyListener()
-        {
-            @Override
-            public boolean onKey( View v, int keyCode, KeyEvent event )
-            {
-                if( keyCode == KeyEvent.KEYCODE_BACK )
-                {
-                    if (drawerSecond!=null || drawerSecond.isDrawerOpen()){
-                        drawerSecond.closeDrawer();
-                    }
-                    else if (linearLayoutCar.getVisibility() == View.GONE){
-                        backToAll();
-                    }
-                    return true;
-                }
-                return false;
-            }
-        } );
+
         return rootView;
     }
 
@@ -590,7 +575,13 @@ public class GMapFragment extends AbstractFragment {
             GetCurrent tag = (GetCurrent) m.getTag();
             getCurrents.add(tag);
         }
-        listView.setAdapter(new GetCurrentAdapter(getContext(), getCurrents));
+
+        if (listView.getAdapter() == null) {
+            adapter = new GetCurrentAdapter(getContext(), getCurrents);
+            listView.setAdapter(adapter);
+        }
+        adapter.updateList((ArrayList<GetCurrent>) getCurrents);
+        changeFontFiter();
         if (collapse){
             changeBSheetState(BottomSheetBehavior.STATE_COLLAPSED,sheetBehavior);
         }
@@ -618,7 +609,12 @@ public class GMapFragment extends AbstractFragment {
                 getCurrents.add(tag);
             }
         }
-        listView.setAdapter(new GetCurrentAdapter(getContext(), getCurrents));
+        if (listView.getAdapter() == null) {
+            adapter = new GetCurrentAdapter(getContext(), getCurrents);
+            listView.setAdapter(adapter);
+        }
+        adapter.updateList((ArrayList<GetCurrent>) getCurrents);
+        changeFontFiter();
         if (collapse)
             changeBSheetState(BottomSheetBehavior.STATE_COLLAPSED,sheetBehavior);
     }
@@ -636,14 +632,19 @@ public class GMapFragment extends AbstractFragment {
             }
 
         }
-        listView.setAdapter(new GetCurrentAdapter(getContext(), getCurrents));
+        if (listView.getAdapter() == null) {
+            adapter = new GetCurrentAdapter(getContext(), getCurrents);
+            listView.setAdapter(adapter);
+        }
+        adapter.updateList((ArrayList<GetCurrent>) getCurrents);
+        changeFontFiter();
         if (collapse)
             changeBSheetState(BottomSheetBehavior.STATE_COLLAPSED,sheetBehavior);
     }
 
     private void updateListState() {
-        final GetCurrentAdapter getCurrentAdapter = new GetCurrentAdapter(getContext(), getCurrents);
-        listView.setAdapter(getCurrentAdapter);
+        /*final GetCurrentAdapter getCurrentAdapter = new GetCurrentAdapter(getContext(), getCurrents);
+        listView.setAdapter(getCurrentAdapter);*/
         if (isActive == null){
             all(false);
         } else if (isActive == true){
@@ -672,6 +673,7 @@ public class GMapFragment extends AbstractFragment {
         if (currentMarker != marker) {
             currentMarker = marker;
             locked = false;
+            mMap.getUiSettings().setScrollGesturesEnabled(true);
             lockCar.setImageDrawable(getResources().getDrawable(R.drawable.ic_unlock));
         }
         GetCurrent tag = (GetCurrent) currentMarker.getTag();
@@ -712,7 +714,7 @@ public class GMapFragment extends AbstractFragment {
                 locked = !locked;
                 if (locked) {
                     mMap.getUiSettings().setScrollGesturesEnabled(false);
-                    mMap.moveCamera(CameraUpdateFactory.newLatLng(currentMarker.getPosition()));
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentMarker.getPosition(),14f));
                     lockCar.setImageDrawable(getResources().getDrawable(R.drawable.ic_lock));
                 } else {
                     mMap.getUiSettings().setScrollGesturesEnabled(true);
@@ -733,6 +735,7 @@ public class GMapFragment extends AbstractFragment {
         changeBSheetState(BottomSheetBehavior.STATE_COLLAPSED,sheetBehavior);
         filtered = false;
         locked = false;
+        mMap.getUiSettings().setScrollGesturesEnabled(true);
         currentMarker = null;
         for (Marker m : markers) {
             if (m!=null){
@@ -773,20 +776,22 @@ public class GMapFragment extends AbstractFragment {
 
         //fuelConsumption
         String fuelConsumption = tag.getQ_dff();
-        if ("-1".equals(fuelConsumption)) {
+        if ("-1".equals(fuelConsumption) || fuelConsumption == null) {
             carFuelConsumptionView.setVisibility(View.GONE);
         } else {
-            fuelConsumption += (" " + getResources().getString(R.string.lperkm));
+            double v = (Double.parseDouble(fuelConsumption))/10;
+            fuelConsumption = v + (" " + getResources().getString(R.string.lperkm));
             carFuelConsumption.setText(fuelConsumption);
             carFuelConsumptionView.setVisibility(View.VISIBLE);
         }
 
         //volumeFuel
         String fuelVolume = tag.getDff();
-        if ("-1".equals(fuelVolume)) {
+        if ("-1".equals(fuelVolume) || fuelVolume == null) {
             carVolumeFuelView.setVisibility(View.GONE);
         } else {
-            fuelVolume += (" " + getResources().getString(R.string.l));
+            double v = Double.parseDouble(fuelVolume);
+            fuelVolume = v +  (" " + getResources().getString(R.string.l));
             carVolumeFuel.setText(fuelVolume);
             carVolumeFuelView.setVisibility(View.VISIBLE);
         }
@@ -855,7 +860,7 @@ public class GMapFragment extends AbstractFragment {
                 power = getResources().getString(R.string.network);
             } else
                 power = getResources().getString(R.string.battery);
-            voltage = new DecimalFormat("0.00").format(Double.parseDouble(voltage));
+            voltage = new DecimalFormat("0.0").format(Double.parseDouble(voltage));
             carVoltage.setText(power
                     + " (" + voltage + getResources().getString(R.string.v) + ")");
             carVoltage.setTextColor(getResources().getColor(R.color.success));
@@ -973,7 +978,49 @@ public class GMapFragment extends AbstractFragment {
         super.onDestroyView();
     }
 
+    @Override
+    public boolean onBackPressed() {
+        if (drawerSecond != null && drawerSecond.isDrawerOpen()) {
+            drawerSecond.closeDrawer();
+            return true;
+        } else if (linearLayoutCar.getVisibility() == View.VISIBLE) {
+            backToAll();
+            return true;
+        } else
+            return super.onBackPressed();
+    }
 
+    private void changeFontFiter(){
+        if (isActive == null) {
+            TextView text = (TextView) filterAll.getChildAt(0);
+            TextView count = (TextView) filterAll.getChildAt(1);
+            text.setTypeface(null, Typeface.BOLD_ITALIC);
+            count.setTypeface(null, Typeface.BOLD_ITALIC);
+            makeNoBoldFont(filterActive,filterInActive);
+        } else if (isActive == false) {
+            TextView text = (TextView) filterInActive.getChildAt(0);
+            TextView count = (TextView) filterInActive.getChildAt(1);
+            text.setTypeface(null, Typeface.BOLD_ITALIC);
+            count.setTypeface(null, Typeface.BOLD_ITALIC);
+            makeNoBoldFont(filterActive,filterAll);
+        } else if (isActive == true) {
+            TextView text = (TextView) filterActive.getChildAt(0);
+            TextView count = (TextView) filterActive.getChildAt(1);
+            text.setTypeface(null, Typeface.BOLD_ITALIC);
+            count.setTypeface(null, Typeface.BOLD_ITALIC);
+            makeNoBoldFont(filterAll,filterInActive);
+        }
 
+    }
 
+    private void makeNoBoldFont(LinearLayout first,LinearLayout second) {
+        TextView text = (TextView) first.getChildAt(0);
+        TextView count = (TextView) first.getChildAt(1);
+        text.setTypeface(null, Typeface.NORMAL);
+        count.setTypeface(null, Typeface.NORMAL);
+        text = (TextView) second.getChildAt(0);
+        count = (TextView) second.getChildAt(1);
+        text.setTypeface(null, Typeface.NORMAL);
+        count.setTypeface(null, Typeface.NORMAL);
+    }
 }
