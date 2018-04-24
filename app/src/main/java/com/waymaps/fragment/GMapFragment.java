@@ -1,23 +1,18 @@
 package com.waymaps.fragment;
 
-import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.TypedValue;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -29,7 +24,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -48,7 +42,6 @@ import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.waymaps.R;
 import com.waymaps.activity.MainActivity;
 import com.waymaps.adapter.GetCurrentAdapter;
-import com.waymaps.adapter.GroupAdapter;
 import com.waymaps.api.CancelableCallback;
 import com.waymaps.api.RetrofitService;
 import com.waymaps.api.WayMapsService;
@@ -58,7 +51,6 @@ import com.waymaps.data.requestEntity.Action;
 import com.waymaps.data.requestEntity.Procedure;
 import com.waymaps.data.responseEntity.GetCurrent;
 import com.waymaps.data.responseEntity.GetGroup;
-import com.waymaps.data.responseEntity.TrackCount;
 import com.waymaps.util.ApplicationUtil;
 import com.waymaps.util.DateTimeUtil;
 import com.waymaps.util.LocalPreferenceManager;
@@ -71,7 +63,6 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -103,7 +94,7 @@ public class GMapFragment extends AbstractFragment {
     private Boolean isActive;
     private long timesMarkerUpdate;
     private int pickedId;
-    private Drawer drawer;
+    private Drawer drawerSecond;
     private GetGroup[] getGroups;
 
 
@@ -238,7 +229,8 @@ public class GMapFragment extends AbstractFragment {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.search_button) {
-            FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+            drawerSecond.openDrawer();
+            /*FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
             GroupFragment fragment= new GroupFragment(new GMapFragment());
             try {
                 fragment.setArguments(ApplicationUtil.setValueToBundle
@@ -247,7 +239,7 @@ public class GMapFragment extends AbstractFragment {
                 logger.error("Error writing user {}",authorizedUser.toString());
             }
             ft.replace(R.id.content_main, fragment);
-            ft.commit();
+            ft.commit();*/
         }
 
         return super.onOptionsItemSelected(item);
@@ -261,7 +253,7 @@ public class GMapFragment extends AbstractFragment {
         ButterKnife.bind(this, rootView);
         getAttrFromBundle();
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
-        DrawerLayout drawer = ((MainActivity) getActivity()).getDrawer();
+        final DrawerLayout drawer = ((MainActivity) getActivity()).getDrawer();
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 getActivity(), drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
@@ -294,6 +286,24 @@ public class GMapFragment extends AbstractFragment {
 
             }
         });
+        this.getView().setOnKeyListener( new View.OnKeyListener()
+        {
+            @Override
+            public boolean onKey( View v, int keyCode, KeyEvent event )
+            {
+                if( keyCode == KeyEvent.KEYCODE_BACK )
+                {
+                    if (drawerSecond!=null || drawerSecond.isDrawerOpen()){
+                        drawerSecond.closeDrawer();
+                    }
+                    else if (linearLayoutCar.getVisibility() == View.GONE){
+                        backToAll();
+                    }
+                    return true;
+                }
+                return false;
+            }
+        } );
         return rootView;
     }
 
@@ -315,7 +325,7 @@ public class GMapFragment extends AbstractFragment {
                 public void onResponse(Call<GetGroup[]> call, Response<GetGroup[]> response) {
                     getGroups = response.body();
 
-                    Drawer build = new DrawerBuilder(getActivity())
+                    drawerSecond = new DrawerBuilder(getActivity())
                             .withToolbar(toolbar)
                             .withActionBarDrawerToggle(false)
                             .withDrawerGravity(Gravity.END)
@@ -329,13 +339,14 @@ public class GMapFragment extends AbstractFragment {
                                         pickedGroup = (GetGroup) drawerItem.getTag();
                                     }
                                     updateMarkersPosition();
+                                    drawerSecond.closeDrawer();
                                     return true;
                                 }
                             })
                             .build();
 
                     for (int i = 0 ; i < getGroups.length;i++){
-                        build.addItem(new SecondaryDrawerItem().withName(getGroups[i].getTitle()).withTag(getGroups[i]));
+                        drawerSecond.addItem(new SecondaryDrawerItem().withName(getGroups[i].getTitle()).withTag(getGroups[i]));
                     }
 
 
@@ -961,4 +972,8 @@ public class GMapFragment extends AbstractFragment {
     public void onDestroyView() {
         super.onDestroyView();
     }
+
+
+
+
 }

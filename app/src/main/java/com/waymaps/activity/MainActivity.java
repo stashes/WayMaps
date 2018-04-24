@@ -202,10 +202,10 @@ public class MainActivity extends AppCompatActivity
 
     private void history() {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        if (isGroupAvaible){
+        /*if (isGroupAvaible){
             currentFragment = new GroupFragment(new GetCurrentFragment());
-        } else
-            currentFragment = new GetCurrentFragment();
+        } else*/
+        currentFragment = new GetCurrentFragment();
         try {
             currentFragment.setArguments(ApplicationUtil.setValueToBundle
                     (new Bundle(),"user",authorisedUser));
