@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:background="@color/lightgray"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="@color/verylightgray"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -9,17 +9,12 @@
     <include layout="@layout/action_bar_transparent">
 
     </include>
-    <ProgressBar
-        android:id="@+id/progress_bar_group_list"
-        style="?android:attr/progressBarStyleLarge"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_centerInParent="true"
-        android:visibility="gone" />
+    <include layout="@layout/progress_bar"/>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:id="@+id/content"
         android:orientation="vertical">
         <LinearLayout
             android:layout_width="match_parent"
@@ -43,4 +38,4 @@
             android:layout_weight="2"></LinearLayout>
 
     </LinearLayout>
-</LinearLayout>
+</android.support.design.widget.CoordinatorLayout>

@@ -42,7 +42,7 @@ public class FirmListFragment extends AbstractFragment implements AdapterView.On
     private FirmList[] firms;
     private ListView listView;
     private Logger logger = LoggerFactory.getLogger(this.getClass());
-    private ProgressBar progressBar;
+    private View progressBar;
 
     @Nullable
     @Override
@@ -51,7 +51,7 @@ public class FirmListFragment extends AbstractFragment implements AdapterView.On
         SystemUtil.hideKeyboard(getActivity());
         View view = inflater.inflate(R.layout.activity_firm_list, container, false);
         listView = view.findViewById(R.id.firm_table);
-        progressBar = view.findViewById(R.id.progress_bar_firm_list);
+        progressBar = view.findViewById(R.id.progress_layout);
         listView.setOnItemClickListener(this);
         closeKeyBoard();
         getFirms();
@@ -89,6 +89,7 @@ public class FirmListFragment extends AbstractFragment implements AdapterView.On
 
             @Override
             public void onFailure(Call<FirmList[]> call, Throwable t) {
+                showProgress(false , listView,progressBar);
                 logger.debug("Failed while trying to load balance.");
             }
         });

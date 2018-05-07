@@ -50,8 +50,11 @@ public class GroupFragment extends AbstractFragment {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
     protected AbstractFragment nextFragment;
 
-    @BindView(R.id.progress_bar_group_list)
-    ProgressBar progressBar;
+    @BindView(R.id.progress_layout)
+    View progressBar;
+
+    @BindView(R.id.content)
+    View content;
 
     @BindView(R.id.group_list)
     ListView groupList;
@@ -88,7 +91,7 @@ public class GroupFragment extends AbstractFragment {
         procedure.setParams(authorizedUser.getFirm_id());
 
 
-        showProgress(true , groupList , progressBar);
+        showProgress(true , content , progressBar);
         Call<GetGroup[]> group = RetrofitService.getWayMapsService().getGroup(procedure.getAction(), procedure.getName(),
                 procedure.getIdentficator(), procedure.getFormat(), procedure.getParams());
 
@@ -97,13 +100,13 @@ public class GroupFragment extends AbstractFragment {
             public void onResponse(Call<GetGroup[]> call, Response<GetGroup[]> response) {
                 getGroups = response.body();
                 populateList();
-                showProgress(false , groupList , progressBar);
+                showProgress(false , content , progressBar);
             }
 
             @Override
             public void onFailure(Call<GetGroup[]> call, Throwable t) {
                 ApplicationUtil.showToast(getContext(),getString(R.string.somethin_went_wrong));
-                showProgress(false , groupList , progressBar);
+                showProgress(false , content , progressBar);
             }
         });
 

@@ -29,7 +29,7 @@ public class NoFoundFragment extends Fragment {
     private void getAttrFromBundle(){
         try {
             user = ApplicationUtil.getObjectFromBundle(getArguments(), "user", User.class);
-            ticketId = (Integer) ApplicationUtil.getObjectFromBundle(getArguments(), "get_ticket_id", Integer.class);
+            ticketId = ApplicationUtil.getObjectFromBundle(getArguments(), "get_ticket_id", Integer.class);
         } catch (IOException e) {
         }
     }

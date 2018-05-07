@@ -62,7 +62,7 @@ public class TrackerListFragment extends AbstractFragment implements AdapterView
     private Logger logger = LoggerFactory.getLogger(this.getClass());
     private HashMap trackerId = new HashMap();
 
-    ProgressBar progressBar;
+    View progressBar;
     ListView trackerList;
 
     @Override
@@ -71,7 +71,7 @@ public class TrackerListFragment extends AbstractFragment implements AdapterView
         super.onCreateView(inflater, container, savedInstanceState);
         View view = inflater.inflate(R.layout.fragment_tracker_list, container, false);
         trackerList = view.findViewById(R.id.tracker_table);
-        progressBar = view.findViewById(R.id.progress_bar_tracker_list);
+        progressBar = view.findViewById(R.id.progress_layout);
         getTracker();
         trackerList.setOnItemClickListener(this);
         ButterKnife.bind(this, view);
@@ -119,7 +119,7 @@ public class TrackerListFragment extends AbstractFragment implements AdapterView
 
             @Override
             public void onFailure(Call<TrackerList[]> call, Throwable t) {
-                logger.debug("Failed while trying to load balance.");
+                logger.debug("Failed while trying to load tracker list.");
             }
         });
 

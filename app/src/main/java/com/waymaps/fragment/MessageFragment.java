@@ -58,11 +58,9 @@ public class MessageFragment extends AbstractFragment implements View.OnClickLis
         super.onCreateView(inflater,container,savedInstanceState);
         View view = inflater.inflate(R.layout.message_layout, container, false);
         setHasOptionsMenu(true);
-        ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle(R.string.message_actionbar_title);
         initViewElement(view);
         getAttrFromBundle();
         ButterKnife.bind(this, view);
-
 
         ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
         DrawerLayout drawer = ((MainActivity) getActivity()).getDrawer();
@@ -70,6 +68,7 @@ public class MessageFragment extends AbstractFragment implements View.OnClickLis
                 getActivity(), drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
+        ((MainActivity) getActivity()).getSupportActionBar().setTitle(fragmentName());
         mess_person_from.setText(tracker.getTitle());
         return view;
     }

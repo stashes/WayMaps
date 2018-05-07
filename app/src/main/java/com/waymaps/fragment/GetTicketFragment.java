@@ -51,7 +51,8 @@ import retrofit2.Response;
 public class GetTicketFragment extends AbstractFragment implements AdapterView.OnClickListener{
 
     ListView ticketsListView;
-    ProgressBar progressBar;
+    View progressBar;
+    View content;
     private Ticket[] tickets;
     private Logger logger = LoggerFactory.getLogger(this.getClass());
     private HashMap trackerId = new HashMap();
@@ -64,7 +65,8 @@ public class GetTicketFragment extends AbstractFragment implements AdapterView.O
         View view = inflater.inflate(R.layout.fragment_get_ticket, container, false);
         getAttrFromBundle();
         ticketsListView = view.findViewById(R.id.get_ticket_table);
-        progressBar = view.findViewById(R.id.progress_bar_get_ticket);
+        progressBar = view.findViewById(R.id.progress_layout);
+        content = view.findViewById(R.id.get_ticket_content);
         fab = view.findViewById(R.id.fab_comment_dialog);
         fab.setOnClickListener(this);
         ButterKnife.bind(this, view);
@@ -93,7 +95,7 @@ public class GetTicketFragment extends AbstractFragment implements AdapterView.O
         procedure.setName(Action.TICKET_GET);
         procedure.setUser_id(MainActivity.authorisedUser.getId());
         procedure.setParams(String.valueOf(ticketId));
-        showProgress(true , ticketsListView , progressBar , fab);
+        showProgress(true , content , progressBar);
         Call<Ticket[]> call = RetrofitService.getWayMapsService().getTicket(procedure.getAction(), procedure.getName(),
                 procedure.getIdentficator(), procedure.getUser_id() , procedure.getFormat(), procedure.getParams());
         call.enqueue(new Callback<Ticket[]>() {
@@ -101,7 +103,7 @@ public class GetTicketFragment extends AbstractFragment implements AdapterView.O
             public void onResponse(Call<Ticket[]> call, Response<Ticket[]> response) {
                 tickets = response.body();
                 populateTable();
-                showProgress(false , ticketsListView , progressBar , fab);
+                showProgress(false , content , progressBar);
             }
 
             @Override

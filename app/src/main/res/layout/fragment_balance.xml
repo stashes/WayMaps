@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_alignParentLeft="true"
+    android:background="@color/very2lightgray"
     android:orientation="vertical">
 
     <LinearLayout
@@ -15,7 +16,7 @@
             layout="@layout/classic_action_bar"></include>
     </LinearLayout>
 
-
+    <include layout="@layout/progress_bar"/>
     <LinearLayout
         android:id="@+id/balance_contain"
         android:orientation="vertical"

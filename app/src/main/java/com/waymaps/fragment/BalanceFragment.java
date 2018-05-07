@@ -44,6 +44,10 @@ public class BalanceFragment extends AbstractFragment {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
     @BindView(R.id.balance_info)
     TextView info;
+    @BindView(R.id.balance_contain)
+    View balanceMain;
+    @BindView(R.id.progress_layout)
+    View progressBar;
 
     @Nullable
     @Override
@@ -84,18 +88,21 @@ public class BalanceFragment extends AbstractFragment {
         procedure.setName(Action.FIN_GET);
         procedure.setUser_id(authorizedUser.getId());
         procedure.setParams(authorizedUser.getFirm_id());
+        showProgress(true,balanceMain,progressBar);
         Call<FinGet[]> call = RetrofitService.getWayMapsService().finGetProcedure(procedure.getAction(), procedure.getName(),
                 procedure.getIdentficator(), procedure.getUser_id(), procedure.getFormat(), procedure.getParams());
         call.enqueue(new Callback<FinGet[]>() {
             @Override
             public void onResponse(Call<FinGet[]> call, Response<FinGet[]> response) {
                 finGets = response.body();
+                showProgress(false,balanceMain,progressBar);
                 logger.debug("Balance load successfully.");
                 populateTable();
             }
 
             @Override
             public void onFailure(Call<FinGet[]> call, Throwable t) {
+                showProgress(false , balanceMain,progressBar);
                 logger.debug("Failed while trying to load balance.");
             }
         });

@@ -50,16 +50,17 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:gravity="left"
+            android:gravity="center"
             android:orientation="horizontal">
 
             <ImageView
-                android:clickable="true"
                 android:id="@+id/history_show_parking"
-                android:layout_width="match_parent"
+                android:padding="5dp"
+                android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:layout_weight="0"
-                app:srcCompat="@drawable/ic_parking" />
+                android:clickable="true"
+                app:srcCompat="@drawable/park1" />
         </LinearLayout>
     </LinearLayout>
 

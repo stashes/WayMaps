@@ -64,7 +64,8 @@ public class TicketListFragment extends AbstractFragment implements AdapterView.
     TrackerList[] tracker;
     Ticket[]tickets;
     FloatingActionButton fab;
-    ProgressBar progressBar;
+    View progressBar;
+    View content;
 
 
     @Override
@@ -73,7 +74,9 @@ public class TicketListFragment extends AbstractFragment implements AdapterView.
         super.onCreateView(inflater, container, savedInstanceState);
         View view = inflater.inflate(R.layout.ticket_list_layout, container, false);
         ticketListView = view.findViewById(R.id.ticket_table);
-        progressBar = view.findViewById(R.id.progress_bar_ticket_list);
+        progressBar = view.findViewById(R.id.progress_layout);
+        content = view.findViewById(R.id.ticket_content);
+
         fab = view.findViewById(R.id.fab);
         getTickers(ticketListView);
         ticketListView.setOnItemClickListener(this);
@@ -115,7 +118,7 @@ public class TicketListFragment extends AbstractFragment implements AdapterView.
         procedure.setName(Action.TICKET_LIST);
         procedure.setUser_id(authorizedUser.getId());
         procedure.setParams(authorizedUser.getId());
-        showProgress(true , ticketListView , progressBar , fab);
+        showProgress(true , content , progressBar);
         Call<TicketList[]> call = RetrofitService.getWayMapsService().tickerListProcedure(procedure.getAction(), procedure.getName(),
                 procedure.getIdentficator(), procedure.getUser_id() , procedure.getFormat(), procedure.getParams());
         call.enqueue(new Callback<TicketList[]>() {
@@ -123,12 +126,13 @@ public class TicketListFragment extends AbstractFragment implements AdapterView.
             public void onResponse(Call<TicketList[]> call, Response<TicketList[]> response) {
                 ticketList = response.body();
                 populateTable();
-                showProgress(false , ticketListView , progressBar , fab);
+                showProgress(false , content , progressBar);
+
             }
 
             @Override
             public void onFailure(Call<TicketList[]> call, Throwable t) {
-
+                showProgress(false , content , progressBar);
             }
         });
     }

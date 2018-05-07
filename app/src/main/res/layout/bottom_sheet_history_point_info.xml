@@ -9,37 +9,6 @@
     android:paddingLeft="25dp">
 
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:orientation="vertical">
-
-        <TextView
-            android:id="@+id/history_car_name"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="start|end"
-            android:layout_weight="1"
-            android:gravity="fill_vertical"
-            android:paddingLeft="20dp"
-            android:textColor="@color/common_google_signin_btn_text_dark_focused"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            tools:text="Opel GS TR-151, Рівне"></TextView>
-
-        <TextView
-            android:id="@+id/history_car_user_name"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:paddingLeft="40dp"
-            android:textColor="@color/common_google_signin_btn_text_dark_focused"
-            android:textSize="20sp"
-            tools:text="Stanislav Cheslavskyi"></TextView>
-    </LinearLayout>
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -151,6 +120,103 @@
                 android:id="@+id/history_burn_fuel"
                 style="@style/HistoryLabel"
                 android:text="1 minute" />
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+
+            <TextView
+                style="@style/HistoryLabel"
+                android:text="@string/speed" />
+
+            <TextView
+                android:id="@+id/history_speed"
+                style="@style/HistoryLabel"
+                android:text="10km/per hour" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                style="@style/HistoryLabel"
+                android:text="@string/ignition" />
+
+            <TextView
+                android:id="@+id/history_ignition"
+                style="@style/HistoryLabel"
+                android:text="true" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                style="@style/HistoryLabel"
+                android:text="@string/engine" />
+
+            <TextView
+                android:id="@+id/history_engine"
+                style="@style/HistoryLabel"
+                android:text="true" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/history_voltage_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+
+            <TextView
+                style="@style/HistoryLabel"
+                android:text="@string/voltage" />
+
+            <TextView
+                android:id="@+id/history_voltage"
+                style="@style/HistoryLabel"
+                android:text="122" />
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:id="@+id/history_gps_satellite_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                style="@style/HistoryLabel"
+                android:text="@string/satellite" />
+
+            <TextView
+                android:id="@+id/history_gps_satellite"
+                style="@style/HistoryLabel"
+                android:text="12" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/history_gps_signal_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                style="@style/HistoryLabel"
+                android:text="@string/signal" />
+
+            <TextView
+                android:id="@+id/history_gps_signal"
+                style="@style/HistoryLabel"
+                android:text="1" />
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>

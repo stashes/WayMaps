@@ -14,10 +14,12 @@ import com.waymaps.R;
 import com.waymaps.data.responseEntity.GetCurrent;
 import com.waymaps.data.responseEntity.Report;
 import com.waymaps.data.responseEntity.TrackCount;
+import com.waymaps.data.responseEntity.TrackerList;
 import com.waymaps.data.responseEntity.User;
 import com.waymaps.util.DateTimeUtil;
 import com.waymaps.util.SystemUtil;
 
+import java.text.DecimalFormat;
 import java.util.Date;
 
 import butterknife.BindView;
@@ -139,11 +141,14 @@ public class ReportDialog extends Dialog {
     private GetCurrent getCurrent;
     private Report report;
     TrackCount trackCount;
+    private TrackerList tracker;
+
+    public static DecimalFormat format = new DecimalFormat("0.0");
 
     private Date dateFrom;
     private Date dateTo;
 
-    public ReportDialog(@NonNull Context context, User authorisedUser, GetCurrent getCurrent, Report report, TrackCount trackCount, Date dateFrom, Date dateTo) {
+    public ReportDialog(@NonNull Context context, User authorisedUser, GetCurrent getCurrent, TrackerList tracker,Report report, TrackCount trackCount, Date dateFrom, Date dateTo) {
         super(context);
         this.authorisedUser = authorisedUser;
         this.getCurrent = getCurrent;
@@ -151,6 +156,7 @@ public class ReportDialog extends Dialog {
         this.trackCount = trackCount;
         this.dateFrom = dateFrom;
         this.dateTo = dateTo;
+        this.tracker = tracker;
     }
 
     @Override
@@ -190,14 +196,22 @@ public class ReportDialog extends Dialog {
 
         String avgspeed = report.getSpeed_action();
         if (avgspeed != null) {
-            reportAverageSpeed.setText(avgspeed + " " + getContext().getResources().getString(R.string.kmperhour));
+            try{
+                avgspeed = format.format(Double.parseDouble(avgspeed));
+            } finally {
+                reportAverageSpeed.setText(avgspeed + " " + getContext().getResources().getString(R.string.kmperhour));
+            }
         } else {
             reportAverageSpeed.setText("");
         }
 
         String avgspeedip = report.getSpeed_avg();
         if (avgspeedip != null) {
-            reportAverageSpeedIncludeParking.setText(avgspeedip + " " + getContext().getResources().getString(R.string.kmperhour));
+            try{
+                avgspeedip = format.format(Double.parseDouble(avgspeedip));
+            } finally {
+                reportAverageSpeedIncludeParking.setText(avgspeedip + " " + getContext().getResources().getString(R.string.kmperhour));
+            }
         } else {
             reportAverageSpeedIncludeParking.setText("");
         }
@@ -231,7 +245,7 @@ public class ReportDialog extends Dialog {
             reportMaxSpeed.setText("");
         }
 
-        String speed_limit = getCurrent.getSpeed();
+        String speed_limit = tracker.getMaxspeed();
         if (speed_limit != null) {
             reportSpeedLimit.setText(speed_limit + " " + getContext().getString(R.string.kmperhour));
         } else {
@@ -263,7 +277,11 @@ public class ReportDialog extends Dialog {
 
         String dist = report.getTotal_odometr();
         if (dist != null) {
-            reportTotalDistance.setText((Double.parseDouble(dist)/1000) + " " + getContext().getString(R.string.km));
+            try{
+                dist = format.format((Double.parseDouble(dist)/1000));
+            } finally {
+                reportTotalDistance.setText(dist + " " + getContext().getString(R.string.km));
+            }
         } else {
             reportTotalDistance.setText("");
         }

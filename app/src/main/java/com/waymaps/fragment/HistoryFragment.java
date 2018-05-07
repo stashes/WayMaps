@@ -39,11 +39,13 @@ import com.waymaps.data.responseEntity.GetGroup;
 import com.waymaps.data.responseEntity.GetTrack;
 import com.waymaps.data.responseEntity.Report;
 import com.waymaps.data.responseEntity.TrackCount;
+import com.waymaps.data.responseEntity.TrackerList;
 import com.waymaps.dialog.ReportDialog;
 import com.waymaps.util.ApplicationUtil;
 import com.waymaps.util.SystemUtil;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -109,6 +111,7 @@ public class HistoryFragment extends AbstractFragment {
     private TrackCount trackCount;
     private Report report;
     private GetCurrent getCurrent;
+    private TrackerList tracker;
 
     private Date dateFromD;
     private Date dateToD;
@@ -139,6 +142,7 @@ public class HistoryFragment extends AbstractFragment {
     private void getFromBundle() {
         try {
             getCurrent = ApplicationUtil.getObjectFromBundle(getArguments(), "car", GetCurrent.class);
+            tracker = ApplicationUtil.getObjectFromBundle(getArguments(), "tracker", TrackerList.class);
         } catch (IOException e) {
             logger.error("Error while trying to parse parameters {}", this.getClass());
         }
@@ -171,22 +175,24 @@ public class HistoryFragment extends AbstractFragment {
             Bundle bundle = ApplicationUtil.setValueToBundle(new Bundle(), "user", authorizedUser);
             ApplicationUtil.setValueToBundle(bundle, "trackCount", trackCount);
             ApplicationUtil.setValueToBundle(bundle, "getCurrent", getCurrent);
+            ApplicationUtil.setValueToBundle(bundle, "tracker", tracker);
             ApplicationUtil.setValueToBundle(bundle, "from", dateFromD);
             ApplicationUtil.setValueToBundle(bundle, "to", dateToD);
             fragment.setArguments(bundle);
         } catch (JsonProcessingException e) {
             logger.error("Error writing user {}",authorizedUser.toString());
         }
-        ft.replace(R.id.content_main, fragment);
+        ft.add(R.id.content_main, fragment);
+        ft.hide(HistoryFragment.this);
         ft.commit();
-        ft.addToBackStack("HistoryFragment");
+        ft.addToBackStack(HistoryFragment.class.getName());
     }
 
     @OnClick(R.id.history_show_report)
     protected void report(){
         Procedure procedure = new Procedure(Action.CALL);
         //todo change
-        Parameter parameter = new IdParam("955");
+        Parameter parameter = new IdParam(getCurrent.getId());
         //
 
         dateToD = new GregorianCalendar(year_to,month_to,day_to,hour_to,minute_to).getTime();
@@ -215,7 +221,7 @@ public class HistoryFragment extends AbstractFragment {
                     //todo change
 
                     //
-                    ReportDialog reportDialog = new ReportDialog(getContext(),authorizedUser,getCurrent,report,trackCount,dateFromD,dateToD);
+                    ReportDialog reportDialog = new ReportDialog(getContext(),authorizedUser,getCurrent,tracker,report,trackCount,dateFromD,dateToD);
                     reportDialog.getWindow().setLayout((int) (SystemUtil.getIntWidth(getActivity())*0.9), (int) (SystemUtil.getIntHeight(getActivity())*0.9));
                     reportDialog.show();
                 }
@@ -268,7 +274,8 @@ public class HistoryFragment extends AbstractFragment {
                 } else{
                     if (trackCounts[0].getOdo()!=null){
                         trackCount = trackCounts[0];
-                        double distanceKm = Double.parseDouble(trackCounts[0].getOdo())/1000;
+                        String distanceKm = new DecimalFormat("0.0").format(
+                                Double.parseDouble(trackCounts[0].getOdo())/1000);
                         distance.setText(distanceKm + " " +  getString(R.string.km));
                         historyCalculateView.setVisibility(View.GONE);
                         hisoryShowInfoView.setVisibility(View.VISIBLE);
@@ -309,6 +316,7 @@ public class HistoryFragment extends AbstractFragment {
         dateToD = new GregorianCalendar(year_to,month_to,day_to,hour_to,minute_to).getTime();
         dateFromD = new GregorianCalendar(year_from,month_from,day_from,hour_from,minute_from).getTime();
         dateFrom.setText(message);
+        distance.setText("");
         historyCalculateView.setVisibility(View.VISIBLE);
         hisoryShowInfoView.setVisibility(View.GONE);
     }

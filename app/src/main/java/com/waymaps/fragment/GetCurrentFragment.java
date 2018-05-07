@@ -1,5 +1,7 @@
 package com.waymaps.fragment;
 
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentTransaction;
@@ -33,6 +35,7 @@ import com.waymaps.data.requestEntity.Action;
 import com.waymaps.data.requestEntity.Procedure;
 import com.waymaps.data.responseEntity.GetCurrent;
 import com.waymaps.data.responseEntity.GetGroup;
+import com.waymaps.data.responseEntity.TrackerList;
 import com.waymaps.util.ApplicationUtil;
 import com.waymaps.util.SystemUtil;
 
@@ -62,13 +65,19 @@ public class GetCurrentFragment extends AbstractFragment {
     private GetGroup[] getGroups;
     private Logger logger = LoggerFactory.getLogger(this.getClass());
     private Drawer drawerSecond;
+    private int methodCompleted = 0;
 
 
-    @BindView(R.id.progress_bar_group_list)
-    ProgressBar progressBar;
+    @BindView(R.id.progress_layout)
+    View progressBar;
 
     @BindView(R.id.group_list)
     ListView groupList;
+
+    @BindView(R.id.content)
+    View content;
+
+    private ArrayList<TrackerList> trackers;
 
     @Nullable
     @Override
@@ -86,14 +95,22 @@ public class GetCurrentFragment extends AbstractFragment {
         drawer.addDrawerListener(toggle);
         toggle.syncState();
         toolbar.setTitle(fragmentName());
-        addSearchGroup();
+
+        showProgress(true, content, progressBar);
+        methodCompleted = 0;
+        getTracker();
+        if (MainActivity.isGroupAvaible) {
+            addSearchGroup();
+        } else {
+            hideProgress();
+        }
         getCurrentList();
         return view;
     }
 
     @Override
     public boolean onBackPressed() {
-        if (drawerSecond!=null || drawerSecond.isDrawerOpen()){
+        if (drawerSecond!=null && drawerSecond.isDrawerOpen()){
             drawerSecond.closeDrawer();
             return true;
         }
@@ -115,9 +132,31 @@ public class GetCurrentFragment extends AbstractFragment {
 
     }
 
+    private void getTracker(){
+        Procedure procedure = new Procedure(Action.CALL);
+        procedure.setFormat(WayMapsService.DEFAULT_FORMAT);
+        procedure.setIdentficator(SystemUtil.getWifiMAC(getActivity()));
+        procedure.setName(Action.TRACKER_LIST);
+        procedure.setUser_id(authorizedUser.getId());
+        procedure.setParams(authorizedUser.getId());
+        Call<TrackerList[]> call = RetrofitService.getWayMapsService().trackerProcedure(procedure.getAction(), procedure.getName(),
+                procedure.getIdentficator(), procedure.getUser_id(), procedure.getFormat(), procedure.getParams());
+        call.enqueue(new Callback<TrackerList[]>() {
+            @Override
+            public void onResponse(Call<TrackerList[]> call, Response<TrackerList[]> response) {
+                trackers =  new ArrayList<>(Arrays.asList(response.body()));
+                hideProgress();
+            }
+
+            @Override
+            public void onFailure(Call<TrackerList[]> call, Throwable t) {
+                logger.debug("Failed while trying to load tracker list.");
+                hideProgress();
+            }
+        });
+    }
+
     private void addSearchGroup() {
-        if (MainActivity.isGroupAvaible == true) {
-            getActivity().getMenuInflater().inflate(R.menu.main, toolbar.getMenu());
             Procedure procedure = new Procedure(Action.CALL);
             procedure.setFormat(WayMapsService.DEFAULT_FORMAT);
             procedure.setIdentficator(SystemUtil.getWifiMAC(getActivity()));
@@ -132,9 +171,9 @@ public class GetCurrentFragment extends AbstractFragment {
                 @Override
                 public void onResponse(Call<GetGroup[]> call, Response<GetGroup[]> response) {
                     getGroups = response.body();
+                    hideProgress();
 
                     drawerSecond = new DrawerBuilder(getActivity())
-                            .withToolbar(toolbar)
                             .withActionBarDrawerToggle(false)
                             .withDrawerGravity(Gravity.END)
                             .addDrawerItems(new PrimaryDrawerItem().withName(R.string.all).withTag(null), new DividerDrawerItem())
@@ -162,12 +201,14 @@ public class GetCurrentFragment extends AbstractFragment {
 
                 @Override
                 public void onFailure(Call<GetGroup[]> call, Throwable t) {
+                    hideProgress();
                     ApplicationUtil.showToast(getContext(), getString(R.string.somethin_went_wrong));
                 }
             });
-
-
-        }
+            getActivity().getMenuInflater().inflate(R.menu.main, toolbar.getMenu());
+        Drawable yourdrawable = toolbar.getMenu().getItem(0).getIcon();
+        yourdrawable.mutate();
+        yourdrawable.setColorFilter(getResources().getColor(R.color.light_blue), PorterDuff.Mode.SRC_IN);
     }
 
     private void getCurrentList() {
@@ -179,7 +220,6 @@ public class GetCurrentFragment extends AbstractFragment {
         procedure.setParams(authorizedUser.getId());
 
 
-        showProgress(true, groupList, progressBar);
         final Call<GetCurrent[]> getCurrent = RetrofitService.getWayMapsService().getCurrentProcedure(procedure.getAction(), procedure.getName(),
                 procedure.getIdentficator(), procedure.getUser_id(), procedure.getFormat(), procedure.getParams());
 
@@ -187,14 +227,14 @@ public class GetCurrentFragment extends AbstractFragment {
             @Override
             public void onResponse(Call<GetCurrent[]> call, Response<GetCurrent[]> response) {
                 getCurrents = response.body();
+                hideProgress();
                 populateList();
-                showProgress(false, groupList, progressBar);
             }
 
             @Override
             public void onFailure(Call<GetCurrent[]> call, Throwable t) {
+                hideProgress();
                 ApplicationUtil.showToast(getContext(), getString(R.string.somethin_went_wrong));
-                showProgress(false, groupList, progressBar);
             }
         });
 
@@ -225,24 +265,40 @@ public class GetCurrentFragment extends AbstractFragment {
 
     public void moveTo(GetCurrent getCurrent) {
         Bundle bundle = new Bundle();
+
+        TrackerList trackerList = null;
+        for (TrackerList t : trackers){
+            if (t.getId().equals(getCurrent.getId())){
+                trackerList = t;
+                break;
+            }
+        }
         HistoryFragment historyFragment = new HistoryFragment();
         try {
             ApplicationUtil.setValueToBundle(bundle, "car", getCurrent);
             ApplicationUtil.setValueToBundle(bundle, "user", authorizedUser);
+            ApplicationUtil.setValueToBundle(bundle,"tracker",trackerList);
         } catch (JsonProcessingException e) {
             logger.debug("Error while trying write to bundle");
         }
         historyFragment.setArguments(bundle);
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.replace(R.id.content_main, historyFragment);
-        ft.addToBackStack("Cars");
+        ft.addToBackStack(this.getClass().getName());
         ft.commit();
+    }
+
+    private void hideProgress(){
+        methodCompleted++;
+        if (methodCompleted==3){
+            showProgress(false, content, progressBar);
+
+        }
     }
 
     @Override
     protected String fragmentName() {
         return "";
-                /*getResources().getString(R.string.get_tracker)*/
     }
 
     private void getAttrFromBundle() {

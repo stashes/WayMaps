@@ -17,6 +17,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ImageView;
 
 import com.waymaps.R;
 import com.waymaps.activity.MainActivity;
@@ -109,6 +111,23 @@ public abstract class AbstractFragment extends Fragment  {
             // and hide the relevant UI components.
             view[0].setVisibility(show ? View.VISIBLE : View.GONE);
             view[1].setVisibility(show ? View.GONE : View.VISIBLE);
+        }
+    }
+
+    public void unbindDrawables(View view) {
+        if (view.getBackground() != null)
+            view.getBackground().setCallback(null);
+
+        if (view instanceof ImageView) {
+            ImageView imageView = (ImageView) view;
+            imageView.setImageBitmap(null);
+        } else if (view instanceof ViewGroup) {
+            ViewGroup viewGroup = (ViewGroup) view;
+            for (int i = 0; i < viewGroup.getChildCount(); i++)
+                unbindDrawables(viewGroup.getChildAt(i));
+
+            if (!(view instanceof AdapterView))
+                viewGroup.removeAllViews();
         }
     }
 

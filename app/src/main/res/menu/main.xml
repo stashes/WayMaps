@@ -4,6 +4,6 @@
     <item
         android:id="@+id/search_button"
         android:icon="@drawable/ic_search_btn"
-        app:showAsAction="ifRoom"
+        app:showAsAction="always"
         android:title="Groups" />
 </menu>

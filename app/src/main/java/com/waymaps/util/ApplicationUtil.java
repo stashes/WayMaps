@@ -2,7 +2,6 @@ package com.waymaps.util;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.ColorFilter;
@@ -12,7 +11,6 @@ import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.view.Gravity;
 import android.view.View;
@@ -23,7 +21,6 @@ import android.widget.Toast;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.waymaps.R;
-import com.waymaps.activity.MainActivity;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -48,7 +45,7 @@ public class ApplicationUtil {
         else return null;
     }
 
-    public static Bitmap changeIconColor(Drawable drawable, int color) {
+    public static Bitmap drawToBitmap(Drawable drawable, int color) {
         if (!(drawable instanceof BitmapDrawable)) {
             Drawable mWrappedDrawable = drawable.mutate();
             mWrappedDrawable = DrawableCompat.wrap(mWrappedDrawable);
@@ -75,7 +72,6 @@ public class ApplicationUtil {
             Canvas canvas = new Canvas(mutableBitmap);
             canvas.drawBitmap(b, 0, 0, paint);
             return mutableBitmap;
-
         }
     }
 
@@ -104,6 +100,18 @@ public class ApplicationUtil {
             return mutableBitmap;
 
         }
+    }
+
+    public static Bitmap drawToBitmap(Drawable d , int height,int width){
+        Bitmap bitmap = drawToBitmap(d);
+        Bitmap resizedBitmap = Bitmap.createScaledBitmap(bitmap, width, height, false);
+        return resizedBitmap;
+    }
+
+    public static Bitmap drawToBitmap(Drawable d , int color, int height,int width){
+        Bitmap bitmap = drawToBitmap(d,color);
+        Bitmap resizedBitmap = Bitmap.createScaledBitmap(bitmap, width, height, false);
+        return resizedBitmap;
     }
 
     public static int changeColorScaleTo16Int(String color) {
@@ -173,7 +181,7 @@ public class ApplicationUtil {
 
         int bitmapColor = ApplicationUtil.changeColorScaleTo16Int(color);
 
-        return ApplicationUtil.changeIconColor(drawable, bitmapColor);
+        return ApplicationUtil.drawToBitmap(drawable, bitmapColor);
     }
 
     public static void showToast(Context context,String text) {

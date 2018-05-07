@@ -6,10 +6,12 @@
     <color name="success">#12b90f</color>
     <color name="fail">#e11a24</color>
     <color name="transparent">#00000000</color>
-    <color name="black">#F000</color>
+    <color name="black">#000000</color>
     <color name="warning">#ff8316</color>
     <color name="white">#FFFFFFFF</color>
     <color name="light_blue">#7a87e7</color>
     <color name="gray">#424242</color>
     <color name="lightgray">#757575</color>
+    <color name="verylightgray">#bdbdbd</color>
+    <color name="very2lightgray">#eeeeee</color>
 </resources>

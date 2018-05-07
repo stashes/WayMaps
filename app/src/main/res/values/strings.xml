@@ -143,5 +143,12 @@
     <string name="personal_account">Personal account</string>
     <string name="uah">UAH</string>
     <string name="balancesmall">balance</string>
+    <string name="parking">Parking</string>
+    <string name="way_point">Way point</string>
+    <string name="downloading_data">Downloading data...</string>
+    <string name="preprocessing_data">Preprocessing data...</string>
+    <string name="draw_way">Drawing way...</string>
+    <string name="prepare_stop_info">Preparing info about stops...</string>
+    <string name="done">Done!</string>
 
 </resources>

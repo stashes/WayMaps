@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.waymaps.R;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
@@ -17,12 +18,30 @@ public class DateTimeUtil {
 
     public static SimpleDateFormat dateFormatForReport = new SimpleDateFormat("HH:mm dd-MM-yyyy");
 
+    public static SimpleDateFormat dateFormatForHistory = new SimpleDateFormat("HH:mm:ss dd-MM-yyyy");
+
     public static String dateToString(Date date){
         return dateFormat.format(date);
     }
 
     public static String dateToStringForReport(Date date){
         return dateFormatForReport.format(date);
+    }
+
+    public static String dateToStringForHistory(Date date){
+        return dateFormatForHistory.format(date);
+    }
+
+    public static Date stringToDate(String date,SimpleDateFormat simpleDateFormat) throws ParseException {
+        return simpleDateFormat.parse(date);
+    }
+
+    public static Date stringToDate(String date) throws ParseException {
+        return stringToDate(date,dateFormat);
+    }
+
+    public static String toReportFormat(String date) throws ParseException {
+        return dateToStringForHistory(stringToDate(date));
     }
 
 

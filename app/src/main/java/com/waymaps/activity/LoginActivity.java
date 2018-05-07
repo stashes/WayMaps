@@ -70,7 +70,7 @@ public class LoginActivity extends AppCompatActivity {
     @BindView(R.id.log_in_btn)
     Button mLoginButton;
 
-    @BindView(R.id.login_progress)
+    @BindView(R.id.progress_layout)
     View mProgressView;
     @BindView(R.id.login_form)
     View mLoginFormView;

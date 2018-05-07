@@ -1,6 +1,7 @@
 package com.waymaps.fragment;
 
 import android.graphics.Bitmap;
+import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -13,7 +14,6 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.TypedValue;
 import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -212,6 +212,11 @@ public class GMapFragment extends AbstractFragment {
     @BindView(R.id.filter_inactive)
     LinearLayout filterInActive;
 
+    @BindView(R.id.progress_layout)
+    View progressLayout;
+
+    @BindView(R.id.map_container)
+    View mapContainer;
 
     BottomSheetBehavior sheetBehavior;
 
@@ -220,6 +225,7 @@ public class GMapFragment extends AbstractFragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         //getActivity().getMenuInflater().inflate(R.menu.main, menu);
+
     }
 
     @Override
@@ -263,7 +269,10 @@ public class GMapFragment extends AbstractFragment {
         ((MainActivity) getActivity()).getSupportActionBar().setTitle(fragmentName());
 
         setHasOptionsMenu(true);
+
         mapView = (MapView) rootView.findViewById(R.id.map);
+
+        showProgress(true,mapContainer,progressLayout);
         mapView.onCreate(savedInstanceState);
 
         mapView.onResume(); // needed to get the map to display immediately
@@ -285,7 +294,6 @@ public class GMapFragment extends AbstractFragment {
                 Float zoom = getZoom();
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location, zoom));
                 updateMarkersPosition();
-
             }
         });
 
@@ -294,7 +302,6 @@ public class GMapFragment extends AbstractFragment {
 
     private void addSearchGroup() {
         if (MainActivity.isGroupAvaible == true){
-            getActivity().getMenuInflater().inflate(R.menu.main, toolbar.getMenu());
             Procedure procedure = new Procedure(Action.CALL);
             procedure.setFormat(WayMapsService.DEFAULT_FORMAT);
             procedure.setIdentficator(SystemUtil.getWifiMAC(getActivity()));
@@ -311,7 +318,6 @@ public class GMapFragment extends AbstractFragment {
                     getGroups = response.body();
 
                     drawerSecond = new DrawerBuilder(getActivity())
-                            .withToolbar(toolbar)
                             .withActionBarDrawerToggle(false)
                             .withDrawerGravity(Gravity.END)
                             .addDrawerItems(new PrimaryDrawerItem().withName(R.string.all).withTag(null), new DividerDrawerItem())
@@ -325,6 +331,8 @@ public class GMapFragment extends AbstractFragment {
                                     }
                                     updateMarkersPosition();
                                     drawerSecond.closeDrawer();
+                                    sheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                                    sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
                                     return true;
                                 }
                             })
@@ -342,6 +350,10 @@ public class GMapFragment extends AbstractFragment {
                     ApplicationUtil.showToast(getContext(),getString(R.string.somethin_went_wrong));
                 }
             });
+            getActivity().getMenuInflater().inflate(R.menu.main, toolbar.getMenu());
+            Drawable yourdrawable = toolbar.getMenu().getItem(0).getIcon();
+            yourdrawable.mutate();
+            yourdrawable.setColorFilter(getResources().getColor(R.color.light_blue), PorterDuff.Mode.SRC_IN);
 
 
         }
@@ -372,9 +384,11 @@ public class GMapFragment extends AbstractFragment {
                     addSearchGroup();
                 mMap.clear();
                 updateMarkers();
+                filter();
                 if (timesMarkerUpdate == 0){
                     updateMethod();
                 }
+                showProgress(false,mapContainer,progressLayout);
                 timesMarkerUpdate++;
             }
 
@@ -695,16 +709,7 @@ public class GMapFragment extends AbstractFragment {
             @Override
             public void onClick(View v) {
                 filtered = !filtered;
-                if (filtered) {
-                    for (Marker m : markers) {
-                        m.setVisible(false);
-                    }
-                    currentMarker.setVisible(true);
-                } else {
-                    for (Marker m : markers) {
-                        m.setVisible(true);
-                    }
-                }
+                filter();
             }
         });
 
@@ -727,6 +732,19 @@ public class GMapFragment extends AbstractFragment {
         linearLayoutCar.setVisibility(View.VISIBLE);
         changeBSheetState(BottomSheetBehavior.STATE_COLLAPSED,sheetBehaviorCar);
 
+    }
+
+    private void filter() {
+        if (filtered) {
+            for (Marker m : markers) {
+                m.setVisible(false);
+            }
+            currentMarker.setVisible(true);
+        } else {
+            for (Marker m : markers) {
+                m.setVisible(true);
+            }
+        }
     }
 
     private void backToAll() {
@@ -923,7 +941,7 @@ public class GMapFragment extends AbstractFragment {
         //icon
         Drawable drawable = carImage.getDrawable();
         int color = ApplicationUtil.changeColorScaleTo16Int(tag.getColor());
-        Bitmap bitmap = ApplicationUtil.changeIconColor(drawable, color);
+        Bitmap bitmap = ApplicationUtil.drawToBitmap(drawable, color);
         carImage.setImageBitmap(bitmap);
     }
 
@@ -1022,5 +1040,16 @@ public class GMapFragment extends AbstractFragment {
         count = (TextView) second.getChildAt(1);
         text.setTypeface(null, Typeface.NORMAL);
         count.setTypeface(null, Typeface.NORMAL);
+    }
+
+    @Override
+    public void onPause() {
+        CancelableCallback.cancelAll();
+        super.onPause();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
     }
 }

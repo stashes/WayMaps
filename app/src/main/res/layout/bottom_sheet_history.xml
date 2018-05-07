@@ -15,11 +15,22 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <include layout="@layout/bottom_sheet_history_header" />
+        <include android:id="@+id/track_history_header" layout="@layout/bottom_sheet_history_header"/>
+        <include android:id="@+id/point_history_header"
+            layout="@layout/bottom_sheet_history_point_header" android:visibility="gone"/>
+        <include android:id="@+id/parking_history_header"
+            layout="@layout/bottom_sheet_history_parking_header" android:visibility="gone"/>
+
+
+
 
         <View style="@style/SingleLine" />
 
-        <include layout="@layout/bottom_sheet_history_info" />
+        <include android:id="@+id/track_history_info" layout="@layout/bottom_sheet_history_info" />
+        <include android:id="@+id/point_history_info"
+            layout="@layout/bottom_sheet_history_point_info" android:visibility="gone"/>
+        <include android:id="@+id/parking_history_info"
+            layout="@layout/bottom_sheet_history_parking_info" android:visibility="gone"/>
 
     </LinearLayout>
 
