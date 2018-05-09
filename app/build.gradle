@@ -1,6 +1,10 @@
 apply plugin: 'com.android.application'
 
 android {
+
+    lintOptions {
+        abortOnError false
+    }
     compileSdkVersion 26
     defaultConfig {
         applicationId "com.waymaps"
