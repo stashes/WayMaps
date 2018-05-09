@@ -973,10 +973,14 @@ public class GMapFragment extends AbstractFragment {
 
     @Override
     public void onStop() {
-        super.onStop();
+        if (drawerSecond!=null){
+            drawerSecond.getDrawerLayout().setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+        }
         mMap.clear();
         ((MainActivity)getActivity()).deleteAllBackgroundTasks();
         CancelableCallback.cancelAll();
+        super.onStop();
+
     }
 
     private void getAttrFromBundle(){

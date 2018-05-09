@@ -308,4 +308,12 @@ public class GetCurrentFragment extends AbstractFragment {
             logger.error("Error while trying to parse parameters {}", this.getClass());
         }
     }
+
+    @Override
+    public void onStop() {
+        if (drawerSecond!=null){
+            drawerSecond.getDrawerLayout().setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+        }
+        super.onStop();
+    }
 }

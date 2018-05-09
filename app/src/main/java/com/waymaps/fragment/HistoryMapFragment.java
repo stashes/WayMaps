@@ -324,7 +324,6 @@ public class HistoryMapFragment extends AbstractFragment {
                 });
 
                 Procedure procedureGetParking = configureGetParkingProcedure();
-                ApplicationUtil.showToast(HistoryMapFragment.this.getActivity(),getResources().getString(R.string.prepare_stop_info));
                 Call<GetParking[]> getParking = RetrofitService.getWayMapsService().getParking(procedureGetParking.getAction(), procedureGetParking.getName(),
                         procedureGetParking.getIdentficator(), procedureGetParking.getFormat(), procedureGetParking.getParams());
                 getParking.enqueue(new Callback<GetParking[]>() {
