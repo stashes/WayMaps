@@ -976,7 +976,9 @@ public class GMapFragment extends AbstractFragment {
         if (drawerSecond!=null){
             drawerSecond.getDrawerLayout().setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
         }
-        mMap.clear();
+        if (mMap!=null) {
+            mMap.clear();
+        }
         ((MainActivity)getActivity()).deleteAllBackgroundTasks();
         CancelableCallback.cancelAll();
         super.onStop();

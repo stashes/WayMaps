@@ -8,9 +8,12 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.menu.MenuBuilder;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -99,7 +102,7 @@ public class GetCurrentFragment extends AbstractFragment {
         showProgress(true, content, progressBar);
         methodCompleted = 0;
         getTracker();
-        if (MainActivity.isGroupAvaible) {
+        if (MainActivity.isGroupAvaible!=null && MainActivity.isGroupAvaible) {
             addSearchGroup();
         } else {
             hideProgress();
@@ -205,11 +208,17 @@ public class GetCurrentFragment extends AbstractFragment {
                     ApplicationUtil.showToast(getContext(), getString(R.string.somethin_went_wrong));
                 }
             });
-            getActivity().getMenuInflater().inflate(R.menu.main, toolbar.getMenu());
+        getActivity().getMenuInflater().inflate(R.menu.main, toolbar.getMenu());
         Drawable yourdrawable = toolbar.getMenu().getItem(0).getIcon();
         yourdrawable.mutate();
         yourdrawable.setColorFilter(getResources().getColor(R.color.light_blue), PorterDuff.Mode.SRC_IN);
     }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+
+    }
+
 
     private void getCurrentList() {
         Procedure procedure = new Procedure(Action.CALL);
@@ -292,7 +301,6 @@ public class GetCurrentFragment extends AbstractFragment {
         methodCompleted++;
         if (methodCompleted==3){
             showProgress(false, content, progressBar);
-
         }
     }
 

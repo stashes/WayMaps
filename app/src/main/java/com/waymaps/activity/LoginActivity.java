@@ -90,6 +90,7 @@ public class LoginActivity extends AppCompatActivity {
         if (mPassSave.isChecked()){
             attemptLogin();
         }
+        MainActivity.firstLaunch = true;
         getFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
     }
 
@@ -166,8 +167,8 @@ public class LoginActivity extends AppCompatActivity {
                 @Override
                 public void onResponse(Call<User[]> call, Response<User[]> response) {
                     User[] users = response.body();
+                    clearFields();
                     if (users.length == 0) {
-                        clearFields();
                         Toast toast = Toast.makeText(getApplicationContext(),
                                 "Password or login is incorrect",
                                 Toast.LENGTH_SHORT);
