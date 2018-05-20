@@ -693,8 +693,7 @@ public class GMapFragment extends AbstractFragment {
         GetCurrent tag = (GetCurrent) currentMarker.getTag();
         pickedId = getCurrents.indexOf(tag);
         currentTag = currentMarker.getTag();
-        mMap.animateCamera(CameraUpdateFactory.newLatLng(new LatLng(Double.parseDouble(tag.getLat())
-                ,Double.parseDouble(tag.getLon()))));
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentMarker.getPosition(),18f));
         updateMarkerState(tag);
 
 
@@ -719,8 +718,8 @@ public class GMapFragment extends AbstractFragment {
                 locked = !locked;
                 if (locked) {
                     mMap.getUiSettings().setScrollGesturesEnabled(false);
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentMarker.getPosition(),14f));
                     lockCar.setImageDrawable(getResources().getDrawable(R.drawable.ic_lock));
+                    mMap.animateCamera(CameraUpdateFactory.newLatLng(currentMarker.getPosition()));
                 } else {
                     mMap.getUiSettings().setScrollGesturesEnabled(true);
                     lockCar.setImageDrawable(getResources().getDrawable(R.drawable.ic_unlock));
@@ -729,8 +728,8 @@ public class GMapFragment extends AbstractFragment {
         });
 
         linearLayout.setVisibility(View.GONE);
-        linearLayoutCar.setVisibility(View.VISIBLE);
         changeBSheetState(BottomSheetBehavior.STATE_COLLAPSED,sheetBehaviorCar);
+        linearLayoutCar.setVisibility(View.VISIBLE);
 
     }
 

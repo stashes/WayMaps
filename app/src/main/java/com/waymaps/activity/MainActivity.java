@@ -149,7 +149,7 @@ public class MainActivity extends AppCompatActivity
             drawer.closeDrawer(GravityCompat.START);
         } else {
             if ("0".equals(authorisedUser.getDiler())
-                    && getSupportFragmentManager().getBackStackEntryCount()==0){
+                    && (getSupportFragmentManager().getBackStackEntryCount()==0)){
                 Intent a = new Intent(Intent.ACTION_MAIN);
                 a.addCategory(Intent.CATEGORY_HOME);
                 a.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
