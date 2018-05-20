@@ -150,8 +150,8 @@ public class TrackerListFragment extends AbstractFragment implements AdapterView
         MessageFragment messageFragment = new MessageFragment();
         messageFragment.setArguments(bundle);
         FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.replace(R.id.content_main, messageFragment);
         ft.addToBackStack("TrackerList");
+        ft.replace(R.id.content_main, messageFragment);
         ft.commit();
     }
 

@@ -29,6 +29,7 @@ import com.waymaps.data.requestEntity.UpdateCredentials;
 import com.waymaps.data.responseEntity.User;
 import com.waymaps.fragment.AbstractFragment;
 import com.waymaps.fragment.BalanceFragment;
+import com.waymaps.fragment.ChooseMapTypeFragment;
 import com.waymaps.fragment.GMapFragment;
 import com.waymaps.fragment.GetCurrentFragment;
 import com.waymaps.fragment.GroupFragment;
@@ -80,6 +81,10 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (getIntent().getBooleanExtra("EXIT", false)) {
+            finish();
+        }
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         getUserFromIntent();
@@ -151,10 +156,15 @@ public class MainActivity extends AppCompatActivity
             if ("0".equals(authorisedUser.getDiler())
                     && (getSupportFragmentManager().getBackStackEntryCount()==0)){
                 firstLaunch = true;
-                Intent a = new Intent(Intent.ACTION_MAIN);
+                /*Intent a = new Intent(Intent.ACTION_MAIN);
                 a.addCategory(Intent.CATEGORY_HOME);
                 a.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(a);
+                startActivity(a);*/
+
+                Intent intent = new Intent(this, MainActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                intent.putExtra("EXIT", true);
+                startActivity(intent);
             }
             super.onBackPressed();
         }
@@ -209,9 +219,9 @@ public class MainActivity extends AppCompatActivity
             map();
         } else if (id == R.id.nav_history) {
             history();
-        } /*else if (id == R.id.nav_settings) {
-
-        } */else if (id == R.id.nav_save_location) {
+        } else if (id == R.id.nav_settings) {
+            chooseProvider();
+        } else if (id == R.id.nav_save_location) {
             saveLocation();
         } else if (id == R.id.nav_balance) {
             balance();
@@ -229,6 +239,7 @@ public class MainActivity extends AppCompatActivity
         /*if (isGroupAvaible){
             currentFragment = new GroupFragment(new GetCurrentFragment());
         } else*/
+        ft.addToBackStack("history");
         currentFragment = new GetCurrentFragment();
         try {
             currentFragment.setArguments(ApplicationUtil.setValueToBundle
@@ -236,8 +247,22 @@ public class MainActivity extends AppCompatActivity
         } catch (JsonProcessingException e) {
             logger.error("Error writing user {}",authorisedUser.toString());
         }
-        ft.addToBackStack("history");
         ft.replace(R.id.content_main, currentFragment);
+        ft.commit();
+    }
+
+
+    private void chooseProvider() {
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        currentFragment = new ChooseMapTypeFragment();
+        try {
+            currentFragment.setArguments(ApplicationUtil.setValueToBundle
+                    (new Bundle(),"user",authorisedUser));
+        } catch (JsonProcessingException e) {
+            logger.error("Error writing user {}",authorisedUser.toString());
+        }
+        ft.replace(R.id.content_main, currentFragment);
+        ft.addToBackStack(null);
         ft.commit();
     }
 
@@ -262,6 +287,7 @@ public class MainActivity extends AppCompatActivity
 
     private void balance() {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.addToBackStack("balance");
         currentFragment= new BalanceFragment();
         try {
             currentFragment.setArguments(ApplicationUtil.setValueToBundle
@@ -269,7 +295,6 @@ public class MainActivity extends AppCompatActivity
         } catch (JsonProcessingException e) {
             logger.error("Error writing user {}",authorisedUser.toString());
         }
-        ft.addToBackStack("balance");
         ft.replace(R.id.content_main, currentFragment);
         ft.commit();
     }
@@ -283,14 +308,12 @@ public class MainActivity extends AppCompatActivity
         } catch (JsonProcessingException e) {
             logger.error("Error writing user {}",authorisedUser.toString());
         }
-
-
-        ft.replace(R.id.content_main, currentFragment);
         if (firstLaunch ){
             getSupportFragmentManager().popBackStackImmediate();
         } else if (!firstLaunch){
-            ft.addToBackStack("map");
+            ft.addToBackStack(null);
         }
+        ft.replace(R.id.content_main, currentFragment);
         firstLaunch = false;
         ft.commit();
 
@@ -298,6 +321,7 @@ public class MainActivity extends AppCompatActivity
     }
     private void showTicketList(){
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.addToBackStack("ticketList");
         currentFragment = new TicketListFragment();
         try {
             currentFragment.setArguments(ApplicationUtil.setValueToBundle
@@ -308,7 +332,6 @@ public class MainActivity extends AppCompatActivity
 
         ft.replace(R.id.content_main, currentFragment);
         ft.commit();
-        ft.addToBackStack("ticketList");
     }
 
     private void setFragmentActive(Fragment fragment){

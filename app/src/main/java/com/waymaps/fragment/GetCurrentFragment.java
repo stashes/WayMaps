@@ -292,8 +292,8 @@ public class GetCurrentFragment extends AbstractFragment {
         }
         historyFragment.setArguments(bundle);
         FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.replace(R.id.content_main, historyFragment);
         ft.addToBackStack(this.getClass().getName());
+        ft.replace(R.id.content_main, historyFragment);
         ft.commit();
     }
 

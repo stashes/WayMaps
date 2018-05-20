@@ -170,6 +170,7 @@ public class HistoryFragment extends AbstractFragment {
     @OnClick(R.id.history_show_track)
     protected void showTrack(){
         FragmentTransaction ft = getFragmentManager().beginTransaction();
+        ft.addToBackStack(HistoryFragment.class.getName());
         HistoryMapFragment fragment = new HistoryMapFragment();
         try {
             Bundle bundle = ApplicationUtil.setValueToBundle(new Bundle(), "user", authorizedUser);
@@ -185,7 +186,6 @@ public class HistoryFragment extends AbstractFragment {
         ft.add(R.id.content_main, fragment);
         ft.hide(HistoryFragment.this);
         ft.commit();
-        ft.addToBackStack(HistoryFragment.class.getName());
     }
 
     @OnClick(R.id.history_show_report)

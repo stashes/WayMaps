@@ -25,6 +25,7 @@ public class LocalPreferenceManager {
     private static final int INVALID_INT = -1;
     private static final String INVALID_STRING = "";
     private static final String MAP_PROVIDER = "mapProvider";
+    private static final MapProvider DEFAULT_MAP_PROVIDER = MapProvider.OSM;
 
     private static final String SHOW_EXCEEDS = "showExceeds";
     private static final String SHOW_OFFLINE_MARKERS = "showOfflineMarkers";
@@ -114,7 +115,13 @@ public class LocalPreferenceManager {
     }
 
     public static String getMapProvider(Context context) {
-        return getStringValue(context, MAP_PROVIDER);
+        String s =  getStringValue(context, MAP_PROVIDER);
+        if (INVALID_STRING.equals(s)){
+            setMapProvider(context,DEFAULT_MAP_PROVIDER.name());
+            return DEFAULT_MAP_PROVIDER.name();
+        } else {
+            return s;
+        }
     }
 
     public static void setMapProvider(Context context, String mapProvider) {

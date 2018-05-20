@@ -67,7 +67,6 @@ public abstract class AbstractFragment extends Fragment  {
      * progress bar [1]
      * others [...]
      */
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
     protected void showProgress(final boolean show , final View...view) {
         // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
         // for very easy animations. If available, use these APIs to fade-in

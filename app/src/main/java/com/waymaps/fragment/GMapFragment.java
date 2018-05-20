@@ -27,13 +27,18 @@ import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.TileOverlayOptions;
+import com.google.android.gms.maps.model.TileProvider;
+import com.google.android.gms.maps.model.UrlTileProvider;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.model.DividerDrawerItem;
@@ -55,29 +60,35 @@ import com.waymaps.data.responseEntity.GetGroup;
 import com.waymaps.util.ApplicationUtil;
 import com.waymaps.util.DateTimeUtil;
 import com.waymaps.util.LocalPreferenceManager;
+import com.waymaps.util.MapProvider;
 import com.waymaps.util.SystemUtil;
+import com.waymaps.util.TilesProvider;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import retrofit2.http.Url;
 
 /**
  * Created by Admin on 11.02.2018.
  */
 
-public class GMapFragment extends AbstractFragment {
+public class GMapFragment extends AbstractFragment implements OnMapReadyCallback{
 
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -222,6 +233,7 @@ public class GMapFragment extends AbstractFragment {
 
     BottomSheetBehavior sheetBehaviorCar;
 
+
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         //getActivity().getMenuInflater().inflate(R.menu.main, menu);
@@ -255,7 +267,7 @@ public class GMapFragment extends AbstractFragment {
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, @Nullable final ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         View rootView = inflater.inflate(R.layout.fragment_map, container, false);
         ButterKnife.bind(this, rootView);
@@ -269,13 +281,12 @@ public class GMapFragment extends AbstractFragment {
         ((MainActivity) getActivity()).getSupportActionBar().setTitle(fragmentName());
 
         setHasOptionsMenu(true);
-
         mapView = (MapView) rootView.findViewById(R.id.map);
 
-        showProgress(true,mapContainer,progressLayout);
         mapView.onCreate(savedInstanceState);
+        showProgress(true, mapContainer, progressLayout);
+        procedure = configureProcedure();
 
-        mapView.onResume(); // needed to get the map to display immediately
 
         try {
             MapsInitializer.initialize(getActivity().getApplicationContext());
@@ -283,25 +294,33 @@ public class GMapFragment extends AbstractFragment {
             logger.error("Error occurs while map initializing");
         }
 
-        procedure = configureProcedure();
 
-        mapView.getMapAsync(new OnMapReadyCallback() {
-            @Override
-            public void onMapReady(GoogleMap googleMap) {
-                mMap = googleMap;
-                mMap.getUiSettings().setRotateGesturesEnabled(false);
-                LatLng location = getLatLng();
-                Float zoom = getZoom();
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location, zoom));
-                updateMarkersPosition();
-            }
-        });
+        mapView.onResume(); // needed to get the map to display immediately
+
+
+
+        mapView.getMapAsync(this);
 
         return rootView;
     }
 
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+        if (MapProvider.valueOf(LocalPreferenceManager.getMapProvider(getContext())) != MapProvider.Google) {
+            mMap.setMapType(GoogleMap.MAP_TYPE_NONE);
+                    mMap.addTileOverlay(new TileOverlayOptions().
+                            tileProvider(TilesProvider.getTile(getContext())));
+        }
+        mMap.getUiSettings().setRotateGesturesEnabled(false);
+        LatLng location = getLatLng();
+        Float zoom = getZoom();
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location, zoom));
+        updateMarkersPosition();
+    }
+
     private void addSearchGroup() {
-        if (MainActivity.isGroupAvaible == true){
+        if (MainActivity.isGroupAvaible == true) {
             Procedure procedure = new Procedure(Action.CALL);
             procedure.setFormat(WayMapsService.DEFAULT_FORMAT);
             procedure.setIdentficator(SystemUtil.getWifiMAC(getActivity()));
@@ -324,7 +343,7 @@ public class GMapFragment extends AbstractFragment {
                             .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                                 @Override
                                 public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-                                    if (drawerItem.getTag()==null){
+                                    if (drawerItem.getTag() == null) {
                                         pickedGroup = null;
                                     } else {
                                         pickedGroup = (GetGroup) drawerItem.getTag();
@@ -338,7 +357,7 @@ public class GMapFragment extends AbstractFragment {
                             })
                             .build();
 
-                    for (int i = 0 ; i < getGroups.length;i++){
+                    for (int i = 0; i < getGroups.length; i++) {
                         drawerSecond.addItem(new SecondaryDrawerItem().withName(getGroups[i].getTitle()).withTag(getGroups[i]));
                     }
 
@@ -347,7 +366,7 @@ public class GMapFragment extends AbstractFragment {
 
                 @Override
                 public void onFailure(Call<GetGroup[]> call, Throwable t) {
-                    ApplicationUtil.showToast(getContext(),getString(R.string.somethin_went_wrong));
+                    ApplicationUtil.showToast(getContext(), getString(R.string.somethin_went_wrong));
                 }
             });
             getActivity().getMenuInflater().inflate(R.menu.main, toolbar.getMenu());
@@ -368,27 +387,26 @@ public class GMapFragment extends AbstractFragment {
 
                 getCurrentsResponse = response.body();
                 getCurrents = new ArrayList<>();
-                if (MainActivity.isGroupAvaible==null){
+                if (MainActivity.isGroupAvaible == null) {
                     MainActivity.isGroupAvaible = new Boolean(false);
                 }
                 for (GetCurrent getCurrent1 : getCurrentsResponse) {
                     if ((!(getCurrent1.getLat() == null || getCurrent1.getLon() == null)
                             && (pickedGroup == null || pickedGroup.getId().equals(getCurrent1.getGroup_id())))) {
                         getCurrents.add(getCurrent1);
-                        if (getCurrent1.getGroup_id()!=null){
+                        if (getCurrent1.getGroup_id() != null) {
                             MainActivity.isGroupAvaible = new Boolean(true);
                         }
                     }
                 }
                 if (timesMarkerUpdate == 0)
                     addSearchGroup();
-                mMap.clear();
                 updateMarkers();
                 filter();
-                if (timesMarkerUpdate == 0){
+                if (timesMarkerUpdate == 0) {
                     updateMethod();
                 }
-                showProgress(false,mapContainer,progressLayout);
+                showProgress(false, mapContainer, progressLayout);
                 timesMarkerUpdate++;
             }
 
@@ -404,11 +422,11 @@ public class GMapFragment extends AbstractFragment {
         final Handler handler = new Handler();
 
         final int delay = 1000; //milliseconds
-        ((MainActivity)getActivity()).registerHandler(handler);
+        ((MainActivity) getActivity()).registerHandler(handler);
         final int[] i = new int[1];
-        handler.postDelayed(new Runnable(){
-            public void run(){
-                ((MainActivity)getActivity()).setBackgroundTaskExecuting(true);
+        handler.postDelayed(new Runnable() {
+            public void run() {
+                ((MainActivity) getActivity()).setBackgroundTaskExecuting(true);
                 i[0]++;
 
                 if (i[0] % 5 == 0) {
@@ -416,13 +434,13 @@ public class GMapFragment extends AbstractFragment {
                 }
                 if (currentMarker != null) {
                     GetCurrent tag = (GetCurrent) currentMarker.getTag();
-                    updateMarkerState((GetCurrent)currentTag);
+                    updateMarkerState((GetCurrent) currentTag);
                 } else {
                     updateListState();
                 }
 
 
-                ((MainActivity)getActivity()).setBackgroundTaskExecuting(false);
+                ((MainActivity) getActivity()).setBackgroundTaskExecuting(false);
                 handler.postDelayed(this, delay);
             }
         }, delay);
@@ -453,47 +471,48 @@ public class GMapFragment extends AbstractFragment {
 
         if (isAdded() && getActivity() != null)
             for (int i = 0; i < numMarkers; i++) {
-                    markers[i] = mMap.addMarker(new MarkerOptions().position(
-                            new LatLng(Double.parseDouble(getCurrents.get(i).getLat())
-                                    , Double.parseDouble(getCurrents.get(i).getLon())))
-                            .anchor(0.5f,0.5f));
-                    double speed = 0;
-                    if (getCurrents.get(i).getSpeed() != null) {
-                        speed = Double.parseDouble(getCurrents.get(i).getSpeed());
-                    } else
-                        speed = 0;
+                markers[i] = mMap.addMarker(new MarkerOptions().position(
+                        new LatLng(Double.parseDouble(getCurrents.get(i).getLat())
+                                , Double.parseDouble(getCurrents.get(i).getLon())))
+                        .anchor(0.5f, 0.5f));
+                double speed = 0;
+                if (getCurrents.get(i).getSpeed() != null) {
+                    speed = Double.parseDouble(getCurrents.get(i).getSpeed());
+                } else
+                    speed = 0;
 
-                    if (getCurrents.get(i).getStatus().equals("1")) {
-                        active++;
-                    } else {
-                        inActive++;
+                if (getCurrents.get(i).getStatus().equals("1")) {
+                    active++;
+                } else {
+                    inActive++;
+                }
+
+                String marker = getCurrents.get(i).getMarker();
+                String color = getCurrents.get(i).getColor();
+
+                Bitmap markerIcon = ApplicationUtil.pickImage(getContext(), speed, marker, color);
+
+                if (speed > 5) {
+                    float vector = 0;
+                    if (getCurrents.get(i).getVector() != null) {
+                        vector = Float.parseFloat(getCurrents.get(i).getVector());
                     }
-
-                    String marker = getCurrents.get(i).getMarker();
-                    String color = getCurrents.get(i).getColor();
-
-                    Bitmap markerIcon = ApplicationUtil.pickImage(getContext(),speed, marker, color);
-
+                    markers[i].setIcon(BitmapDescriptorFactory.fromBitmap(markerIcon));
                     if (speed > 5) {
-                        float vector = 0;
-                        if (getCurrents.get(i).getVector() != null) {
-                            vector = Float.parseFloat(getCurrents.get(i).getVector());
-                        }
-                        markers[i].setIcon(BitmapDescriptorFactory.fromBitmap(markerIcon));
-                        if (speed > 5) {
-                            markers[i].setRotation(vector);
-                        }
-
-                    } else {
-                        markers[i].setIcon(BitmapDescriptorFactory.fromBitmap(markerIcon));
+                        markers[i].setRotation(vector);
                     }
 
-                    markers[i].setTag(getCurrents.get(i));
-                    if (currentMarker!= null &&  ((GetCurrent) currentTag).getTracker_title()
-                            .equals(getCurrents.get(i).getTracker_title())){
-                        currentMarker = markers[i];
-                        if (locked) mMap.moveCamera(CameraUpdateFactory.newLatLng(currentMarker.getPosition()));
-                    }
+                } else {
+                    markers[i].setIcon(BitmapDescriptorFactory.fromBitmap(markerIcon));
+                }
+
+                markers[i].setTag(getCurrents.get(i));
+                if (currentMarker != null && ((GetCurrent) currentTag).getTracker_title()
+                        .equals(getCurrents.get(i).getTracker_title())) {
+                    currentMarker = markers[i];
+                    if (locked)
+                        mMap.moveCamera(CameraUpdateFactory.newLatLng(currentMarker.getPosition()));
+                }
             }
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
@@ -596,16 +615,16 @@ public class GMapFragment extends AbstractFragment {
         }
         adapter.updateList((ArrayList<GetCurrent>) getCurrents);
         changeFontFiter();
-        if (collapse){
-            changeBSheetState(BottomSheetBehavior.STATE_COLLAPSED,sheetBehavior);
+        if (collapse) {
+            changeBSheetState(BottomSheetBehavior.STATE_COLLAPSED, sheetBehavior);
         }
     }
 
     private void changeBSheetState(int stateCollapsed, BottomSheetBehavior sheetBehavior) {
-        if (stateCollapsed == BottomSheetBehavior.STATE_COLLAPSED){
+        if (stateCollapsed == BottomSheetBehavior.STATE_COLLAPSED) {
             sheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
             sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-        } else if (stateCollapsed == BottomSheetBehavior.STATE_EXPANDED){
+        } else if (stateCollapsed == BottomSheetBehavior.STATE_EXPANDED) {
             sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
             sheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
         }
@@ -630,7 +649,7 @@ public class GMapFragment extends AbstractFragment {
         adapter.updateList((ArrayList<GetCurrent>) getCurrents);
         changeFontFiter();
         if (collapse)
-            changeBSheetState(BottomSheetBehavior.STATE_COLLAPSED,sheetBehavior);
+            changeBSheetState(BottomSheetBehavior.STATE_COLLAPSED, sheetBehavior);
     }
 
     private void inActive(boolean collapse) {
@@ -653,15 +672,15 @@ public class GMapFragment extends AbstractFragment {
         adapter.updateList((ArrayList<GetCurrent>) getCurrents);
         changeFontFiter();
         if (collapse)
-            changeBSheetState(BottomSheetBehavior.STATE_COLLAPSED,sheetBehavior);
+            changeBSheetState(BottomSheetBehavior.STATE_COLLAPSED, sheetBehavior);
     }
 
     private void updateListState() {
         /*final GetCurrentAdapter getCurrentAdapter = new GetCurrentAdapter(getContext(), getCurrents);
         listView.setAdapter(getCurrentAdapter);*/
-        if (isActive == null){
+        if (isActive == null) {
             all(false);
-        } else if (isActive == true){
+        } else if (isActive == true) {
             active(false);
         } else {
             inActive(false);
@@ -693,7 +712,7 @@ public class GMapFragment extends AbstractFragment {
         GetCurrent tag = (GetCurrent) currentMarker.getTag();
         pickedId = getCurrents.indexOf(tag);
         currentTag = currentMarker.getTag();
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentMarker.getPosition(),18f));
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentMarker.getPosition(), 18f));
         updateMarkerState(tag);
 
 
@@ -728,7 +747,7 @@ public class GMapFragment extends AbstractFragment {
         });
 
         linearLayout.setVisibility(View.GONE);
-        changeBSheetState(BottomSheetBehavior.STATE_COLLAPSED,sheetBehaviorCar);
+        changeBSheetState(BottomSheetBehavior.STATE_COLLAPSED, sheetBehaviorCar);
         linearLayoutCar.setVisibility(View.VISIBLE);
 
     }
@@ -749,13 +768,13 @@ public class GMapFragment extends AbstractFragment {
     private void backToAll() {
         linearLayout.setVisibility(View.VISIBLE);
         linearLayoutCar.setVisibility(View.GONE);
-        changeBSheetState(BottomSheetBehavior.STATE_COLLAPSED,sheetBehavior);
+        changeBSheetState(BottomSheetBehavior.STATE_COLLAPSED, sheetBehavior);
         filtered = false;
         locked = false;
         mMap.getUiSettings().setScrollGesturesEnabled(true);
         currentMarker = null;
         for (Marker m : markers) {
-            if (m!=null){
+            if (m != null) {
                 m.remove();
             }
         }
@@ -796,7 +815,7 @@ public class GMapFragment extends AbstractFragment {
         if ("-1".equals(fuelConsumption) || fuelConsumption == null) {
             carFuelConsumptionView.setVisibility(View.GONE);
         } else {
-            double v = (Double.parseDouble(fuelConsumption))/10;
+            double v = (Double.parseDouble(fuelConsumption)) / 10;
             fuelConsumption = v + (" " + getResources().getString(R.string.lperkm));
             carFuelConsumption.setText(fuelConsumption);
             carFuelConsumptionView.setVisibility(View.VISIBLE);
@@ -808,7 +827,7 @@ public class GMapFragment extends AbstractFragment {
             carVolumeFuelView.setVisibility(View.GONE);
         } else {
             double v = Double.parseDouble(fuelVolume);
-            fuelVolume = v +  (" " + getResources().getString(R.string.l));
+            fuelVolume = v + (" " + getResources().getString(R.string.l));
             carVolumeFuel.setText(fuelVolume);
             carVolumeFuelView.setVisibility(View.VISIBLE);
         }
@@ -869,7 +888,7 @@ public class GMapFragment extends AbstractFragment {
         //voltage
         String voltage = tag.getVoltage();
         carVoltageView.setVisibility(View.VISIBLE);
-        if ("-1".equals(voltage) || voltage==null) {
+        if ("-1".equals(voltage) || voltage == null) {
             carVoltageView.setVisibility(View.GONE);
         } else {
             String power = tag.getPower();
@@ -972,19 +991,19 @@ public class GMapFragment extends AbstractFragment {
 
     @Override
     public void onStop() {
-        if (drawerSecond!=null){
+        if (drawerSecond != null) {
             drawerSecond.getDrawerLayout().setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
         }
-        if (mMap!=null) {
+        if (mMap != null) {
             mMap.clear();
         }
-        ((MainActivity)getActivity()).deleteAllBackgroundTasks();
+        ((MainActivity) getActivity()).deleteAllBackgroundTasks();
         CancelableCallback.cancelAll();
         super.onStop();
 
     }
 
-    private void getAttrFromBundle(){
+    private void getAttrFromBundle() {
         try {
             pickedGroup = ApplicationUtil.getObjectFromBundle(getArguments(), "group", GetGroup.class);
         } catch (IOException e) {
@@ -1013,30 +1032,30 @@ public class GMapFragment extends AbstractFragment {
             return super.onBackPressed();
     }
 
-    private void changeFontFiter(){
+    private void changeFontFiter() {
         if (isActive == null) {
             TextView text = (TextView) filterAll.getChildAt(0);
             TextView count = (TextView) filterAll.getChildAt(1);
             text.setTypeface(null, Typeface.BOLD_ITALIC);
             count.setTypeface(null, Typeface.BOLD_ITALIC);
-            makeNoBoldFont(filterActive,filterInActive);
+            makeNoBoldFont(filterActive, filterInActive);
         } else if (isActive == false) {
             TextView text = (TextView) filterInActive.getChildAt(0);
             TextView count = (TextView) filterInActive.getChildAt(1);
             text.setTypeface(null, Typeface.BOLD_ITALIC);
             count.setTypeface(null, Typeface.BOLD_ITALIC);
-            makeNoBoldFont(filterActive,filterAll);
+            makeNoBoldFont(filterActive, filterAll);
         } else if (isActive == true) {
             TextView text = (TextView) filterActive.getChildAt(0);
             TextView count = (TextView) filterActive.getChildAt(1);
             text.setTypeface(null, Typeface.BOLD_ITALIC);
             count.setTypeface(null, Typeface.BOLD_ITALIC);
-            makeNoBoldFont(filterAll,filterInActive);
+            makeNoBoldFont(filterAll, filterInActive);
         }
 
     }
 
-    private void makeNoBoldFont(LinearLayout first,LinearLayout second) {
+    private void makeNoBoldFont(LinearLayout first, LinearLayout second) {
         TextView text = (TextView) first.getChildAt(0);
         TextView count = (TextView) first.getChildAt(1);
         text.setTypeface(null, Typeface.NORMAL);

@@ -22,7 +22,7 @@
     <string name="logout">Logout</string>
     <string name="balance">Balance</string>
     <string name="technical_support">Technical support</string>
-    <string name="save_location">Save location</string>
+    <string name="save_location">Save map state</string>
     <string name="settings">Settings</string>
     <string name="online">Online</string>
     <string name="title_activity_maps">Map</string>
@@ -150,5 +150,6 @@
     <string name="draw_way">Drawing way...</string>
     <string name="prepare_stop_info">Preparing info about stops...</string>
     <string name="done">Done!</string>
+    <string name="map_type">Choose map type</string>
 
 </resources>

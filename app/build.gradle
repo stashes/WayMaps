@@ -37,8 +37,8 @@ dependencies {
     compile 'com.squareup.retrofit2:retrofit:2.3.0'
     compile 'com.squareup.retrofit2:converter-jackson:2.3.0'
     compile 'com.squareup.okhttp3:logging-interceptor:3.6.0'
-    compile 'org.slf4j:slf4j-android:1.7.7'
     compile 'com.amulyakhare:com.amulyakhare.textdrawable:1.0.1'
+    compile 'org.slf4j:slf4j-android:1.7.7'
     compile group: 'com.google.maps.android', name: 'android-maps-utils', version: '0.5'
     compile('com.mikepenz:materialdrawer:6.0.7@aar') {
         transitive = true

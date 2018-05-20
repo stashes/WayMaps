@@ -48,7 +48,7 @@
     <string name="logout">Вийти</string>
     <string name="balance">Баланс</string>
     <string name="technical_support">Технічна підтримка</string>
-    <string name="save_location">Зберегти розташування</string>
+    <string name="save_location">Зберегти стан мапи</string>
     <string name="settings">Налаштування</string>
     <string name="online">Онлайн</string>
     <string name="title_activity_maps">Мапа</string>
@@ -80,7 +80,7 @@
     <string name="good">Хороший</string>
     <string name="normal">Нормальний</string>
     <string name="bad">Поганий</string>
-    <string name="absent">ВІдсутній</string>
+    <string name="absent">Відсутній</string>
     <string name="pieces">шт</string>
     <string name="battery">Батарея</string>
     <string name="v">V</string>
@@ -137,4 +137,5 @@
     <string name="personal_account">Особовий рахунок</string>
     <string name="balancesmall">баланс</string>
     <string name="uah">грн</string>
+    <string name="map_type">Обрати тип мапи</string>
 </resources>

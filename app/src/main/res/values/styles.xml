@@ -9,6 +9,7 @@
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="drawerArrowStyle">@style/DrawerIconStyle</item>
+        <item name="radioButtonStyle">@style/MyRadioButton</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
@@ -23,6 +24,11 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light">
         <item name="android:textColorPrimary">@color/light_blue</item>
+    </style>
+
+    <style name="MyRadioButton" parent="Theme.AppCompat.Light">
+        <item name="colorControlNormal">@color/colorPrimaryDark</item>
+        <item name="colorControlActivated">@color/light_blue</item>
     </style>
 
     <style name="FullWidthEditText" parent="Widget.AppCompat.EditText">

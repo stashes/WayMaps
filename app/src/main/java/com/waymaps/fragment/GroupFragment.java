@@ -138,8 +138,8 @@ public class GroupFragment extends AbstractFragment {
         }
         nextFragment.setArguments(bundle);
         FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.replace(R.id.content_main, nextFragment);
         ft.addToBackStack("Groups");
+        ft.replace(R.id.content_main, nextFragment);
         ft.commit();
     }
 

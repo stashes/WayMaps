@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="@color/verylightgray"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_alignParentLeft="true">
+
+    <include layout="@layout/classic_action_bar"/>
+
+    <include layout="@layout/progress_bar"/>
+
+    <RadioGroup
+        android:id="@+id/radiogroup"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_gravity="right"
+        android:inputType="text"
+        android:orientation="vertical" >
+
+        <RadioButton
+            android:id="@+id/osmap"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:button="@null"
+            android:drawableRight="@android:drawable/btn_radio"
+            android:gravity="right|center_vertical"
+            android:text="Open Street Map"
+            android:paddingLeft="20dp"
+            android:paddingRight="10dp"
+            android:textAlignment="viewStart"
+            android:textSize="20dip" />
+
+        <RadioButton
+            android:id="@+id/gmap"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:button="@null"
+            android:drawablePadding="30dp"
+            android:drawableRight="@android:drawable/btn_radio"
+            android:gravity="right|center_vertical"
+            android:text="Google Map"
+            android:paddingLeft="20dp"
+            android:paddingRight="10dp"
+            android:textAlignment="viewStart"
+            android:textSize="20dp"/>
+    </RadioGroup>
+</LinearLayout>
