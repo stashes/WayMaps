@@ -150,6 +150,7 @@ public class MainActivity extends AppCompatActivity
         } else {
             if ("0".equals(authorisedUser.getDiler())
                     && (getSupportFragmentManager().getBackStackEntryCount()==0)){
+                firstLaunch = true;
                 Intent a = new Intent(Intent.ACTION_MAIN);
                 a.addCategory(Intent.CATEGORY_HOME);
                 a.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
