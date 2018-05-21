@@ -1,14 +1,17 @@
 package com.waymaps.fragment;
 
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -25,6 +28,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -57,6 +61,7 @@ import com.waymaps.data.requestEntity.Action;
 import com.waymaps.data.requestEntity.Procedure;
 import com.waymaps.data.responseEntity.GetCurrent;
 import com.waymaps.data.responseEntity.GetGroup;
+import com.waymaps.data.responseEntity.TrackerList;
 import com.waymaps.util.ApplicationUtil;
 import com.waymaps.util.DateTimeUtil;
 import com.waymaps.util.LocalPreferenceManager;
@@ -73,12 +78,14 @@ import java.net.URL;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -105,7 +112,7 @@ public class GMapFragment extends AbstractFragment implements OnMapReadyCallback
     private boolean locked;
     private Boolean isActive;
     private long timesMarkerUpdate;
-    private int pickedId;
+    private String pickedId;
     private Drawer drawerSecond;
     private GetGroup[] getGroups;
     private GetCurrentAdapter adapter;
@@ -211,6 +218,9 @@ public class GMapFragment extends AbstractFragment implements OnMapReadyCallback
     @BindView(R.id.filter_car)
     ImageView filterCar;
 
+    @BindView(R.id.history)
+    ImageView historyCar;
+
     @BindView(R.id.lock_car)
     ImageView lockCar;
 
@@ -301,6 +311,8 @@ public class GMapFragment extends AbstractFragment implements OnMapReadyCallback
 
         mapView.getMapAsync(this);
 
+
+        filterCar.setImageBitmap(ApplicationUtil.drawToBitmap(getResources().getDrawable(R.drawable.filter),Color.GRAY));
         return rootView;
     }
 
@@ -394,17 +406,24 @@ public class GMapFragment extends AbstractFragment implements OnMapReadyCallback
                     if ((!(getCurrent1.getLat() == null || getCurrent1.getLon() == null)
                             && (pickedGroup == null || pickedGroup.getId().equals(getCurrent1.getGroup_id())))) {
                         getCurrents.add(getCurrent1);
-                        if (getCurrent1.getGroup_id() != null) {
-                            MainActivity.isGroupAvaible = new Boolean(true);
+                        if (timesMarkerUpdate == 0) {
+                            if (getCurrent1.getGroup_id() != null) {
+                                MainActivity.isGroupAvaible = new Boolean(true);
+                            }
                         }
                     }
                 }
                 if (timesMarkerUpdate == 0)
                     addSearchGroup();
+                if (markers !=null){
+                    for (Marker marker:markers){
+                        marker.remove();
+                    }
+                }
                 updateMarkers();
                 filter();
                 if (timesMarkerUpdate == 0) {
-                    updateMethod();
+                    updateMethod(0);
                 }
                 showProgress(false, mapContainer, progressLayout);
                 timesMarkerUpdate++;
@@ -418,17 +437,22 @@ public class GMapFragment extends AbstractFragment implements OnMapReadyCallback
 
     }
 
-    private void updateMethod() {
+    private void updateMethod(int flag) {
         final Handler handler = new Handler();
 
         final int delay = 1000; //milliseconds
         ((MainActivity) getActivity()).registerHandler(handler);
         final int[] i = new int[1];
+        final int[] j = new int[1];
+        j[0] = flag;
         handler.postDelayed(new Runnable() {
             public void run() {
                 ((MainActivity) getActivity()).setBackgroundTaskExecuting(true);
                 i[0]++;
-
+                if (j[0] == 1){
+                    i[0]=0;
+                    j[0]--;
+                }
                 if (i[0] % 5 == 0) {
                     updateMarkersPosition();
                 }
@@ -464,7 +488,14 @@ public class GMapFragment extends AbstractFragment implements OnMapReadyCallback
 
     private void updateMarkers() {
         int numMarkers = getCurrents.size();
-        if (currentMarker != null) currentTag = getCurrents.get(pickedId);
+        if (currentMarker != null) {
+            for (GetCurrent gc:getCurrents){
+                if (gc.getId().equals(pickedId)){
+                    currentTag = gc;
+                    break;
+                }
+            }
+        }
         markers = new Marker[numMarkers];
         int active = 0;
         int inActive = 0;
@@ -535,7 +566,6 @@ public class GMapFragment extends AbstractFragment implements OnMapReadyCallback
             @Override
             public void onSlide(@NonNull View bottomSheet, float slideOffset) {
                 resizeMap(bottomSheet);
-
             }
         });
         sheetBehaviorCar.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
@@ -589,10 +619,9 @@ public class GMapFragment extends AbstractFragment implements OnMapReadyCallback
             @Override
             public void onClick(View v) {
                 active(true);
-
-
             }
         });
+
 
     }
 
@@ -617,6 +646,7 @@ public class GMapFragment extends AbstractFragment implements OnMapReadyCallback
         changeFontFiter();
         if (collapse) {
             changeBSheetState(BottomSheetBehavior.STATE_COLLAPSED, sheetBehavior);
+            resizeMap(linearLayout);
         }
     }
 
@@ -650,6 +680,7 @@ public class GMapFragment extends AbstractFragment implements OnMapReadyCallback
         changeFontFiter();
         if (collapse)
             changeBSheetState(BottomSheetBehavior.STATE_COLLAPSED, sheetBehavior);
+            resizeMap(linearLayout);
     }
 
     private void inActive(boolean collapse) {
@@ -673,6 +704,7 @@ public class GMapFragment extends AbstractFragment implements OnMapReadyCallback
         changeFontFiter();
         if (collapse)
             changeBSheetState(BottomSheetBehavior.STATE_COLLAPSED, sheetBehavior);
+            resizeMap(linearLayout);
     }
 
     private void updateListState() {
@@ -696,6 +728,10 @@ public class GMapFragment extends AbstractFragment implements OnMapReadyCallback
                 }
             }
         });
+        if (linearLayoutCar.getVisibility() == View.VISIBLE)
+            resizeMap(linearLayoutCar);
+        if (linearLayout.getVisibility() == View.VISIBLE)
+            resizeMap(linearLayout);
     }
 
     private void onMarkerOrListViewClick(Marker marker) {
@@ -710,7 +746,7 @@ public class GMapFragment extends AbstractFragment implements OnMapReadyCallback
             lockCar.setImageDrawable(getResources().getDrawable(R.drawable.ic_unlock));
         }
         GetCurrent tag = (GetCurrent) currentMarker.getTag();
-        pickedId = getCurrents.indexOf(tag);
+        pickedId = tag.getId();
         currentTag = currentMarker.getTag();
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentMarker.getPosition(), 18f));
         updateMarkerState(tag);
@@ -737,7 +773,8 @@ public class GMapFragment extends AbstractFragment implements OnMapReadyCallback
                 locked = !locked;
                 if (locked) {
                     mMap.getUiSettings().setScrollGesturesEnabled(false);
-                    lockCar.setImageDrawable(getResources().getDrawable(R.drawable.ic_lock));
+                    lockCar.setImageBitmap(ApplicationUtil.drawToBitmap(
+                            getResources().getDrawable(R.drawable.lock), Color.YELLOW));
                     mMap.animateCamera(CameraUpdateFactory.newLatLng(currentMarker.getPosition()));
                 } else {
                     mMap.getUiSettings().setScrollGesturesEnabled(true);
@@ -752,16 +789,66 @@ public class GMapFragment extends AbstractFragment implements OnMapReadyCallback
 
     }
 
+    @OnClick(R.id.history)
+    public void history(){
+        showProgress(true, mapContainer, progressLayout);
+
+        Procedure procedure = new Procedure(Action.CALL);
+        procedure.setFormat(WayMapsService.DEFAULT_FORMAT);
+        procedure.setIdentficator(SystemUtil.getWifiMAC(getActivity()));
+        procedure.setName(Action.TRACKER_LIST);
+        procedure.setUser_id(authorizedUser.getId());
+        procedure.setParams(authorizedUser.getId());
+        Call<TrackerList[]> call = RetrofitService.getWayMapsService().trackerProcedure(procedure.getAction(), procedure.getName(),
+                procedure.getIdentficator(), procedure.getUser_id(), procedure.getFormat(), procedure.getParams());
+        call.enqueue(new Callback<TrackerList[]>() {
+            @Override
+            public void onResponse(Call<TrackerList[]> call, Response<TrackerList[]> response) {
+                ArrayList<TrackerList> trackers = new ArrayList<>(Arrays.asList(response.body()));
+                Bundle bundle = new Bundle();
+                TrackerList trackerList = null;
+                for (TrackerList t : trackers){
+                    if (t.getId().equals(((GetCurrent) currentTag).getId())){
+                        trackerList = t;
+                        break;
+                    }
+                }
+                HistoryFragment historyFragment = new HistoryFragment();
+                try {
+                    ApplicationUtil.setValueToBundle(bundle, "car", currentTag);
+                    ApplicationUtil.setValueToBundle(bundle, "user", authorizedUser);
+                    ApplicationUtil.setValueToBundle(bundle,"tracker",trackerList);
+                } catch (JsonProcessingException e) {
+                    logger.debug("Error while trying write to bundle");
+                }
+                historyFragment.setArguments(bundle);
+                FragmentTransaction ft = getFragmentManager().beginTransaction();
+                ft.addToBackStack(this.getClass().getName());
+                ft.replace(R.id.content_main, historyFragment);
+                ft.commit();
+                showProgress(false, mapContainer, progressLayout);
+            }
+
+            @Override
+            public void onFailure(Call<TrackerList[]> call, Throwable t) {
+                logger.debug("Failed while trying to load tracker list.");
+                showProgress(false, mapContainer, progressLayout);
+            }
+        });
+    }
+
     private void filter() {
         if (filtered) {
             for (Marker m : markers) {
                 m.setVisible(false);
             }
             currentMarker.setVisible(true);
+            filterCar.setImageBitmap(ApplicationUtil.drawToBitmap(getResources().getDrawable(R.drawable.filter),Color.YELLOW));
         } else {
             for (Marker m : markers) {
                 m.setVisible(true);
             }
+            filterCar.setImageBitmap(ApplicationUtil.drawToBitmap(getResources().getDrawable(R.drawable.filter),Color.GRAY));
         }
     }
 
@@ -1074,6 +1161,7 @@ public class GMapFragment extends AbstractFragment implements OnMapReadyCallback
 
     @Override
     public void onResume() {
+        updateMethod(1);
         super.onResume();
     }
 }

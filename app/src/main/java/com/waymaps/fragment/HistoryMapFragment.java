@@ -37,6 +37,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.gms.maps.model.TileOverlayOptions;
 import com.waymaps.R;
 import com.waymaps.activity.MainActivity;
 import com.waymaps.api.RetrofitService;
@@ -57,7 +58,10 @@ import com.waymaps.data.responseEntity.TrackerList;
 import com.waymaps.dialog.ParkingDialog;
 import com.waymaps.util.ApplicationUtil;
 import com.waymaps.util.DateTimeUtil;
+import com.waymaps.util.LocalPreferenceManager;
+import com.waymaps.util.MapProvider;
 import com.waymaps.util.SystemUtil;
+import com.waymaps.util.TilesProvider;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -283,6 +287,11 @@ public class HistoryMapFragment extends AbstractFragment {
             @Override
             public void onMapReady(final GoogleMap googleMap) {
                 mMap = googleMap;
+                if (MapProvider.valueOf(LocalPreferenceManager.getMapProvider(getContext())) != MapProvider.Google) {
+                    mMap.setMapType(GoogleMap.MAP_TYPE_NONE);
+                    mMap.addTileOverlay(new TileOverlayOptions().
+                            tileProvider(TilesProvider.getTile(getContext())));
+                }
                 mMap.setOnCameraMoveListener(new GoogleMap.OnCameraMoveListener() {
                     @Override
                     public void onCameraMove() {

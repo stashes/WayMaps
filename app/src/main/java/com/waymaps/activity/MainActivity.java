@@ -101,6 +101,9 @@ public class MainActivity extends AppCompatActivity
 
         Menu menu = navigationView.getMenu();
 
+        menu.findItem(R.id.nav_map).setVisible(false);
+
+
         if ("0".equals(authorisedUser.getManager()) & "0".equals(authorisedUser.getDiler()) ) {
             menu.findItem(R.id.nav_balance).setVisible(false);
             menu.findItem(R.id.nav_tech_supp).setVisible(false);
@@ -217,9 +220,9 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.nav_map) {
             map();
-        } else if (id == R.id.nav_history) {
+        }/* else if (id == R.id.nav_history) {
             history();
-        } else if (id == R.id.nav_settings) {
+        }*/ else if (id == R.id.nav_settings) {
             chooseProvider();
         } else if (id == R.id.nav_save_location) {
             saveLocation();
