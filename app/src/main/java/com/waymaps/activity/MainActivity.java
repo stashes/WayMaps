@@ -1,11 +1,13 @@
 package com.waymaps.activity;
 
+import android.app.ActivityManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.text.Html;
 import android.view.Gravity;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -23,9 +25,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.android.gms.maps.model.LatLng;
 import com.waymaps.R;
 import com.waymaps.api.RetrofitService;
+import com.waymaps.api.WayMapsService;
 import com.waymaps.data.requestEntity.Action;
 import com.waymaps.data.requestEntity.LogoutCredentials;
+import com.waymaps.data.requestEntity.Procedure;
 import com.waymaps.data.requestEntity.UpdateCredentials;
+import com.waymaps.data.responseEntity.FinGet;
 import com.waymaps.data.responseEntity.User;
 import com.waymaps.fragment.AbstractFragment;
 import com.waymaps.fragment.BalanceFragment;
@@ -47,6 +52,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -69,7 +75,7 @@ public class MainActivity extends AppCompatActivity
 
     public ArrayList<Handler> handlers;
 
-    public Boolean backgroundTaskExecuting=false;
+    public Boolean backgroundTaskExecuting = false;
 
 
     @BindView(R.id.nav_view)
@@ -77,6 +83,7 @@ public class MainActivity extends AppCompatActivity
 
     @BindView(R.id.drawer_layout)
     DrawerLayout drawer;
+    private boolean doubleTap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,23 +97,27 @@ public class MainActivity extends AppCompatActivity
         getUserFromIntent();
         startServices();
 
+        isGroupAvaible = false;
 
         navigationView.setNavigationItemSelectedListener(this);
 
 
-        TextView userTitle =  (TextView) navigationView.getHeaderView(0).findViewById(R.id.userTitle_nav_bar);
+        TextView userTitle = (TextView) navigationView.getHeaderView(0).findViewById(R.id.userTitle_nav_bar);
         TextView firmTitle = navigationView.getHeaderView(0).findViewById(R.id.firmTitle_nav_bar);
         userTitle.setText(authorisedUser.getUser_title());
         firmTitle.setText(authorisedUser.getFirm_title());
 
         Menu menu = navigationView.getMenu();
 
+
         menu.findItem(R.id.nav_map).setVisible(false);
 
 
-        if ("0".equals(authorisedUser.getManager()) & "0".equals(authorisedUser.getDiler()) ) {
+        if ("0".equals(authorisedUser.getManager()) & "0".equals(authorisedUser.getDiler())) {
             menu.findItem(R.id.nav_balance).setVisible(false);
             menu.findItem(R.id.nav_tech_supp).setVisible(false);
+        } else {
+            getBalance(menu.findItem(R.id.nav_balance));
         }
         displaySelectedScreen(R.id.nav_map);
     }
@@ -142,36 +153,49 @@ public class MainActivity extends AppCompatActivity
         List fragmentList = getSupportFragmentManager().getFragments();
 
         boolean handled = false;
-        for(Object f : fragmentList) {
-            if(f instanceof AbstractFragment) {
-                handled = ((AbstractFragment)f).onBackPressed();
+        for (Object f : fragmentList) {
+            if (f instanceof AbstractFragment) {
+                handled = ((AbstractFragment) f).onBackPressed();
 
-                if(handled) {
+                if (handled) {
                     break;
                 }
             }
         }
 
-        if(!handled) {
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            if ("0".equals(authorisedUser.getDiler())
-                    && (getSupportFragmentManager().getBackStackEntryCount()==0)){
-                firstLaunch = true;
-                /*Intent a = new Intent(Intent.ACTION_MAIN);
-                a.addCategory(Intent.CATEGORY_HOME);
-                a.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(a);*/
+        if (!handled) {
+            if (drawer.isDrawerOpen(GravityCompat.START)) {
+                drawer.closeDrawer(GravityCompat.START);
+            } else {
+                if ("0".equals(authorisedUser.getDiler())
+                        && (getSupportFragmentManager().getBackStackEntryCount() == 0)) {
+                    if (doubleTap) {
+                        firstLaunch = true;
+                        /*Intent a = new Intent(Intent.ACTION_MAIN);
+                        a.addCategory(Intent.CATEGORY_HOME);
+                        a.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(a);*/
+                        Intent intent = new Intent(this, MainActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        intent.putExtra("EXIT", true);
+                        startActivity(intent);
+                    } else {
+                        ApplicationUtil.showToast(this, getString(R.string.press_one_more_time));
+                        doubleTap = true;
+                        Handler handler = new Handler();
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                doubleTap = false;
+                            }
+                        }, 2000);
+                        return;
+                    }
 
-                Intent intent = new Intent(this, MainActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                intent.putExtra("EXIT", true);
-                startActivity(intent);
+                }
+                super.onBackPressed();
             }
-            super.onBackPressed();
         }
-            }
     }
 
     @Override
@@ -180,7 +204,6 @@ public class MainActivity extends AppCompatActivity
         //getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
-
 
 
     @Override
@@ -199,7 +222,6 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
-
 
 
         displaySelectedScreen(id);
@@ -246,9 +268,9 @@ public class MainActivity extends AppCompatActivity
         currentFragment = new GetCurrentFragment();
         try {
             currentFragment.setArguments(ApplicationUtil.setValueToBundle
-                    (new Bundle(),"user",authorisedUser));
+                    (new Bundle(), "user", authorisedUser));
         } catch (JsonProcessingException e) {
-            logger.error("Error writing user {}",authorisedUser.toString());
+            logger.error("Error writing user {}", authorisedUser.toString());
         }
         ft.replace(R.id.content_main, currentFragment);
         ft.commit();
@@ -260,9 +282,9 @@ public class MainActivity extends AppCompatActivity
         currentFragment = new ChooseMapTypeFragment();
         try {
             currentFragment.setArguments(ApplicationUtil.setValueToBundle
-                    (new Bundle(),"user",authorisedUser));
+                    (new Bundle(), "user", authorisedUser));
         } catch (JsonProcessingException e) {
-            logger.error("Error writing user {}",authorisedUser.toString());
+            logger.error("Error writing user {}", authorisedUser.toString());
         }
         ft.replace(R.id.content_main, currentFragment);
         ft.addToBackStack(null);
@@ -271,14 +293,14 @@ public class MainActivity extends AppCompatActivity
 
     private void saveLocation() {
         Toast toast = null;
-        if (currentFragment instanceof GMapFragment){
+        if (currentFragment instanceof GMapFragment) {
             LatLng target = ((GMapFragment) currentFragment).getmMap().getCameraPosition().target;
             float zoom = ((GMapFragment) currentFragment).getmMap().getCameraPosition().zoom;
-            LocalPreferenceManager.saveLatLonZoom(this,target.latitude,target.longitude,zoom);
+            LocalPreferenceManager.saveLatLonZoom(this, target.latitude, target.longitude, zoom);
             toast = Toast.makeText(getApplicationContext(),
                     R.string.location_saved,
                     Toast.LENGTH_SHORT);
-        } else{
+        } else {
             toast = Toast.makeText(getApplicationContext(),
                     R.string.error_saving_location,
                     Toast.LENGTH_SHORT);
@@ -291,12 +313,12 @@ public class MainActivity extends AppCompatActivity
     private void balance() {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.addToBackStack("balance");
-        currentFragment= new BalanceFragment();
+        currentFragment = new BalanceFragment();
         try {
             currentFragment.setArguments(ApplicationUtil.setValueToBundle
-                    (new Bundle(),"user",authorisedUser));
+                    (new Bundle(), "user", authorisedUser));
         } catch (JsonProcessingException e) {
-            logger.error("Error writing user {}",authorisedUser.toString());
+            logger.error("Error writing user {}", authorisedUser.toString());
         }
         ft.replace(R.id.content_main, currentFragment);
         ft.commit();
@@ -304,16 +326,16 @@ public class MainActivity extends AppCompatActivity
 
     private void map() {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        currentFragment= new GMapFragment();
+        currentFragment = new GMapFragment();
         try {
             currentFragment.setArguments(ApplicationUtil.setValueToBundle
-                    (new Bundle(),"user",authorisedUser));
+                    (new Bundle(), "user", authorisedUser));
         } catch (JsonProcessingException e) {
-            logger.error("Error writing user {}",authorisedUser.toString());
+            logger.error("Error writing user {}", authorisedUser.toString());
         }
-        if (firstLaunch ){
+        if (firstLaunch) {
             getSupportFragmentManager().popBackStackImmediate();
-        } else if (!firstLaunch){
+        } else if (!firstLaunch) {
             ft.addToBackStack(null);
         }
         ft.replace(R.id.content_main, currentFragment);
@@ -322,22 +344,23 @@ public class MainActivity extends AppCompatActivity
 
 
     }
-    private void showTicketList(){
+
+    private void showTicketList() {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.addToBackStack("ticketList");
         currentFragment = new TicketListFragment();
         try {
             currentFragment.setArguments(ApplicationUtil.setValueToBundle
-                    (new Bundle(),"user",authorisedUser));
+                    (new Bundle(), "user", authorisedUser));
         } catch (JsonProcessingException e) {
-            logger.error("Error writing user {}",authorisedUser.toString());
+            logger.error("Error writing user {}", authorisedUser.toString());
         }
 
         ft.replace(R.id.content_main, currentFragment);
         ft.commit();
     }
 
-    private void setFragmentActive(Fragment fragment){
+    private void setFragmentActive(Fragment fragment) {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.content_main, fragment);
         ft.commit();
@@ -357,8 +380,8 @@ public class MainActivity extends AppCompatActivity
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
 
-              //  setResult(1);
-              //  finish();
+                //  setResult(1);
+                //  finish();
             }
 
             @Override
@@ -382,21 +405,32 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-    public void registerHandler(Handler handler){
-        if (handlers == null){
+    public void registerHandler(Handler handler) {
+        if (handlers == null) {
             handlers = new ArrayList<>();
         }
         handlers.add(handler);
     }
 
-    public void deleteAllBackgroundTasks(){
-        if (handlers == null || handlers.size()==0){
+    public void deleteAllBackgroundTasks() {
+        if (handlers == null || handlers.size() == 0) {
             return;
         }
-        for (Handler h : handlers){
+        for (Handler h : handlers) {
             h.removeCallbacksAndMessages(null);
         }
     }
+
+    /*@Override
+    protected void onPause() {
+        super.onPause();
+        firstLaunch = true;
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.putExtra("EXIT", true);
+        startActivity(intent);
+    }*/
+
 
     public Boolean getBackgroundTaskExecuting() {
         return backgroundTaskExecuting;
@@ -404,6 +438,57 @@ public class MainActivity extends AppCompatActivity
 
     public void setBackgroundTaskExecuting(Boolean backgroundTaskExecuting) {
         this.backgroundTaskExecuting = backgroundTaskExecuting;
+    }
+
+    private void getBalance(final MenuItem item) {
+        Procedure procedure = new Procedure(Action.CALL);
+        procedure.setFormat(WayMapsService.DEFAULT_FORMAT);
+        procedure.setIdentficator(SystemUtil.getWifiMAC(this));
+        procedure.setName(Action.FIN_GET);
+        procedure.setUser_id(authorisedUser.getId());
+        procedure.setParams(authorisedUser.getFirm_id());
+        Call<FinGet[]> call = RetrofitService.getWayMapsService().finGetProcedure(procedure.getAction(), procedure.getName(),
+                procedure.getIdentficator(), procedure.getUser_id(), procedure.getFormat(), procedure.getParams());
+        call.enqueue(new Callback<FinGet[]>() {
+            @Override
+            public void onResponse(Call<FinGet[]> call, Response<FinGet[]> response) {
+                FinGet[] finGets = response.body();
+                logger.debug("Balance load successfully.");
+
+                double bal = 0;
+
+                if (finGets == null){
+                    finGets = new FinGet[0];
+                }
+                if (finGets.length == 0){
+                    bal = 0;
+                } else {
+                    bal = new Double(finGets[0].getBalance());
+                }
+
+                String html1 = null;
+                String html2 = null;
+                String saldo = null;
+                String text = getResources().getString(R.string.balance) + ": ";
+                saldo = new DecimalFormat("0.00").format(bal) + " " + getString(R.string.uah);
+                html1 = "<font>" + text + "</font>";
+
+                if (bal > 0) {
+                    html2 = "<font color=#12b90f>" + saldo + "</font>";
+                }else if (bal == 0) {
+                    html2 = "<font>" + saldo + "</font>";
+                } else {
+                    html2 = "<font color=#e11a24>" + saldo + "</font>";
+                }
+                item.setTitle(Html.fromHtml(html1 + html2));
+            }
+
+            @Override
+            public void onFailure(Call<FinGet[]> call, Throwable t) {
+                logger.debug("Failed while trying to load balance.");
+            }
+        });
+
     }
 
     /*   protected Dialog onCreateDialog(int id) {

@@ -13,11 +13,13 @@ public class PointData {
     private String motor;
     private String voltage;
     private String note;
+    private String dff;
+    private String q_dff;
 
     public PointData() {
     }
 
-    public PointData(String speed, String sat, String gsm, String power, String ignition, String motor, String voltage, String note) {
+    public PointData(String speed, String sat, String gsm, String power, String ignition, String motor, String voltage, String note, String dff, String q_dff) {
         this.speed = speed;
         this.sat = sat;
         this.gsm = gsm;
@@ -26,6 +28,8 @@ public class PointData {
         this.motor = motor;
         this.voltage = voltage;
         this.note = note;
+        this.dff = dff;
+        this.q_dff = q_dff;
     }
 
     public String getSpeed() {
@@ -92,6 +96,22 @@ public class PointData {
         this.note = note;
     }
 
+    public String getDff() {
+        return dff;
+    }
+
+    public void setDff(String dff) {
+        this.dff = dff;
+    }
+
+    public String getQ_dff() {
+        return q_dff;
+    }
+
+    public void setQ_dff(String q_dff) {
+        this.q_dff = q_dff;
+    }
+
     @Override
     public String toString() {
         return "PointData{" +
@@ -103,7 +123,9 @@ public class PointData {
                 ", motor='" + motor + '\'' +
                 ", voltage='" + voltage + '\'' +
                 ", note='" + note + '\'' +
+                ", dff='" + dff + '\'' +
+                ", q_dff='" + q_dff + '\'' +
                 '}';
     }
-
 }
+

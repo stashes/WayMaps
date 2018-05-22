@@ -233,6 +233,7 @@ public class HistoryMapFragment extends AbstractFragment {
         View rootView = inflater.inflate(R.layout.fragment_history_map, container, false);
         getAttrFromBundle();
         ButterKnife.bind(this, rootView);
+        showProgress(true,content,progres);
 
         //customize button
         historyShowOverSpeed.setText(tracker.getMaxspeed());
@@ -282,7 +283,6 @@ public class HistoryMapFragment extends AbstractFragment {
         }
 
         procedure = configureProcedure();
-        showProgress(true,content,progres);
         mapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(final GoogleMap googleMap) {

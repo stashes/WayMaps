@@ -233,6 +233,15 @@ public class GMapFragment extends AbstractFragment implements OnMapReadyCallback
     @BindView(R.id.filter_inactive)
     LinearLayout filterInActive;
 
+    @BindView(R.id.car_group_view)
+    LinearLayout carGroupView;
+
+    @BindView(R.id.car_group_exit)
+    ImageView carGroupExit;
+
+    @BindView(R.id.car_group)
+    TextView carGroup;
+
     @BindView(R.id.progress_layout)
     View progressLayout;
 
@@ -307,8 +316,9 @@ public class GMapFragment extends AbstractFragment implements OnMapReadyCallback
 
         mapView.onResume(); // needed to get the map to display immediately
 
-
-
+        CancelableCallback.cancelAll();
+        ((MainActivity)getActivity()).deleteAllBackgroundTasks();
+        timesMarkerUpdate = 0;
         mapView.getMapAsync(this);
 
 
@@ -357,13 +367,14 @@ public class GMapFragment extends AbstractFragment implements OnMapReadyCallback
                                 public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
                                     if (drawerItem.getTag() == null) {
                                         pickedGroup = null;
+                                        carGroupView.setVisibility(View.GONE);
                                     } else {
                                         pickedGroup = (GetGroup) drawerItem.getTag();
+                                        carGroup.setText(pickedGroup.getTitle());
+                                        carGroupView.setVisibility(View.VISIBLE);
                                     }
                                     updateMarkersPosition();
                                     drawerSecond.closeDrawer();
-                                    sheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-                                    sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
                                     return true;
                                 }
                             })
@@ -385,8 +396,8 @@ public class GMapFragment extends AbstractFragment implements OnMapReadyCallback
             Drawable yourdrawable = toolbar.getMenu().getItem(0).getIcon();
             yourdrawable.mutate();
             yourdrawable.setColorFilter(getResources().getColor(R.color.light_blue), PorterDuff.Mode.SRC_IN);
-
-
+            carGroupExit.setImageBitmap(ApplicationUtil.drawToBitmap(getResources().getDrawable(R.drawable.ic_exit)
+                    ,getResources().getColor(R.color.colorAccent)));
         }
     }
 
@@ -652,11 +663,15 @@ public class GMapFragment extends AbstractFragment implements OnMapReadyCallback
 
     private void changeBSheetState(int stateCollapsed, BottomSheetBehavior sheetBehavior) {
         if (stateCollapsed == BottomSheetBehavior.STATE_COLLAPSED) {
-            sheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
             sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
         } else if (stateCollapsed == BottomSheetBehavior.STATE_EXPANDED) {
-            sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
             sheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+        }
+        if (sheetBehavior == this.sheetBehavior){
+            resizeMap(linearLayout);
+        }
+        if (sheetBehavior == this.sheetBehaviorCar){
+            resizeMap(linearLayoutCar);
         }
     }
 
@@ -913,8 +928,9 @@ public class GMapFragment extends AbstractFragment implements OnMapReadyCallback
         if ("-1".equals(fuelVolume) || fuelVolume == null) {
             carVolumeFuelView.setVisibility(View.GONE);
         } else {
-            double v = Double.parseDouble(fuelVolume);
-            fuelVolume = v + (" " + getResources().getString(R.string.l));
+            double v = Double.parseDouble(fuelVolume) / 10;
+            String result = new DecimalFormat("0.0").format(v);
+            fuelVolume = result + (" " + getResources().getString(R.string.l));
             carVolumeFuel.setText(fuelVolume);
             carVolumeFuelView.setVisibility(View.VISIBLE);
         }
@@ -1140,6 +1156,14 @@ public class GMapFragment extends AbstractFragment implements OnMapReadyCallback
             makeNoBoldFont(filterAll, filterInActive);
         }
 
+    }
+
+    @OnClick(R.id.car_group_exit)
+    public void groupExt(){
+        drawerSecond.deselect();
+        carGroupView.setVisibility(View.GONE);
+        pickedGroup = null;
+        updateMarkersPosition();
     }
 
     private void makeNoBoldFont(LinearLayout first, LinearLayout second) {

@@ -151,5 +151,7 @@
     <string name="prepare_stop_info">Preparing info about stops...</string>
     <string name="done">Done!</string>
     <string name="map_type">Choose map type</string>
+    <string name="press_one_more_time">Press again to exit</string>
+    <string name="filter_by_group">Filter by group:</string>
 
 </resources>
