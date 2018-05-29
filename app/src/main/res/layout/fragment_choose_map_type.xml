@@ -46,5 +46,33 @@
             android:paddingRight="10dp"
             android:textAlignment="viewStart"
             android:textSize="20dp"/>
+
+        <RadioButton
+            android:id="@+id/gmaphybrid"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:button="@null"
+            android:drawablePadding="30dp"
+            android:drawableRight="@android:drawable/btn_radio"
+            android:gravity="right|center_vertical"
+            android:text="Google Map hybrid"
+            android:paddingLeft="20dp"
+            android:paddingRight="10dp"
+            android:textAlignment="viewStart"
+            android:textSize="20dp"/>
+
+        <RadioButton
+            android:id="@+id/gmapsatellite"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:button="@null"
+            android:drawablePadding="30dp"
+            android:drawableRight="@android:drawable/btn_radio"
+            android:gravity="right|center_vertical"
+            android:text="Google Map satellite"
+            android:paddingLeft="20dp"
+            android:paddingRight="10dp"
+            android:textAlignment="viewStart"
+            android:textSize="20dp"/>
     </RadioGroup>
 </LinearLayout>

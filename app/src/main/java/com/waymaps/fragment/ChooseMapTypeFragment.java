@@ -2,43 +2,26 @@ package com.waymaps.fragment;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.waymaps.R;
 import com.waymaps.activity.MainActivity;
-import com.waymaps.adapter.GroupAdapter;
-import com.waymaps.api.RetrofitService;
-import com.waymaps.api.WayMapsService;
-import com.waymaps.data.requestEntity.Action;
-import com.waymaps.data.requestEntity.Procedure;
 import com.waymaps.data.responseEntity.GetGroup;
-import com.waymaps.util.ApplicationUtil;
 import com.waymaps.util.LocalPreferenceManager;
 import com.waymaps.util.MapProvider;
-import com.waymaps.util.SystemUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
-import java.util.List;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class ChooseMapTypeFragment extends AbstractFragment {
     private GetGroup[] getGroups;
@@ -52,6 +35,12 @@ public class ChooseMapTypeFragment extends AbstractFragment {
 
     @BindView(R.id.osmap)
     RadioButton osMap;
+
+    @BindView(R.id.gmaphybrid)
+    RadioButton gMapHybrid;
+
+    @BindView(R.id.gmapsatellite)
+    RadioButton gMapSatellite;
 
     @Nullable
     @Override
@@ -74,6 +63,20 @@ public class ChooseMapTypeFragment extends AbstractFragment {
             }
         });
 
+        gMapHybrid.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                radioButtonClick(v);
+            }
+        });
+
+        gMapSatellite.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                radioButtonClick(v);
+            }
+        });
+
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
         DrawerLayout drawer = ((MainActivity) getActivity()).getDrawer();
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -87,8 +90,12 @@ public class ChooseMapTypeFragment extends AbstractFragment {
 
     private void setRadioButtonActive() {
         String mapProvider = LocalPreferenceManager.getMapProvider(getContext());
-        if (MapProvider.valueOf(mapProvider) == MapProvider.Google){
+        if (MapProvider.valueOf(mapProvider) == MapProvider.Google) {
             gMap.toggle();
+        } else if (MapProvider.valueOf(mapProvider) == MapProvider.GOOGLE_HYBRID) {
+            gMapHybrid.toggle();
+        } else if (MapProvider.valueOf(mapProvider) == MapProvider.GOOGLE_SATELLITE) {
+            gMapSatellite.toggle();
         } else {
             osMap.toggle();
         }
@@ -96,12 +103,20 @@ public class ChooseMapTypeFragment extends AbstractFragment {
 
     private void radioButtonClick(View v) {
         RadioButton radioButton = (RadioButton) v;
-        switch (radioButton.getId()){
+        switch (radioButton.getId()) {
             case R.id.osmap:
                 LocalPreferenceManager.setMapProvider(getContext(), MapProvider.OSM.name());
                 break;
             case R.id.gmap:
-                LocalPreferenceManager.setMapProvider(getContext(),MapProvider.Google.name());
+                LocalPreferenceManager.setMapProvider(getContext(), MapProvider.Google.name());
+                break;
+
+            case R.id.gmaphybrid:
+                LocalPreferenceManager.setMapProvider(getContext(), MapProvider.GOOGLE_HYBRID.name());
+                break;
+
+            case R.id.gmapsatellite:
+                LocalPreferenceManager.setMapProvider(getContext(), MapProvider.GOOGLE_SATELLITE.name());
                 break;
         }
     }

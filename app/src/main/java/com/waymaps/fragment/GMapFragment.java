@@ -842,7 +842,9 @@ public class GMapFragment extends AbstractFragment implements OnMapReadyCallback
                 historyFragment.setArguments(bundle);
                 FragmentTransaction ft = getFragmentManager().beginTransaction();
                 ft.addToBackStack(this.getClass().getName());
-                ft.replace(R.id.content_main, historyFragment);
+/*                ft.replace(R.id.content_main, historyFragment);*/
+                ft.add(R.id.content_main, historyFragment);
+                ft.hide(GMapFragment.this);
                 ft.commit();
                 showProgress(false, mapContainer, progressLayout);
             }

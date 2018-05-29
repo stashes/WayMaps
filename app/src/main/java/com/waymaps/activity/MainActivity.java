@@ -153,14 +153,8 @@ public class MainActivity extends AppCompatActivity
         List fragmentList = getSupportFragmentManager().getFragments();
 
         boolean handled = false;
-        for (Object f : fragmentList) {
-            if (f instanceof AbstractFragment) {
-                handled = ((AbstractFragment) f).onBackPressed();
-
-                if (handled) {
-                    break;
-                }
-            }
+        if (fragmentList.get(fragmentList.size()-1) instanceof AbstractFragment){
+            handled = ((AbstractFragment) fragmentList.get(fragmentList.size()-1)).onBackPressed();
         }
 
         if (!handled) {
