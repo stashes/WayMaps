@@ -1,6 +1,5 @@
 package com.waymaps.fragment;
 
-import android.app.Dialog;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -16,7 +15,6 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -28,7 +26,6 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
@@ -55,7 +52,6 @@ import com.waymaps.data.responseEntity.GetTrack;
 import com.waymaps.data.responseEntity.PointData;
 import com.waymaps.data.responseEntity.TrackCount;
 import com.waymaps.data.responseEntity.TrackerList;
-import com.waymaps.dialog.ParkingDialog;
 import com.waymaps.util.ApplicationUtil;
 import com.waymaps.util.DateTimeUtil;
 import com.waymaps.util.LocalPreferenceManager;
@@ -197,6 +193,18 @@ public class HistoryMapFragment extends AbstractFragment {
     @BindView(R.id.progress_layout)
     View progres;
 
+    @BindView(R.id.history_maxspeed_view)
+    LinearLayout maxSpeedView;
+
+    @BindView(R.id.history_parkingcount_view)
+    LinearLayout parkingCountView;
+
+    @BindView(R.id.history_maxspeed)
+    TextView maxSpeed;
+
+    @BindView(R.id.history_parkingcount)
+    TextView historyParkingCount;
+
     BottomSheetBehavior sheetBehavior;
 
     BasicTrackInfoLayout trackLayout;
@@ -211,6 +219,9 @@ public class HistoryMapFragment extends AbstractFragment {
     static class BasicTrackInfoLayout{
         @BindView(R.id.history_burn_fuel)
         TextView historyBurnFuel;
+
+        @BindView(R.id.history_burn_fuel_view)
+        LinearLayout historyBurnFuelView;
 
         @BindView(R.id.history_distance)
         TextView historyDistance;
@@ -237,6 +248,7 @@ public class HistoryMapFragment extends AbstractFragment {
 
         //customize button
         historyShowOverSpeed.setText(tracker.getMaxspeed());
+        maxSpeed.setText(tracker.getMaxspeed() + " " + getResources().getString(R.string.kmperhour));
 
         //Back button block
         BackButtonLayout backButtonLayoutPoint = new BackButtonLayout();
@@ -287,11 +299,7 @@ public class HistoryMapFragment extends AbstractFragment {
             @Override
             public void onMapReady(final GoogleMap googleMap) {
                 mMap = googleMap;
-                if (MapProvider.valueOf(LocalPreferenceManager.getMapProvider(getContext())) != MapProvider.Google) {
-                    mMap.setMapType(GoogleMap.MAP_TYPE_NONE);
-                    mMap.addTileOverlay(new TileOverlayOptions().
-                            tileProvider(TilesProvider.getTile(getContext())));
-                }
+                TilesProvider.setTile(googleMap,getContext());
                 mMap.setOnCameraMoveListener(new GoogleMap.OnCameraMoveListener() {
                     @Override
                     public void onCameraMove() {
@@ -323,6 +331,23 @@ public class HistoryMapFragment extends AbstractFragment {
                         ApplicationUtil.showToast(HistoryMapFragment.this.getActivity(),getResources().getString(R.string.draw_way));
                         drawMarkers();
                         fillBasicInfo(trackLayout, getTracks.get(getTracks.size() - 1));
+
+                        //period
+                        String fromDate;
+                        String toDate;
+                        try {
+                            fromDate = DateTimeUtil.dateFormatHistory.format(from);
+                        } catch (Exception e) {
+                            fromDate = "-";
+                        }
+                        try {
+                            toDate = DateTimeUtil.dateFormatHistory.format(to);
+                        } catch (Exception e) {
+                            toDate = "-";
+                        }
+                        trackLayout.historyPeriodFrom.setText(fromDate);
+                        trackLayout.historyPeriodTo.setText(toDate);
+
                         linearLayout.setVisibility(View.VISIBLE);
                     }
 
@@ -345,6 +370,7 @@ public class HistoryMapFragment extends AbstractFragment {
                                 getParkings.add(getP);
                             }
                         }
+                        historyParkingCount.setText(getParkingResponse.length + " " + getResources().getString(R.string.pieces)+".");
                         drawParking();
                     }
 
@@ -506,19 +532,19 @@ public class HistoryMapFragment extends AbstractFragment {
                         ,(int) (PARKINGHEIGHT*1.5), (int)(PARKINGWIDTH*1.5))));
         String dateFrom = tag.getStart_date();
         if (dateFrom != null) {
-            parkingFrom.setText(dateFrom);
+            parkingFrom.setText(dateFrom.substring(0,dateFrom.length()-3));
         } else
             parkingFrom.setText("");
 
         String dateTo = tag.getEnd_date();
         if (dateTo != null) {
-            parkingTo.setText(dateTo);
+            parkingTo.setText(dateTo.substring(0,dateTo.length()-3));
         } else
-            parkingTo.setText("");
+            parkingTo.setText(getResources().getString(R.string.continues));
 
         String duration = tag.getDuration();
         if (duration != null) {
-            parkingDuration.setText(duration + " " + getContext().getString(R.string.minute));
+            parkingDuration.setText(DateTimeUtil.longMinToStringDate(Long.parseLong(duration),getContext()));
         } else
             parkingDuration.setText("0 " + getContext().getString(R.string.minute));
 
@@ -641,6 +667,15 @@ public class HistoryMapFragment extends AbstractFragment {
         historySpeed.setText(speed);
 
 
+        //period
+        String toDate;
+        try {
+            toDate = DateTimeUtil.toReportFormat(getTrack.getDate());
+        } catch (ParseException e) {
+            toDate = "-";
+        }
+        pointLayout.historyPeriodTo.setText(toDate);
+
         fillBasicInfo(pointLayout,getTrack);
     }
 
@@ -649,14 +684,17 @@ public class HistoryMapFragment extends AbstractFragment {
         String burnFuel = getTrack.getCount_dff();
         String burnFuelStart = getTracks.get(0).getCount_dff();
         if (burnFuel != null && burnFuelStart != null) {
+            layout.historyBurnFuelView.setVisibility(View.VISIBLE);
             try {
                 Double b1 = Double.parseDouble(burnFuel);
                 Double b2 = Double.parseDouble(burnFuelStart);
                 layout.historyBurnFuel.setText(((b1 - b2) / 10) + " " + getResources().getString(R.string.l));
             } catch (Exception e) {
+                layout.historyBurnFuelView.setVisibility(View.GONE);
                 layout.historyBurnFuel.setText("-");
             }
         } else {
+            layout.historyBurnFuelView.setVisibility(View.GONE);
             layout.historyBurnFuel.setText("-");
         }
 
@@ -674,23 +712,6 @@ public class HistoryMapFragment extends AbstractFragment {
         } else {
             layout.historyDistance.setText("-");
         }
-
-        //period
-        String fromDate;
-        String toDate;
-        try {
-            fromDate = DateTimeUtil.toReportFormat(getTracks.get(0).getDate());
-        } catch (ParseException e) {
-            fromDate = "-";
-        }
-        try {
-            toDate = DateTimeUtil.toReportFormat(getTrack.getDate());
-        } catch (ParseException e) {
-            toDate = "-";
-        }
-        layout.historyPeriodFrom.setText(fromDate);
-        layout.historyPeriodTo.setText(toDate);
-
     }
 
 
@@ -707,8 +728,10 @@ public class HistoryMapFragment extends AbstractFragment {
         }
         isOverSpeed = !isOverSpeed;
         if (isOverSpeed){
+            maxSpeedView.setVisibility(View.VISIBLE);
             historyShowOverSpeed.setTypeface(null, Typeface.BOLD_ITALIC);
         } else {
+            maxSpeedView.setVisibility(View.GONE);
             historyShowOverSpeed.setTypeface(null, Typeface.NORMAL);
         }
     }
@@ -720,8 +743,10 @@ public class HistoryMapFragment extends AbstractFragment {
         }
         isShowParking = !isShowParking;
         if (isShowParking){
+            parkingCountView.setVisibility(View.VISIBLE);
             historyShowParking.setImageDrawable(getResources().getDrawable(R.drawable.park2));
         } else {
+            parkingCountView.setVisibility(View.GONE);
             historyShowParking.setImageDrawable(getResources().getDrawable(R.drawable.park1));
         }
     }
@@ -765,12 +790,15 @@ public class HistoryMapFragment extends AbstractFragment {
         if (TRACK.equals(to)) {
             trackHistoryHeader.setVisibility(View.VISIBLE);
             trackHistoryInfo.setVisibility(View.VISIBLE);
+            sheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
         } else if (POINT.equals(to)) {
             pointHistoryInfo.setVisibility(View.VISIBLE);
             pointHistoyHeader.setVisibility(View.VISIBLE);
+            sheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
         } else if (PARKING.equals(to)) {
             parkingHistoryHeader.setVisibility(View.VISIBLE);
             parkingHistoryInfo.setVisibility(View.VISIBLE);
+            sheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
         }
     }
 

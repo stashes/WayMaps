@@ -18,6 +18,8 @@ public class DateTimeUtil {
 
     public static SimpleDateFormat dateFormatForReport = new SimpleDateFormat("HH:mm dd-MM-yyyy");
 
+    public static SimpleDateFormat dateFormatHistory = new SimpleDateFormat("dd-MM-yyyy HH:mm");
+
     public static SimpleDateFormat dateFormatForHistory = new SimpleDateFormat("HH:mm:ss dd-MM-yyyy");
 
     public static String dateToString(Date date){
@@ -42,6 +44,10 @@ public class DateTimeUtil {
 
     public static String toReportFormat(String date) throws ParseException {
         return dateToStringForHistory(stringToDate(date));
+    }
+
+    public static String toBottomSheetFormat(String date) throws ParseException {
+        return dateToStringForHistory(stringToDate(date,dateFormatHistory));
     }
 
 

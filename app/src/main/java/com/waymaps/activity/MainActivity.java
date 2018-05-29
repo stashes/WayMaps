@@ -140,7 +140,7 @@ public class MainActivity extends AppCompatActivity
 
     private void getUserFromIntent() {
         try {
-            authorisedUser = JSONUtil.getObjectMapper().readValue(getIntent().getExtras()
+             authorisedUser = JSONUtil.getObjectMapper().readValue(getIntent().getExtras()
                     .getCharSequence("user").toString(), User.class);
             logger.debug("User {} reads successfully", authorisedUser.getId());
         } catch (IOException e) {

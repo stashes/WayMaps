@@ -28,6 +28,8 @@ public class User {
 
     private String currency;
 
+    private String unread_ticket;
+
     public User() {
 
     }
@@ -112,6 +114,14 @@ public class User {
         this.currency = currency;
     }
 
+    public String getUnread_ticket() {
+        return unread_ticket;
+    }
+
+    public void setUnread_ticket(String unread_ticket) {
+        this.unread_ticket = unread_ticket;
+    }
+
     @Override
     public String toString() {
         return "User{" +
@@ -125,6 +135,7 @@ public class User {
                 ", firm_title='" + firm_title + '\'' +
                 ", saldo='" + saldo + '\'' +
                 ", currency='" + currency + '\'' +
+                ", unread_ticket='" + unread_ticket + '\'' +
                 '}';
     }
 }

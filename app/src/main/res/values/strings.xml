@@ -153,5 +153,10 @@
     <string name="map_type">Choose map type</string>
     <string name="press_one_more_time">Press again to exit</string>
     <string name="filter_by_group">Filter by group:</string>
+    <string name="distance_sum">Distance</string>
+    <string name="date_time">Date and time</string>
+    <string name="continues">Continues</string>
+    <string name="hist_max_speed">Max speed:</string>
+    <string name="hist_parking_count">Parking count:</string>
 
 </resources>

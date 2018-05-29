@@ -13,7 +13,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="10dp">
+        android:paddingBottom="10dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingTop="0dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -32,9 +35,9 @@
                     android:layout_gravity="center"
                     android:layout_weight="0"
                     android:gravity="center"
-                    android:text="@string/chosen_period" />
+                    android:text="@string/date_time" />
 
-                <LinearLayout
+                <!-- <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -54,7 +57,7 @@
                         android:layout_weight="1"
                         android:paddingLeft="10dp"
                         android:text="@string/to" />
-                </LinearLayout>
+                </LinearLayout>-->
             </LinearLayout>
 
 
@@ -75,7 +78,8 @@
                         style="@style/HistoryLabel"
                         android:layout_width="wrap_content"
                         android:layout_weight="1"
-                        android:text="From" />
+                        android:text="From"
+                        android:visibility="gone" />
 
                     <TextView
                         android:id="@+id/history_period_to"
@@ -99,7 +103,7 @@
 
             <TextView
                 style="@style/HistoryLabel"
-                android:text="@string/distance_for_period" />
+                android:text="@string/distance_sum" />
 
             <TextView
                 android:id="@+id/history_distance"
@@ -108,6 +112,7 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/history_burn_fuel_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
