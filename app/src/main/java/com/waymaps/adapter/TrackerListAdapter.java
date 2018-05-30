@@ -1,6 +1,7 @@
 package com.waymaps.adapter;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +14,7 @@ import com.amulyakhare.textdrawable.util.ColorGenerator;
 import com.waymaps.R;
 import com.waymaps.data.responseEntity.FinGet;
 import com.waymaps.data.responseEntity.TrackerList;
+import com.waymaps.util.ApplicationUtil;
 
 import java.util.List;
 
@@ -70,10 +72,10 @@ public class TrackerListAdapter extends BaseAdapter {
         }
         ButterKnife.bind(this,view);
         TrackerList tracker = getTrackerList(position);
-        letter = String.valueOf(tracker.getTitle().charAt(0));
-        TextDrawable drawable = TextDrawable.builder()
-                .buildRound(letter, generator.getRandomColor());
-        imageView.setImageDrawable(drawable);
+        String marker = tracker.getMarker();
+        String color = tracker.getColor();
+        Bitmap bitmap = ApplicationUtil.pickImage(context, 0, marker, color);
+        imageView.setImageBitmap(bitmap);
         trackerName.setText(tracker.getTitle());
         return view;
     }

@@ -147,6 +147,23 @@
 
 
         <LinearLayout
+            android:id="@+id/history_fuelexpense_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:orientation="horizontal">
+
+            <TextView
+                style="@style/HistoryLabel"
+                android:text="@string/hist_fuelexpense" />
+
+            <TextView
+                android:id="@+id/history_fuelexpense"
+                style="@style/HistoryLabel"
+                android:text="1 minute" />
+        </LinearLayout>
+
+        <LinearLayout
             android:id="@+id/history_maxspeed_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

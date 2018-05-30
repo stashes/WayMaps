@@ -345,10 +345,13 @@ public class HistoryMapFragment extends AbstractFragment {
                         } catch (Exception e) {
                             toDate = "-";
                         }
+
+
                         trackLayout.historyPeriodFrom.setText(fromDate);
                         trackLayout.historyPeriodTo.setText(toDate);
 
                         linearLayout.setVisibility(View.VISIBLE);
+                        sheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
                     }
 
                     @Override
@@ -411,7 +414,7 @@ public class HistoryMapFragment extends AbstractFragment {
                 stopMarkers[i] = mMap.addMarker(new MarkerOptions().position(
                         new LatLng(Double.parseDouble(getParkings.get(i).getParking_lat())
                                 , Double.parseDouble(getParkings.get(i).getParking_lon())))
-                        .anchor(0.5f, 0.5f));
+                        .anchor(0.5f, 0.5f).zIndex(100));
                 stopMarkers[i].setIcon(BitmapDescriptorFactory.fromBitmap(bitmap));
                 stopMarkers[i].setVisible(false);
                 stopMarkers[i].setTag(getParkings.get(i));
@@ -532,13 +535,21 @@ public class HistoryMapFragment extends AbstractFragment {
                         ,(int) (PARKINGHEIGHT*1.5), (int)(PARKINGWIDTH*1.5))));
         String dateFrom = tag.getStart_date();
         if (dateFrom != null) {
-            parkingFrom.setText(dateFrom.substring(0,dateFrom.length()-3));
+            try {
+                parkingFrom.setText(DateTimeUtil.toBottomSheetFormat(dateFrom.substring(0,dateFrom.length()-3)));
+            } catch (ParseException e) {
+                parkingFrom.setText("");
+            }
         } else
             parkingFrom.setText("");
 
         String dateTo = tag.getEnd_date();
         if (dateTo != null) {
-            parkingTo.setText(dateTo.substring(0,dateTo.length()-3));
+            try {
+                parkingTo.setText(DateTimeUtil.toBottomSheetFormat(dateTo.substring(0,dateTo.length()-3)));
+            } catch (ParseException e) {
+                parkingTo.setText("");
+            }
         } else
             parkingTo.setText(getResources().getString(R.string.continues));
 

@@ -792,7 +792,7 @@ public class GMapFragment extends AbstractFragment implements OnMapReadyCallback
                 if (locked) {
                     mMap.getUiSettings().setScrollGesturesEnabled(false);
                     lockCar.setImageBitmap(ApplicationUtil.drawToBitmap(
-                            getResources().getDrawable(R.drawable.lock), Color.YELLOW));
+                            getResources().getDrawable(R.drawable.ic_locked)));
                     mMap.animateCamera(CameraUpdateFactory.newLatLng(currentMarker.getPosition()));
                 } else {
                     mMap.getUiSettings().setScrollGesturesEnabled(true);
@@ -863,7 +863,7 @@ public class GMapFragment extends AbstractFragment implements OnMapReadyCallback
                 m.setVisible(false);
             }
             currentMarker.setVisible(true);
-            filterCar.setImageBitmap(ApplicationUtil.drawToBitmap(getResources().getDrawable(R.drawable.filter), Color.YELLOW));
+            filterCar.setImageBitmap(ApplicationUtil.drawToBitmap(getResources().getDrawable(R.drawable.filterpicked)));
         } else {
             /*for (Marker m : markers) {
                 m.setVisible(true);

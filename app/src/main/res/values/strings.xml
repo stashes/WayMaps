@@ -158,5 +158,6 @@
     <string name="continues">Continues</string>
     <string name="hist_max_speed">Max speed:</string>
     <string name="hist_parking_count">Parking count:</string>
+    <string name="hist_fuelexpense">Fuel consumption:</string>
 
 </resources>

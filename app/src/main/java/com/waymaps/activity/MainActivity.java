@@ -464,7 +464,7 @@ public class MainActivity extends AppCompatActivity
                 String html2 = null;
                 String saldo = null;
                 String text = getResources().getString(R.string.balance) + ": ";
-                saldo = new DecimalFormat("0.00").format(bal) + " " + getString(R.string.uah);
+                saldo = new DecimalFormat("#.###,00").format(bal) + " " + getString(R.string.uah);
                 html1 = "<font>" + text + "</font>";
 
                 if (bal > 0) {

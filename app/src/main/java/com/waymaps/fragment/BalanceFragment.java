@@ -25,6 +25,7 @@ import com.waymaps.util.SystemUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.text.DecimalFormat;
 import java.util.Arrays;
 
 import butterknife.BindView;
@@ -113,6 +114,7 @@ public class BalanceFragment extends AbstractFragment {
         if (finGets == null){
             finGets = new FinGet[0];
         }
+        DecimalFormat decimalFormat = new DecimalFormat("#.###,00");
         String html1 = null;
         String html2 = null;
         String saldo = null;
@@ -121,11 +123,13 @@ public class BalanceFragment extends AbstractFragment {
                 " - " + getString(R.string.balancesmall) + " ";
         if (finGets.length == 0){
             balance = 0;
-            saldo = balance + " " + getString(R.string.uah);
+            saldo = decimalFormat.format(balance);
+            saldo += " " + getString(R.string.uah);
             html1 = "<font>" + text + "</font>";
         } else {
             balance = new Double(finGets[0].getBalance());
-            saldo = balance + " " + getString(R.string.uah);
+            saldo = decimalFormat.format(balance);
+            saldo += " " + getString(R.string.uah);
             html1 = "<font>" + text + "</font>";
         }
         if (balance > 0) {
