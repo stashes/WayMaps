@@ -9,6 +9,7 @@
         android:layout_height="wrap_content"
         android:background="@color/transparent"
         android:orientation="vertical"
+        android:clickable="false"
         android:theme="@style/AppTheme.AppBarOverlay">
 
         <android.support.v7.widget.Toolbar
@@ -16,6 +17,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="@color/transparent"
+            android:clickable="false"
             app:popupTheme="@style/AppTheme.PopupOverlay"
             app:titleTextColor="@color/light_blue"/>
 

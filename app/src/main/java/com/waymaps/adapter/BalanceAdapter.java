@@ -38,7 +38,7 @@ public class BalanceAdapter extends BaseAdapter {
     @BindView(R.id.balance_credit)
     TextView credit;
 
-    DecimalFormat decimalFormat = new DecimalFormat("#.###,00");
+    DecimalFormat decimalFormat = new DecimalFormat("#,###.00");
 
     public BalanceAdapter(Context context, List<FinGet> finGets) {
         this.context = context;
@@ -73,10 +73,10 @@ public class BalanceAdapter extends BaseAdapter {
         ButterKnife.bind(this,view);
         FinGet finGet = getFinGet(position);
 
-        balance.setText(finGet.getBalance()== null ? "" : decimalFormat.format(finGet.getBalance()));
-        debet.setText(finGet.getDebet() == null ? "" : decimalFormat.format(finGet.getDebet()));
+        balance.setText(finGet.getBalance()== null ? "" : decimalFormat.format(Double.parseDouble(finGet.getBalance())));
+        debet.setText(finGet.getDebet() == null ? "" : decimalFormat.format(Double.parseDouble(finGet.getDebet())));
         date.setText(finGet.getDate() == null ? "" : finGet.getDate());
-        credit.setText(finGet.getCredit() == null ? "" : decimalFormat.format(finGet.getCredit()));
+        credit.setText(finGet.getCredit() == null ? "" : decimalFormat.format(Double.parseDouble(finGet.getCredit())));
 
         if (Double.valueOf(finGet.getBalance()) >=  0){
             balance.setTextColor(context.getResources().getColor(R.color.success));

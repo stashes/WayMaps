@@ -114,7 +114,7 @@ public class BalanceFragment extends AbstractFragment {
         if (finGets == null){
             finGets = new FinGet[0];
         }
-        DecimalFormat decimalFormat = new DecimalFormat("#.###,00");
+        DecimalFormat decimalFormat = new DecimalFormat("#,###.00");
         String html1 = null;
         String html2 = null;
         String saldo = null;
