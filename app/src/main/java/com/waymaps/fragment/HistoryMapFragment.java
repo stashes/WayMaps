@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.CoordinatorLayout;
@@ -94,6 +95,10 @@ public class HistoryMapFragment extends AbstractFragment {
     public static final String POINT = "POINT";
     public static final String PARKING = "PARKING";
 
+    private static final int POLYLINECOLOR = Color.RED;
+    private static final int POLYLINECOLOR2 = Color.YELLOW;
+
+
     private Logger logger = LoggerFactory.getLogger(this.getClass());
     private GoogleMap mMap;
     private MapView mapView;
@@ -114,6 +119,7 @@ public class HistoryMapFragment extends AbstractFragment {
     private boolean isOverSpeed;
     private boolean isShowParking;
     private boolean currentMarkerVisibility;
+    private ArrayList<Handler> handlers = new ArrayList<>();
 
     @BindView(R.id.rootView)
     CoordinatorLayout coordinatorLayout;
@@ -491,7 +497,7 @@ public class HistoryMapFragment extends AbstractFragment {
                     Double.parseDouble(tag.getLon()))).zIndex(1);
             if ("1".equals(tag.getOver_speed())) {
                 if (i >= 1 && i < markers.length - 1) {
-                    PolylineOptions overSpeed = new PolylineOptions().width(5.0f).geodesic(true).color(Color.RED).visible(false).zIndex(10);
+                    PolylineOptions overSpeed = new PolylineOptions().width(9.0f).geodesic(true).color(Color.RED).visible(false).zIndex(20);
                     GetTrack tag0 = (GetTrack) markers[i - 1].getTag();
                     GetTrack tag2 = (GetTrack) markers[i + 1].getTag();
 
@@ -734,9 +740,13 @@ public class HistoryMapFragment extends AbstractFragment {
 
     @OnClick(R.id.history_show_overspeed)
     protected void overSpeed() {
+        removeBgTasks();
+        updatePolyline(!isOverSpeed);
+/*
         for (Polyline polyline : overSpeeds) {
             polyline.setVisible(!isOverSpeed);
         }
+*/
         isOverSpeed = !isOverSpeed;
         if (isOverSpeed){
             maxSpeedView.setVisibility(View.VISIBLE);
@@ -746,6 +756,67 @@ public class HistoryMapFragment extends AbstractFragment {
             historyShowOverSpeed.setTypeface(null, Typeface.NORMAL);
         }
     }
+
+    private void updatePolyline(boolean show) {
+        final Handler handler = new Handler();
+
+        for (Polyline polyline : overSpeeds) {
+            polyline.setVisible(show);
+        }
+
+        final int delay = 50; //milliseconds
+        registerUpdateHandler(handler);
+        final int[] currentColor = new int[1];
+        currentColor[0] = POLYLINECOLOR;
+        final int[] i = new int[1];
+        i[0] = 0;
+        final boolean[] side = new boolean[1];
+        side[0] =true;
+        int green = Color.green(POLYLINECOLOR);
+        int green1 = Color.green(POLYLINECOLOR2);
+        int blue = Color.blue(POLYLINECOLOR);
+        int blue1 = Color.blue(POLYLINECOLOR2);
+        int red = Color.red(POLYLINECOLOR);
+        int red1 = Color.red(POLYLINECOLOR2);
+        final float deltag = (green - green1)/80;
+        final float deltar = (red - red1)/80;
+        final float deltab = (blue - blue1)/80;
+
+        final float[] rgb = new float[3];
+        rgb[0] =red;
+        rgb[1] =green;
+        rgb[2] =blue;
+
+
+        handler.postDelayed(new Runnable() {
+            public void run() {
+
+                if (i[0] == 80) {
+                    i[0] = 0;
+                    side[0] = !side[0];
+                }
+
+                if (side[0]) {
+                    rgb[0] -=deltar;
+                    rgb[1] -=deltag;
+                    rgb[2] -=deltab;
+                    for (Polyline polyline : overSpeeds) {
+                        polyline.setColor(Color.rgb((int)rgb[0],(int)rgb[1],(int)rgb[2]));
+                    }
+                } else {
+                    rgb[0] +=deltar;
+                    rgb[1] +=deltag;
+                    rgb[2] +=deltab;
+                    for (Polyline polyline : overSpeeds) {
+                        polyline.setColor(Color.rgb((int)rgb[0],(int)rgb[1],(int)rgb[2]));
+                    }
+                }
+                i[0]++;
+                handler.postDelayed(this, delay);
+            }
+        }, delay);
+    }
+
 
     @OnClick(R.id.history_show_parking)
     protected void setShowParking() {
@@ -857,8 +928,9 @@ public class HistoryMapFragment extends AbstractFragment {
 
     @Override
     public void onStop() {
-        super.onStop();
         clearMemory();
+        removeBgTasks();
+        super.onStop();
     }
 
     private void clearMemory() {
@@ -879,4 +951,15 @@ public class HistoryMapFragment extends AbstractFragment {
         System.gc();
     }
 
+    public void registerUpdateHandler(Handler handler) {
+        handlers.add(handler);
+    }
+
+    public void removeBgTasks(){
+        for (Handler handler : handlers){
+            handler.removeCallbacksAndMessages(null);
+        }
+    }
 }
+
+
