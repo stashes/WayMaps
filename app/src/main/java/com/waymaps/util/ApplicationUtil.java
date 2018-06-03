@@ -102,6 +102,36 @@ public class ApplicationUtil {
         }
     }
 
+    public static Bitmap drawToBitmap(Drawable drawable, int color, PorterDuff.Mode mode) {
+        if (!(drawable instanceof BitmapDrawable)) {
+            Drawable mWrappedDrawable = drawable.mutate();
+            mWrappedDrawable = DrawableCompat.wrap(mWrappedDrawable);
+            DrawableCompat.setTint(mWrappedDrawable, color);
+            DrawableCompat.setTintMode(mWrappedDrawable, mode);
+
+            Bitmap bitmap = Bitmap.createBitmap(mWrappedDrawable.getIntrinsicWidth(),
+                    mWrappedDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas(bitmap);
+            drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+            drawable.draw(canvas);
+            return bitmap;
+
+        } else {
+            BitmapDrawable bitmapdraw = (BitmapDrawable) drawable;
+            Bitmap b = bitmapdraw.getBitmap();
+
+            Bitmap mutableBitmap = b.copy(Bitmap.Config.ARGB_8888, true);
+
+            Paint paint = new Paint();
+            ColorFilter filter = new PorterDuffColorFilter(color, mode);
+            paint.setColorFilter(filter);
+
+            Canvas canvas = new Canvas(mutableBitmap);
+            canvas.drawBitmap(b, 0, 0, paint);
+            return mutableBitmap;
+        }
+    }
+
     public static Bitmap drawToBitmap(Drawable d , int height,int width){
         Bitmap bitmap = drawToBitmap(d);
         Bitmap resizedBitmap = Bitmap.createScaledBitmap(bitmap, width, height, false);

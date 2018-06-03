@@ -1,15 +1,19 @@
 package com.waymaps.adapter;
 
 import android.content.Context;
+import android.graphics.PorterDuff;
+import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.waymaps.R;
 import com.waymaps.data.responseEntity.Ticket;
 import com.waymaps.data.responseEntity.TicketList;
+import com.waymaps.util.ApplicationUtil;
 
 import java.util.List;
 
@@ -32,6 +36,9 @@ public class GetTicketAdapter extends BaseAdapter {private Context context;
 
     @BindView(R.id.ticketMessage)
     TextView ticketMessage;
+
+    @BindView(R.id.ticket_mail)
+    ImageView ticketMail;
 
 //    @BindView(R.id.ticketReadDate)
 //    TextView ticketReadDate;
@@ -63,10 +70,20 @@ public class GetTicketAdapter extends BaseAdapter {private Context context;
     public View getView(int position, View convertView, ViewGroup parent) {
         View view = convertView;
         if (view == null) {
-            view = lInflater.inflate(R.layout.item_ticket_list, parent, false);
+            view = lInflater.inflate(R.layout.item_get_ticket, parent, false);
         }
         ButterKnife.bind(this,view);
         Ticket ticket = getTickets(position);
+        if (ticket.getReadDate() == null){
+            ticketMail.setImageBitmap(ApplicationUtil.drawToBitmap(context.getResources().getDrawable(R.drawable.ic_mail)
+                    , context.getResources().getColor(R.color.light_blue)
+                    , PorterDuff.Mode.SRC_IN));
+            ticketMessage.setTypeface(null, Typeface.BOLD);
+        } else {
+            ticketMail.setImageBitmap(ApplicationUtil.drawToBitmap(context.getResources().getDrawable(R.drawable.mail_open_ic)
+                    , context.getResources().getColor(R.color.light_blue)
+                    , PorterDuff.Mode.SRC_IN));
+        }
         ticketDate.setText("[" + ticket.getCreatedDate() + "]");
         ticketUsr.setText(ticket.getUserTitle());
         ticketMessage.setText(ticket.getText());

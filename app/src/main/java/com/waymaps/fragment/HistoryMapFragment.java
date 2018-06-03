@@ -2,6 +2,7 @@ package com.waymaps.fragment;
 
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
@@ -51,6 +52,7 @@ import com.waymaps.data.responseEntity.GetCurrent;
 import com.waymaps.data.responseEntity.GetParking;
 import com.waymaps.data.responseEntity.GetTrack;
 import com.waymaps.data.responseEntity.PointData;
+import com.waymaps.data.responseEntity.Report;
 import com.waymaps.data.responseEntity.TrackCount;
 import com.waymaps.data.responseEntity.TrackerList;
 import com.waymaps.util.ApplicationUtil;
@@ -120,6 +122,7 @@ public class HistoryMapFragment extends AbstractFragment {
     private boolean isShowParking;
     private boolean currentMarkerVisibility;
     private ArrayList<Handler> handlers = new ArrayList<>();
+    private Report report;
 
     @BindView(R.id.rootView)
     CoordinatorLayout coordinatorLayout;
@@ -211,6 +214,15 @@ public class HistoryMapFragment extends AbstractFragment {
     @BindView(R.id.history_parkingcount)
     TextView historyParkingCount;
 
+    @BindView(R.id.history_limit_view)
+    LinearLayout limitView;
+
+    @BindView(R.id.history_limit)
+    TextView limit;
+
+    @BindView(R.id.menu)
+    ImageView menu;
+
     BottomSheetBehavior sheetBehavior;
 
     BasicTrackInfoLayout trackLayout;
@@ -228,6 +240,12 @@ public class HistoryMapFragment extends AbstractFragment {
 
         @BindView(R.id.history_burn_fuel_view)
         LinearLayout historyBurnFuelView;
+
+        @BindView(R.id.history_fuelexpense_view)
+        LinearLayout fuelExpenseView;
+
+        @BindView(R.id.history_fuelexpense)
+        TextView fuelExpense;
 
         @BindView(R.id.history_distance)
         TextView historyDistance;
@@ -254,7 +272,9 @@ public class HistoryMapFragment extends AbstractFragment {
 
         //customize button
         historyShowOverSpeed.setText(tracker.getMaxspeed());
-        maxSpeed.setText(tracker.getMaxspeed() + " " + getResources().getString(R.string.kmperhour));
+
+        limit.setText(tracker.getMaxspeed() + " " + getResources().getString(R.string.kmperhour));
+        maxSpeed.setText(report.getMax_speed() + " " + getResources().getString(R.string.kmperhour));
 
         //Back button block
         BackButtonLayout backButtonLayoutPoint = new BackButtonLayout();
@@ -392,6 +412,9 @@ public class HistoryMapFragment extends AbstractFragment {
             }
         });
 
+        menu.setImageBitmap(ApplicationUtil.drawToBitmap(getResources().getDrawable(R.drawable.ic_menu)
+                ,getResources().getColor(R.color.light_blue_tr), PorterDuff.Mode.SRC_IN));
+
         sheetBehavior = BottomSheetBehavior.from(linearLayout);
 
         historyCarName.setText(getCurrent.getTracker_title());
@@ -435,6 +458,7 @@ public class HistoryMapFragment extends AbstractFragment {
     private void makeMarkerVisible(boolean visibility) {
         if (currentMarkerVisibility != visibility) {
             for (Marker marker : markers) {
+                if (marker != markers[0] || marker != markers[markers.length-1])
                 marker.setVisible(visibility);
             }
             currentMarkerVisibility = visibility;
@@ -455,12 +479,14 @@ public class HistoryMapFragment extends AbstractFragment {
                         .anchor(0.5f, 0.5f));
                 if (i == 0) {
                     markers[i].setIcon(BitmapDescriptorFactory.fromBitmap(flagStart));
+                    markers[i].setVisible(true);
                 } else if (i == (numMarkers - 1)) {
                     markers[i].setIcon(BitmapDescriptorFactory.fromBitmap(flagEnd));
+                    markers[i].setVisible(true);
                 } else {
                     markers[i].setIcon(BitmapDescriptorFactory.fromBitmap(bitmap));
+                    markers[i].setVisible(false);
                 }
-                markers[i].setVisible(false);
                 markers[i].setTag(getTracks.get(i));
             }
         currentMarkerVisibility = false;
@@ -700,11 +726,13 @@ public class HistoryMapFragment extends AbstractFragment {
         //burnFuel
         String burnFuel = getTrack.getCount_dff();
         String burnFuelStart = getTracks.get(0).getCount_dff();
+        Double b1=-1d;
+        Double b2=-1d;
         if (burnFuel != null && burnFuelStart != null) {
             layout.historyBurnFuelView.setVisibility(View.VISIBLE);
             try {
-                Double b1 = Double.parseDouble(burnFuel);
-                Double b2 = Double.parseDouble(burnFuelStart);
+                b1  = Double.parseDouble(burnFuel);
+                b2  = Double.parseDouble(burnFuelStart);
                 layout.historyBurnFuel.setText(((b1 - b2) / 10) + " " + getResources().getString(R.string.l));
             } catch (Exception e) {
                 layout.historyBurnFuelView.setVisibility(View.GONE);
@@ -718,10 +746,12 @@ public class HistoryMapFragment extends AbstractFragment {
         //distance
         String dEnd = getTrack.getOdometr();
         String dStart = getTracks.get(0).getOdometr();
+        Double d1 = -1d;
+        Double d2 = -1d;
         if (dEnd != null && dStart != null) {
             try {
-                Double d1 = Double.parseDouble(dEnd);
-                Double d2 = Double.parseDouble(dStart);
+                d1 = Double.parseDouble(dEnd);
+                d2 = Double.parseDouble(dStart);
                 layout.historyDistance.setText((new DecimalFormat("0.0").format((d1 - d2) / 1000)) + " " + getResources().getString(R.string.km));
             } catch (Exception e) {
                 layout.historyDistance.setText("-");
@@ -729,6 +759,16 @@ public class HistoryMapFragment extends AbstractFragment {
         } else {
             layout.historyDistance.setText("-");
         }
+
+        if ((d1 != -1) &&(d2 != -1)&&(b1 != -1)&&(b2 != -1)){
+            try {
+                layout.fuelExpense.setText((((b1 - b2) / 10) * 100) / ((d1-d2)/1000) + " " + getResources().getString(R.string.l) +
+                "/"+"100" + getResources().getString(R.string.km));
+                layout.fuelExpenseView.setVisibility(View.VISIBLE);
+            } catch (Exception e) {
+                layout.fuelExpenseView.setVisibility(View.GONE);
+                layout.fuelExpense.setText("-");
+            }
     }
 
 
@@ -749,10 +789,14 @@ public class HistoryMapFragment extends AbstractFragment {
 */
         isOverSpeed = !isOverSpeed;
         if (isOverSpeed){
+            historyShowOverSpeed.setBackground(getContext().getResources().getDrawable(R.drawable.ic_overspeed_new));
             maxSpeedView.setVisibility(View.VISIBLE);
+            limitView.setVisibility(View.VISIBLE);
             historyShowOverSpeed.setTypeface(null, Typeface.BOLD_ITALIC);
         } else {
+            historyShowOverSpeed.setBackground(getContext().getResources().getDrawable(R.drawable.ic_overspeed));
             maxSpeedView.setVisibility(View.GONE);
+            limitView.setVisibility(View.GONE);
             historyShowOverSpeed.setTypeface(null, Typeface.NORMAL);
         }
     }
@@ -918,6 +962,7 @@ public class HistoryMapFragment extends AbstractFragment {
             trackCount = ApplicationUtil.getObjectFromBundle(getArguments(), "trackCount", TrackCount.class);
             getCurrent = ApplicationUtil.getObjectFromBundle(getArguments(), "getCurrent", GetCurrent.class);
             tracker = ApplicationUtil.getObjectFromBundle(getArguments(), "tracker", TrackerList.class);
+            report = ApplicationUtil.getObjectFromBundle(getArguments(), "report", Report.class);
             from = ApplicationUtil.getObjectFromBundle(getArguments(), "from", Date.class);
             to = ApplicationUtil.getObjectFromBundle(getArguments(), "to", Date.class);
         } catch (IOException e) {

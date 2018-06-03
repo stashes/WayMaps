@@ -96,17 +96,17 @@ public class HistoryFragment extends AbstractFragment {
     private static final int DIALOG_DATE_FROM = 1;
     private static final int DIALOG_DATE_TO = 2;
 
-    private  int year_from;
-    private  int month_from;
-    private  int day_from;
-    private  int hour_from;
-    private  int minute_from;
+    private int year_from;
+    private int month_from;
+    private int day_from;
+    private int hour_from;
+    private int minute_from;
 
-    private  int year_to;
-    private  int month_to;
-    private  int day_to;
-    private  int hour_to;
-    private  int minute_to;
+    private int year_to;
+    private int month_to;
+    private int day_to;
+    private int hour_to;
+    private int minute_to;
 
     private TrackCount trackCount;
     private Report report;
@@ -168,7 +168,7 @@ public class HistoryFragment extends AbstractFragment {
     }
 
     @OnClick(R.id.history_show_track)
-    protected void showTrack(){
+    protected void showTrack() {
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.addToBackStack(HistoryFragment.class.getName());
         HistoryMapFragment fragment = new HistoryMapFragment();
@@ -177,11 +177,12 @@ public class HistoryFragment extends AbstractFragment {
             ApplicationUtil.setValueToBundle(bundle, "trackCount", trackCount);
             ApplicationUtil.setValueToBundle(bundle, "getCurrent", getCurrent);
             ApplicationUtil.setValueToBundle(bundle, "tracker", tracker);
+            ApplicationUtil.setValueToBundle(bundle, "report", report);
             ApplicationUtil.setValueToBundle(bundle, "from", dateFromD);
             ApplicationUtil.setValueToBundle(bundle, "to", dateToD);
             fragment.setArguments(bundle);
         } catch (JsonProcessingException e) {
-            logger.error("Error writing user {}",authorizedUser.toString());
+            logger.error("Error writing user {}", authorizedUser.toString());
         }
         ft.add(R.id.content_main, fragment);
         ft.hide(HistoryFragment.this);
@@ -189,41 +190,39 @@ public class HistoryFragment extends AbstractFragment {
     }
 
     @OnClick(R.id.history_show_report)
-    protected void report(){
-        Procedure procedure = new Procedure(Action.CALL);
-        //todo change
-        Parameter parameter = new IdParam(getCurrent.getId());
-        //
+    protected void report() {
+        ReportDialog reportDialog = new ReportDialog(getContext(), authorizedUser, getCurrent, tracker, report, trackCount, dateFromD, dateToD);
+        reportDialog.getWindow().setLayout((int) (SystemUtil.getIntWidth(getActivity()) * 0.9), (int) (SystemUtil.getIntHeight(getActivity()) * 0.9));
+        reportDialog.show();
+    }
 
-        dateToD = new GregorianCalendar(year_to,month_to,day_to,hour_to,minute_to).getTime();
-        dateFromD = new GregorianCalendar(year_from,month_from,day_from,hour_from,minute_from).getTime();
+
+    private void loadReport() {
+        Procedure procedure = new Procedure(Action.CALL);
+        Parameter parameter = new IdParam(getCurrent.getId());
+        dateToD = new GregorianCalendar(year_to, month_to, day_to, hour_to, minute_to).getTime();
+        dateFromD = new GregorianCalendar(year_from, month_from, day_from, hour_from, minute_from).getTime();
         StartEndDate startEndDate = new StartEndDate(dateFromD,
                 dateToD);
-        Parameter parameters= new ComplexParameters(parameter,startEndDate);
+        Parameter parameters = new ComplexParameters(parameter, startEndDate);
         procedure.setUser_id(authorizedUser.getId());
         procedure.setName(Action.REPORT);
         procedure.setIdentficator(SystemUtil.getWifiMAC(getActivity()));
         procedure.setFormat(WayMapsService.DEFAULT_FORMAT);
         procedure.setParams(parameters.getParameters());
-        RetrofitService.getWayMapsService().getReport(procedure.getAction(),procedure.getName(),
-                procedure.getIdentficator(),procedure.getFormat(),procedure.getParams()).enqueue(new Callback<Report[]>() {
+        RetrofitService.getWayMapsService().getReport(procedure.getAction(), procedure.getName(),
+                procedure.getIdentficator(), procedure.getFormat(), procedure.getParams()).enqueue(new Callback<Report[]>() {
             @Override
             public void onResponse(Call<Report[]> call, Response<Report[]> response) {
                 Report[] reports = response.body();
-                if (reports.length ==0){
+                if (reports.length == 0) {
                     Toast toast = Toast.makeText(getContext(),
                             getResources().getString(R.string.somethin_went_wrong),
                             Toast.LENGTH_SHORT);
                     toast.setGravity(Gravity.CENTER, 0, 0);
                     toast.show();
-                } else{
+                } else {
                     report = reports[0];
-                    //todo change
-
-                    //
-                    ReportDialog reportDialog = new ReportDialog(getContext(),authorizedUser,getCurrent,tracker,report,trackCount,dateFromD,dateToD);
-                    reportDialog.getWindow().setLayout((int) (SystemUtil.getIntWidth(getActivity())*0.9), (int) (SystemUtil.getIntHeight(getActivity())*0.9));
-                    reportDialog.show();
                 }
             }
 
@@ -236,10 +235,7 @@ public class HistoryFragment extends AbstractFragment {
                 toast.show();
             }
         });
-
-
     }
-
 
     @OnClick(R.id.date_from)
     protected void dateFromOnClick() {
@@ -247,38 +243,39 @@ public class HistoryFragment extends AbstractFragment {
     }
 
     @OnClick(R.id.history_calculate)
-    protected void calculate(){
+    protected void calculate() {
         Procedure procedure = new Procedure(Action.CALL);
         //todo change
-        Parameter parameter = new IdParam(getCurrent.getId() );
+        Parameter parameter = new IdParam(getCurrent.getId());
         //
-        StartEndDate startEndDate = new StartEndDate(new GregorianCalendar(year_from,month_from,day_from,hour_from,minute_from).getTime(),
-                new GregorianCalendar(year_to,month_to,day_to,hour_to,minute_to).getTime());
-        Parameter parameters= new ComplexParameters(parameter,startEndDate);
+        StartEndDate startEndDate = new StartEndDate(new GregorianCalendar(year_from, month_from, day_from, hour_from, minute_from).getTime(),
+                new GregorianCalendar(year_to, month_to, day_to, hour_to, minute_to).getTime());
+        Parameter parameters = new ComplexParameters(parameter, startEndDate);
         procedure.setUser_id(authorizedUser.getId());
         procedure.setName(Action.TRACK_COUNT);
         procedure.setIdentficator(SystemUtil.getWifiMAC(getActivity()));
         procedure.setFormat(WayMapsService.DEFAULT_FORMAT);
         procedure.setParams(parameters.getParameters());
-        RetrofitService.getWayMapsService().getTrackCount(procedure.getAction(),procedure.getName(),
-                procedure.getIdentficator(),procedure.getFormat(),procedure.getParams()).enqueue(new Callback<TrackCount[]>() {
+        RetrofitService.getWayMapsService().getTrackCount(procedure.getAction(), procedure.getName(),
+                procedure.getIdentficator(), procedure.getFormat(), procedure.getParams()).enqueue(new Callback<TrackCount[]>() {
             @Override
             public void onResponse(Call<TrackCount[]> call, Response<TrackCount[]> response) {
                 TrackCount[] trackCounts = response.body();
-                if (trackCounts.length ==0){
+                if (trackCounts.length == 0) {
                     Toast toast = Toast.makeText(getContext(),
                             getResources().getString(R.string.somethin_went_wrong),
                             Toast.LENGTH_SHORT);
                     toast.setGravity(Gravity.CENTER, 0, 0);
                     toast.show();
-                } else{
-                    if (trackCounts[0].getOdo()!=null){
+                } else {
+                    if (trackCounts[0].getOdo() != null) {
                         trackCount = trackCounts[0];
                         String distanceKm = new DecimalFormat("0.0").format(
-                                Double.parseDouble(trackCounts[0].getOdo())/1000);
-                        distance.setText(distanceKm + " " +  getString(R.string.km));
+                                Double.parseDouble(trackCounts[0].getOdo()) / 1000);
+                        distance.setText(distanceKm + " " + getString(R.string.km));
                         historyCalculateView.setVisibility(View.GONE);
                         hisoryShowInfoView.setVisibility(View.VISIBLE);
+                        loadReport();
                     } else {
                         distance.setText("0.0 " + getString(R.string.km));
                         Toast toast = Toast.makeText(getContext(),
@@ -307,14 +304,14 @@ public class HistoryFragment extends AbstractFragment {
         showDialog(DIALOG_DATE_TO);
     }
 
-    private void updateButtonText(){
-        String message = (hour_to<10?"0":"") + hour_to  + ":" + (minute_to<10?"0":"")  + minute_to + " " +
-                (day_to<10?"0":"") + day_to + "."+ ((month_to+1)<10?"0":"") + (month_to+1) + "." + year_to;
+    private void updateButtonText() {
+        String message = (hour_to < 10 ? "0" : "") + hour_to + ":" + (minute_to < 10 ? "0" : "") + minute_to + " " +
+                (day_to < 10 ? "0" : "") + day_to + "." + ((month_to + 1) < 10 ? "0" : "") + (month_to + 1) + "." + year_to;
         dateTo.setText(message);
-        message = (hour_from<10?"0":"") + hour_from + ":" + (minute_from<10?"0":"") +  minute_from + " " +
-                (day_from<10?"0":"") + day_from + "."+ ((month_from+1)<10?"0":"") + (month_from+1) + "." + year_from;
-        dateToD = new GregorianCalendar(year_to,month_to,day_to,hour_to,minute_to).getTime();
-        dateFromD = new GregorianCalendar(year_from,month_from,day_from,hour_from,minute_from).getTime();
+        message = (hour_from < 10 ? "0" : "") + hour_from + ":" + (minute_from < 10 ? "0" : "") + minute_from + " " +
+                (day_from < 10 ? "0" : "") + day_from + "." + ((month_from + 1) < 10 ? "0" : "") + (month_from + 1) + "." + year_from;
+        dateToD = new GregorianCalendar(year_to, month_to, day_to, hour_to, minute_to).getTime();
+        dateFromD = new GregorianCalendar(year_from, month_from, day_from, hour_from, minute_from).getTime();
         dateFrom.setText(message);
         distance.setText("");
         historyCalculateView.setVisibility(View.VISIBLE);

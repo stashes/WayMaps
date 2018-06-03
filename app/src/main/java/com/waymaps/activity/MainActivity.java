@@ -339,7 +339,7 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-    private void showTicketList() {
+    public void showTicketList() {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.addToBackStack("ticketList");
         currentFragment = new TicketListFragment();

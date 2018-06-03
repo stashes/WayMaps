@@ -181,6 +181,23 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/history_limit_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:orientation="horizontal">
+
+            <TextView
+                style="@style/HistoryLabel"
+                android:text="@string/hist_speed_limit" />
+
+            <TextView
+                android:id="@+id/history_limit"
+                style="@style/HistoryLabel"
+                android:text="1 minute" />
+        </LinearLayout>
+
+        <LinearLayout
             android:id="@+id/history_parkingcount_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -196,6 +213,5 @@
                 style="@style/HistoryLabel"
                 android:text="1 minute" />
         </LinearLayout>
-
     </LinearLayout>
 </LinearLayout>

@@ -13,17 +13,29 @@ public class TicketList {
     private String tracker_id;
     private String tracker_title;
     private String text;
+    private String unread;
 
     public TicketList() {
     }
 
-    public TicketList(String id, String created_date, String tracker_id, String tracker_title, String text) {
+
+    public TicketList(String id, String created_date, String tracker_id, String tracker_title, String text, String unread) {
         this.id = id;
         this.created_date = created_date;
         this.tracker_id = tracker_id;
         this.tracker_title = tracker_title;
         this.text = text;
+        this.unread = unread;
     }
+
+    public String getUnread() {
+        return unread;
+    }
+
+    public void setUnread(String unread) {
+        this.unread = unread;
+    }
+
     @JsonGetter("id")
     public String getId() {
         return id;

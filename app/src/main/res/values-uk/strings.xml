@@ -60,7 +60,8 @@
     <string name="record_not_found">Не знайдено записів</string>
     <string name="state">Статус</string>
     <string name="actual">Актуальність</string>
-    <string name="stop">Зупинка</string>
+    <string name="stop">Стоянка</string>
+    <string name="mini_stop">Зупинка</string>
     <string name="speed">Швидкість</string>
     <string name="ignition">Запалювання</string>
     <string name="engine">Двигун</string>
@@ -152,5 +153,7 @@
     <string name="continues">Триває</string>
     <string name="hist_parking_count">Всього зупинок:</string>
     <string name="hist_max_speed">Макс. швидкість:</string>
+    <string name="hist_speed_limit">Встановлений ліміт швидкості:</string>
+    <string name="hist_fuelexpense">Питома витрата:</string>
 
 </resources>

@@ -1,5 +1,7 @@
 package com.waymaps.fragment;
 
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -23,6 +25,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.LinearInterpolator;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -248,6 +253,20 @@ public class GMapFragment extends AbstractFragment implements OnMapReadyCallback
     @BindView(R.id.map_container)
     View mapContainer;
 
+    @BindView(R.id.group_view)
+    LinearLayout groupButtonView;
+
+    @BindView(R.id.group)
+    ImageView group;
+
+    @BindView(R.id.menu)
+    ImageView menu;
+
+    @BindView(R.id.message)
+    ImageView message;
+
+
+
     BottomSheetBehavior sheetBehavior;
 
     BottomSheetBehavior sheetBehaviorCar;
@@ -338,6 +357,9 @@ public class GMapFragment extends AbstractFragment implements OnMapReadyCallback
     }
 
     private void addSearchGroup() {
+        menu.setImageBitmap(ApplicationUtil.drawToBitmap(getResources().getDrawable(R.drawable.ic_menu)
+                ,getResources().getColor(R.color.light_blue_tr), PorterDuff.Mode.SRC_IN));
+
         if (MainActivity.isGroupAvaible == true) {
             Procedure procedure = new Procedure(Action.CALL);
             procedure.setFormat(WayMapsService.DEFAULT_FORMAT);
@@ -394,6 +416,27 @@ public class GMapFragment extends AbstractFragment implements OnMapReadyCallback
             yourdrawable.setColorFilter(getResources().getColor(R.color.light_blue), PorterDuff.Mode.SRC_IN);
             carGroupExit.setImageBitmap(ApplicationUtil.drawToBitmap(getResources().getDrawable(R.drawable.ic_exit)
                     , getResources().getColor(R.color.colorAccent)));
+            this.group.setImageBitmap(ApplicationUtil.drawToBitmap(getResources().getDrawable(R.drawable.group_ic)
+                    , getResources().getColor(R.color.light_blue_tr), PorterDuff.Mode.MULTIPLY));
+            groupButtonView.setVisibility(View.VISIBLE);
+
+        }
+
+        if ( true/*(!"0".equals(authorizedUser.getUnread_ticket()) && authorizedUser.getUnread_ticket()!=null)
+                && ("1".equals(authorizedUser.getManager()) || "1".equals(authorizedUser.getDiler()))*/){
+            message.setImageBitmap(ApplicationUtil.drawToBitmap(getResources().getDrawable(R.drawable.ic_mail)
+                    ,getResources().getColor(R.color.light_blue), PorterDuff.Mode.SRC_IN));
+
+            message.setVisibility(View.VISIBLE);
+
+            ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(message,View.ALPHA,1,0);
+            objectAnimator.setRepeatCount(Animation.INFINITE);
+            objectAnimator.setRepeatMode(Animation.REVERSE);
+            objectAnimator.setDuration(2500);
+            objectAnimator.setInterpolator(new LinearInterpolator());
+            AnimatorSet animatorSet = new AnimatorSet();
+            animatorSet.playTogether(objectAnimator);
+            animatorSet.start();
         }
     }
 
@@ -842,7 +885,7 @@ public class GMapFragment extends AbstractFragment implements OnMapReadyCallback
                 historyFragment.setArguments(bundle);
                 FragmentTransaction ft = getFragmentManager().beginTransaction();
                 ft.addToBackStack(this.getClass().getName());
-/*                ft.replace(R.id.content_main, historyFragment);*/
+                /*                ft.replace(R.id.content_main, historyFragment);*/
                 ft.add(R.id.content_main, historyFragment);
                 ft.hide(GMapFragment.this);
                 ft.commit();
@@ -1192,5 +1235,21 @@ public class GMapFragment extends AbstractFragment implements OnMapReadyCallback
             drawerSecond.getDrawerLayout().setDrawerLockMode(DrawerLayout.LOCK_MODE_UNDEFINED);
         }
         super.onResume();
+    }
+
+    @OnClick(R.id.menu)
+    public void onMenuClick(){
+        ((MainActivity) getActivity()).getDrawer().openDrawer(Gravity.LEFT);
+    }
+
+    @OnClick(R.id.message)
+    public void onMessageClick(){
+        ((MainActivity) getActivity()).showTicketList();
+    }
+
+    @OnClick(R.id.group)
+    public void onGroupClick(){
+        if (drawerSecond != null)
+            drawerSecond.openDrawer();
     }
 }

@@ -9,7 +9,6 @@
         android:layout_height="wrap_content">
 
         <ImageView
-            android:id="@+id/ticket_mail"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_marginLeft="10dp"
@@ -46,7 +45,6 @@
         android:layout_height="match_parent"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
-        android:maxHeight="65dp"
         android:text="Текст ще інша пренша претензія клієнта до роботи цього обладнання. Розраховувати так. щоб було нтензія клієнта до роботи цього обладнання. Розраховувати так. щоб було на три рядки максимум, а все інше не показувати, обривати"
         android:textColor="#FF000000"
         android:textSize="17dp"></TextView>

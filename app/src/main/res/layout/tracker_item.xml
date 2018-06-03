@@ -11,8 +11,9 @@
         android:layout_height="50dp">
         <ImageView
             android:id="@+id/gmailitem_letter"
-            android:layout_width="50dp"
-            android:layout_height="50dp" />
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:padding="8dp"/>
         <TextView
             android:textColor="@color/black"
             android:layout_marginLeft="15dp"

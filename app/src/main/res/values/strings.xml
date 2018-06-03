@@ -159,5 +159,7 @@
     <string name="hist_max_speed">Max speed:</string>
     <string name="hist_parking_count">Parking count:</string>
     <string name="hist_fuelexpense">Fuel consumption:</string>
+    <string name="mini_stop">Stop</string>
+    <string name="hist_speed_limit">Set speed limit:</string>
 
 </resources>

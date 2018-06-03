@@ -126,6 +126,7 @@ public class TicketListFragment extends AbstractFragment implements AdapterView.
             public void onResponse(Call<TicketList[]> call, Response<TicketList[]> response) {
                 ticketList = response.body();
                 populateTable();
+                ((MainActivity) getActivity()).authorisedUser.setUnread_ticket("0");
                 showProgress(false , content , progressBar);
 
             }

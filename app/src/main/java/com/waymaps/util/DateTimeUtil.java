@@ -68,6 +68,11 @@ public class DateTimeUtil {
                 (diffSeconds == 0 ? "" : (diffSeconds + context.getResources().getString(R.string.second))));
     }
 
+    public static long getDiffInMinutes(Date date1, Date date2){
+        long diff = (date1.getTime() - date2.getTime());
+        return  (diff / (60 * 1000));
+    }
+
     public static String longToStringDate(long diff,Context context){
         long diffSeconds = diff  % 60;
         long diffMinutes = diff / (60 ) % 60;

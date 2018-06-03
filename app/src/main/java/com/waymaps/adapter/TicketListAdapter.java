@@ -1,15 +1,19 @@
 package com.waymaps.adapter;
 
 import android.content.Context;
+import android.graphics.PorterDuff;
+import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.waymaps.R;
 import com.waymaps.data.responseEntity.TicketList;
 import com.waymaps.data.responseEntity.TrackerList;
+import com.waymaps.util.ApplicationUtil;
 
 import java.util.List;
 
@@ -34,6 +38,8 @@ public class TicketListAdapter extends BaseAdapter {
     @BindView(R.id.ticketMessage)
     TextView ticketMessage;
 
+    @BindView(R.id.ticket_mail)
+    ImageView ticketMail;
 //    @BindView(R.id.ticketReadDate)
 //    TextView ticketReadDate;
 
@@ -68,6 +74,16 @@ public class TicketListAdapter extends BaseAdapter {
         }
         ButterKnife.bind(this,view);
         TicketList ticket = getTicketList(position);
+        if ("1".equals(ticket.getUnread())){
+            ticketMail.setImageBitmap(ApplicationUtil.drawToBitmap(context.getResources().getDrawable(R.drawable.ic_mail)
+                    , context.getResources().getColor(R.color.light_blue)
+                    , PorterDuff.Mode.SRC_IN));
+            ticketMessage.setTypeface(null, Typeface.BOLD);
+        } else {
+            ticketMail.setImageBitmap(ApplicationUtil.drawToBitmap(context.getResources().getDrawable(R.drawable.mail_open_ic)
+                    , context.getResources().getColor(R.color.light_blue)
+                    , PorterDuff.Mode.SRC_IN));
+        }
         ticketDate.setText(ticket.getCreated_date());
         ticketUsr.setText(ticket.getTracker_title());
         ticketMessage.setText(ticket.getText());
