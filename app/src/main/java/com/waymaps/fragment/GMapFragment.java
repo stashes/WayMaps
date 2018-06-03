@@ -422,8 +422,8 @@ public class GMapFragment extends AbstractFragment implements OnMapReadyCallback
 
         }
 
-        if ( true/*(!"0".equals(authorizedUser.getUnread_ticket()) && authorizedUser.getUnread_ticket()!=null)
-                && ("1".equals(authorizedUser.getManager()) || "1".equals(authorizedUser.getDiler()))*/){
+        if ( (!"0".equals(authorizedUser.getUnread_ticket()) && authorizedUser.getUnread_ticket()!=null)
+                && ("1".equals(authorizedUser.getManager()) || "1".equals(authorizedUser.getDiler()))){
             message.setImageBitmap(ApplicationUtil.drawToBitmap(getResources().getDrawable(R.drawable.ic_mail)
                     ,getResources().getColor(R.color.light_blue), PorterDuff.Mode.SRC_IN));
 
@@ -571,7 +571,7 @@ public class GMapFragment extends AbstractFragment implements OnMapReadyCallback
                 String marker = getCurrents.get(i).getMarker();
                 String color = getCurrents.get(i).getColor();
 
-                Bitmap markerIcon = ApplicationUtil.pickImage(getContext(), speed, marker, color);
+                Bitmap markerIcon = ApplicationUtil.pickImage(getContext(), speed, getCurrents.get(i).getLast_parking_start(),marker, color);
                 if (speed > 5) {
                     float vector = 0;
                     if (getCurrents.get(i).getVector() != null) {
@@ -908,9 +908,10 @@ public class GMapFragment extends AbstractFragment implements OnMapReadyCallback
             currentMarker.setVisible(true);
             filterCar.setImageBitmap(ApplicationUtil.drawToBitmap(getResources().getDrawable(R.drawable.filterpicked)));
         } else {
-            /*for (Marker m : markers) {
+            for (Marker m : markers) {
+                if (pickedGroup == null || pickedGroup.getId().equals(((GetCurrent)m.getTag()).getGroup_id()))
                 m.setVisible(true);
-            }*/
+            }
             filterCar.setImageBitmap(ApplicationUtil.drawToBitmap(getResources().getDrawable(R.drawable.filter), Color.GRAY));
         }
     }

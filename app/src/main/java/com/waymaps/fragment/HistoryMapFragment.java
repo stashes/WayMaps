@@ -458,7 +458,7 @@ public class HistoryMapFragment extends AbstractFragment {
     private void makeMarkerVisible(boolean visibility) {
         if (currentMarkerVisibility != visibility) {
             for (Marker marker : markers) {
-                if (marker != markers[0] || marker != markers[markers.length-1])
+                if (marker != markers[0] && marker != markers[markers.length-1])
                 marker.setVisible(visibility);
             }
             currentMarkerVisibility = visibility;
@@ -568,7 +568,7 @@ public class HistoryMapFragment extends AbstractFragment {
         String dateFrom = tag.getStart_date();
         if (dateFrom != null) {
             try {
-                parkingFrom.setText(DateTimeUtil.toBottomSheetFormat(dateFrom.substring(0,dateFrom.length()-3)));
+                parkingFrom.setText(DateTimeUtil.toBottomSheetFormat(dateFrom));
             } catch (ParseException e) {
                 parkingFrom.setText("");
             }
@@ -578,7 +578,7 @@ public class HistoryMapFragment extends AbstractFragment {
         String dateTo = tag.getEnd_date();
         if (dateTo != null) {
             try {
-                parkingTo.setText(DateTimeUtil.toBottomSheetFormat(dateTo.substring(0,dateTo.length()-3)));
+                parkingTo.setText(DateTimeUtil.toBottomSheetFormat(dateTo));
             } catch (ParseException e) {
                 parkingTo.setText("");
             }
@@ -760,15 +760,16 @@ public class HistoryMapFragment extends AbstractFragment {
             layout.historyDistance.setText("-");
         }
 
-        if ((d1 != -1) &&(d2 != -1)&&(b1 != -1)&&(b2 != -1)){
+        if ((d1 != -1) &&(d2 != -1)&&(b1 != -1)&&(b2 != -1)) {
             try {
-                layout.fuelExpense.setText((((b1 - b2) / 10) * 100) / ((d1-d2)/1000) + " " + getResources().getString(R.string.l) +
-                "/"+"100" + getResources().getString(R.string.km));
+                layout.fuelExpense.setText(new DecimalFormat("0.0").format((((b1 - b2) / 10) * 100) / ((d1 - d2) / 1000)) + " " + getResources().getString(R.string.l) +
+                        "/" + "100" + getResources().getString(R.string.km));
                 layout.fuelExpenseView.setVisibility(View.VISIBLE);
             } catch (Exception e) {
                 layout.fuelExpenseView.setVisibility(View.GONE);
                 layout.fuelExpense.setText("-");
             }
+        }
     }
 
 
@@ -994,6 +995,11 @@ public class HistoryMapFragment extends AbstractFragment {
         super.onDestroy();
         unbindDrawables(coordinatorLayout);
         System.gc();
+    }
+
+    @OnClick(R.id.menu)
+    public void onMenuClick(){
+        ((MainActivity) getActivity()).getDrawer().openDrawer(Gravity.LEFT);
     }
 
     public void registerUpdateHandler(Handler handler) {

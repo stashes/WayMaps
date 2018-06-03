@@ -81,7 +81,7 @@ public class GetCurrentAdapter extends BaseAdapter {
         } else
             speed = 0.0;
 
-        Bitmap bitmap = ApplicationUtil.pickImage(view.getContext(), speed
+        Bitmap bitmap = ApplicationUtil.pickImage(view.getContext(), speed , getCurrent.getLast_parking_start()
                 ,getCurrent.getMarker(),getCurrent.getColor());
 
         icon.setImageBitmap(bitmap);

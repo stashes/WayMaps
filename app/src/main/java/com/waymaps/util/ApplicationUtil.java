@@ -185,9 +185,9 @@ public class ApplicationUtil {
         }
     }
 
-    public static Bitmap pickImage(Context context, double speed, String marker, String color) {
+    public static Bitmap pickImage(Context context, double speed,String lastParkingDate, String marker, String color) {
         Drawable drawable;
-        if (speed > 5) {
+        if (speed > 5 && lastParkingDate == null) {
             drawable = context.getResources().getDrawable(R.drawable.ic_marker_navigation);
         } else {
             if ("0".equals(marker)) {

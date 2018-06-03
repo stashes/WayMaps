@@ -140,7 +140,7 @@ public class MainActivity extends AppCompatActivity
 
     private void getUserFromIntent() {
         try {
-             authorisedUser = JSONUtil.getObjectMapper().readValue(getIntent().getExtras()
+            authorisedUser = JSONUtil.getObjectMapper().readValue(getIntent().getExtras()
                     .getCharSequence("user").toString(), User.class);
             logger.debug("User {} reads successfully", authorisedUser.getId());
         } catch (IOException e) {
@@ -153,9 +153,10 @@ public class MainActivity extends AppCompatActivity
         List fragmentList = getSupportFragmentManager().getFragments();
 
         boolean handled = false;
-        if (fragmentList.get(fragmentList.size()-1) instanceof AbstractFragment){
-            handled = ((AbstractFragment) fragmentList.get(fragmentList.size()-1)).onBackPressed();
-        }
+        if (fragmentList.size() != 0)
+            if (fragmentList.get(fragmentList.size() - 1) instanceof AbstractFragment) {
+                handled = ((AbstractFragment) fragmentList.get(fragmentList.size() - 1)).onBackPressed();
+            }
 
         if (!handled) {
             if (drawer.isDrawerOpen(GravityCompat.START)) {
@@ -318,7 +319,7 @@ public class MainActivity extends AppCompatActivity
         ft.commit();
     }
 
-    private void map() {
+    public void map() {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         currentFragment = new GMapFragment();
         try {
@@ -451,10 +452,10 @@ public class MainActivity extends AppCompatActivity
 
                 double bal = 0;
 
-                if (finGets == null){
+                if (finGets == null) {
                     finGets = new FinGet[0];
                 }
-                if (finGets.length == 0){
+                if (finGets.length == 0) {
                     bal = 0;
                 } else {
                     bal = new Double(finGets[0].getBalance());
@@ -469,7 +470,7 @@ public class MainActivity extends AppCompatActivity
 
                 if (bal > 0) {
                     html2 = "<font color=#12b90f>" + saldo + "</font>";
-                }else if (bal == 0) {
+                } else if (bal == 0) {
                     html2 = "<font>" + saldo + "</font>";
                 } else {
                     html2 = "<font color=#e11a24>" + saldo + "</font>";

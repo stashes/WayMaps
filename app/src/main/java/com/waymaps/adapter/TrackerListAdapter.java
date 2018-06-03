@@ -74,7 +74,7 @@ public class TrackerListAdapter extends BaseAdapter {
         TrackerList tracker = getTrackerList(position);
         String marker = tracker.getMarker();
         String color = tracker.getColor();
-        Bitmap bitmap = ApplicationUtil.pickImage(context, 0, marker, color);
+        Bitmap bitmap = ApplicationUtil.pickImage(context, 0,null, marker, color);
         imageView.setImageBitmap(bitmap);
         trackerName.setText(tracker.getTitle());
         return view;

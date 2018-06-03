@@ -223,6 +223,8 @@ public class HistoryFragment extends AbstractFragment {
                     toast.show();
                 } else {
                     report = reports[0];
+                    historyCalculateView.setVisibility(View.GONE);
+                    hisoryShowInfoView.setVisibility(View.VISIBLE);
                 }
             }
 
@@ -273,8 +275,6 @@ public class HistoryFragment extends AbstractFragment {
                         String distanceKm = new DecimalFormat("0.0").format(
                                 Double.parseDouble(trackCounts[0].getOdo()) / 1000);
                         distance.setText(distanceKm + " " + getString(R.string.km));
-                        historyCalculateView.setVisibility(View.GONE);
-                        hisoryShowInfoView.setVisibility(View.VISIBLE);
                         loadReport();
                     } else {
                         distance.setText("0.0 " + getString(R.string.km));

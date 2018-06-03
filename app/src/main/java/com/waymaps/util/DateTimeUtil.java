@@ -47,7 +47,7 @@ public class DateTimeUtil {
     }
 
     public static String toBottomSheetFormat(String date) throws ParseException {
-        return dateToStringForHistory(stringToDate(date,dateFormatHistory));
+        return dateToStringForHistory(stringToDate(date,dateFormat));
     }
 
 
