@@ -2,6 +2,8 @@ package com.waymaps;
 
 import org.junit.Test;
 
+import java.text.DecimalFormat;
+
 import static org.junit.Assert.*;
 
 /**
@@ -12,6 +14,7 @@ import static org.junit.Assert.*;
 public class ExampleUnitTest {
     @Test
     public void addition_isCorrect() throws Exception {
+        System.out.println(new DecimalFormat("0.0").format(43.4324));
         assertEquals(4, 2 + 2);
     }
 }

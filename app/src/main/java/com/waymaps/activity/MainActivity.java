@@ -1,12 +1,14 @@
 package com.waymaps.activity;
 
 import android.app.ActivityManager;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.IntentCompat;
 import android.text.Html;
 import android.view.Gravity;
 import android.support.design.widget.NavigationView;
@@ -39,6 +41,7 @@ import com.waymaps.fragment.GMapFragment;
 import com.waymaps.fragment.GetCurrentFragment;
 import com.waymaps.fragment.GroupFragment;
 import com.waymaps.fragment.HistoryFragment;
+import com.waymaps.fragment.HistoryMapFragment;
 import com.waymaps.fragment.TicketListFragment;
 import com.waymaps.intent.LoginActivityIntent;
 import com.waymaps.intent.SessionUpdateServiceIntent;
@@ -66,7 +69,10 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     Logger logger = LoggerFactory.getLogger(this.getClass());
 
+    public static volatile boolean blinkMessageIcon = true;
+
     public static User authorisedUser;
+
     public static Fragment currentFragment;
 
     public static Boolean isGroupAvaible;
@@ -87,11 +93,25 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        if (getIntent().getBooleanExtra("EXIT", false)) {
+            LogoutCredentials logoutCredentials = getLogoutCredential();
+            RetrofitService.getWayMapsService().logoutProcedure(logoutCredentials.getAction(), logoutCredentials.getUserId(),
+                    logoutCredentials.getIdentificator()).enqueue(new Callback<Void>() {
+                @Override
+                public void onResponse(Call<Void> call, Response<Void> response) {
+
+                }
+
+                @Override
+                public void onFailure(Call<Void> call, Throwable t) {
+
+                }
+            });
+            //finish();
+            System.exit(0);
+        }
         super.onCreate(savedInstanceState);
 
-        if (getIntent().getBooleanExtra("EXIT", false)) {
-            finish();
-        }
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         getUserFromIntent();
@@ -140,9 +160,12 @@ public class MainActivity extends AppCompatActivity
 
     private void getUserFromIntent() {
         try {
-            authorisedUser = JSONUtil.getObjectMapper().readValue(getIntent().getExtras()
-                    .getCharSequence("user").toString(), User.class);
-            logger.debug("User {} reads successfully", authorisedUser.getId());
+            if (getIntent().getExtras()
+                    .getCharSequence("user")!=null) {
+                authorisedUser = JSONUtil.getObjectMapper().readValue(getIntent().getExtras()
+                        .getCharSequence("user").toString(), User.class);
+                logger.debug("User {} reads successfully", authorisedUser.getId());
+            }
         } catch (IOException e) {
             logger.debug("Something went wrong while try to parse user");
         }
@@ -170,10 +193,14 @@ public class MainActivity extends AppCompatActivity
                         a.addCategory(Intent.CATEGORY_HOME);
                         a.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(a);*/
-                        Intent intent = new Intent(this, MainActivity.class);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        intent.putExtra("EXIT", true);
-                        startActivity(intent);
+
+                        Intent a = new Intent(getApplicationContext(), MainActivity.class);
+                        ComponentName cn = a.getComponent();
+                        Intent mainIntent = Intent.makeRestartActivityTask(cn);
+                        mainIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        mainIntent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                        mainIntent.putExtra("EXIT", true);
+                        startActivity(mainIntent);
                     } else {
                         ApplicationUtil.showToast(this, getString(R.string.press_one_more_time));
                         doubleTap = true;
@@ -273,17 +300,21 @@ public class MainActivity extends AppCompatActivity
 
 
     private void chooseProvider() {
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        currentFragment = new ChooseMapTypeFragment();
-        try {
-            currentFragment.setArguments(ApplicationUtil.setValueToBundle
-                    (new Bundle(), "user", authorisedUser));
-        } catch (JsonProcessingException e) {
-            logger.error("Error writing user {}", authorisedUser.toString());
+        if (currentFragment instanceof GMapFragment || currentFragment instanceof HistoryMapFragment) {
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            currentFragment = new ChooseMapTypeFragment();
+            try {
+                currentFragment.setArguments(ApplicationUtil.setValueToBundle
+                        (new Bundle(), "user", authorisedUser));
+            } catch (JsonProcessingException e) {
+                logger.error("Error writing user {}", authorisedUser.toString());
+            }
+            ft.replace(R.id.content_main, currentFragment);
+            ft.addToBackStack(null);
+            ft.commit();
+        } else {
+            ApplicationUtil.showToast(getApplicationContext(), getResources().getString(R.string.map_screen_should_be_chosen));
         }
-        ft.replace(R.id.content_main, currentFragment);
-        ft.addToBackStack(null);
-        ft.commit();
     }
 
     private void saveLocation() {
@@ -328,15 +359,16 @@ public class MainActivity extends AppCompatActivity
         } catch (JsonProcessingException e) {
             logger.error("Error writing user {}", authorisedUser.toString());
         }
-        if (firstLaunch) {
-            getSupportFragmentManager().popBackStackImmediate();
-        } else if (!firstLaunch) {
-            ft.addToBackStack(null);
-        }
         ft.replace(R.id.content_main, currentFragment);
         firstLaunch = false;
         ft.commit();
-
+        for (Fragment fragment : getSupportFragmentManager().getFragments()) {
+            if (fragment != null) {
+                getSupportFragmentManager().beginTransaction().remove(fragment).commit();
+            }
+        }
+        while (getSupportFragmentManager().getBackStackEntryCount() > 0)
+            getSupportFragmentManager().popBackStackImmediate();
 
     }
 
@@ -465,7 +497,7 @@ public class MainActivity extends AppCompatActivity
                 String html2 = null;
                 String saldo = null;
                 String text = getResources().getString(R.string.balance) + ": ";
-                saldo = new DecimalFormat("#,###.00").format(bal) + " " + getString(R.string.uah);
+                saldo = new DecimalFormat("#,##0.00").format(bal) + " " + getString(R.string.uah);
                 html1 = "<font>" + text + "</font>";
 
                 if (bal > 0) {

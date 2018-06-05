@@ -62,10 +62,10 @@ public class DateTimeUtil {
         long diffHours = diff / (60 * 60 * 1000) % 24;
         long diffDays = diff / (24 * 60 * 60 * 1000) % 1000;
 
-        return new String((diffDays == 0 ? "" : (diffDays + context.getResources().getString(R.string.day) + " ")) +
-                (diffHours == 0 ? "" : (diffHours + context.getResources().getString(R.string.hour) + " ")) +
-                (diffMinutes == 0 ? "" : (diffMinutes + context.getResources().getString(R.string.minute) + " ")) +
-                (diffSeconds == 0 ? "" : (diffSeconds + context.getResources().getString(R.string.second))));
+        return new String((diffDays == 0 ? "" : (diffDays + context.getResources().getString(R.string.day))) +
+                (diffHours == 0 ? "" : (" " + diffHours + context.getResources().getString(R.string.hour) )) +
+                (diffMinutes == 0 ? "" : (" " + diffMinutes + context.getResources().getString(R.string.minute))) +
+                (diffSeconds == 0 ? "" : (" " + diffSeconds + context.getResources().getString(R.string.second))));
     }
 
     public static long getDiffInMinutes(Date date1, Date date2){
@@ -79,18 +79,18 @@ public class DateTimeUtil {
         long diffHours = diff / (60 * 60 ) % 24;
         long diffDays = diff / (24 * 60 * 60 ) % 1000;
 
-        return new String((diffDays == 0 ? "" : (diffDays + context.getResources().getString(R.string.day) + " ")) +
-                (diffHours == 0 ? "" : (diffHours + context.getResources().getString(R.string.hour) + " ")) +
-                (diffMinutes == 0 ? "" : (diffMinutes + context.getResources().getString(R.string.minute) + " ")) +
-                (diffSeconds == 0 ? "" : (diffSeconds + context.getResources().getString(R.string.second))));
+        return new String((diffDays == 0 ? "" : (diffDays + context.getResources().getString(R.string.day))) +
+                (diffHours == 0 ? "" : (" " + diffHours + context.getResources().getString(R.string.hour))) +
+                (diffMinutes == 0 ? "" : (" " + diffMinutes + context.getResources().getString(R.string.minute))) +
+                (diffSeconds == 0 ? "" : (" " + diffSeconds + context.getResources().getString(R.string.second))));
     }
     public static String longMinToStringDate(long diff,Context context){
         long diffMinutes = diff % 60;
         long diffHours = diff / (60) % 24;
         long diffDays = diff / (24 * 60 ) % 1000;
 
-        return new String((diffDays == 0 ? "" : (diffDays + context.getResources().getString(R.string.day) + " ")) +
-                (diffHours == 0 ? "" : (diffHours + context.getResources().getString(R.string.hour) + " ")) +
-                (diffMinutes == 0 ? "" : (diffMinutes + context.getResources().getString(R.string.minute) + " ")));
+        return new String((diffDays == 0 ? "" : (diffDays + context.getResources().getString(R.string.day))) +
+                (diffHours == 0 ? "" : (" " + diffHours + context.getResources().getString(R.string.hour))) +
+                (diffMinutes == 0 ? "" : (" " + diffMinutes + context.getResources().getString(R.string.minute))));
     }
 }

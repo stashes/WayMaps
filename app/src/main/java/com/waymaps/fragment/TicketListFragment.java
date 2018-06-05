@@ -126,7 +126,7 @@ public class TicketListFragment extends AbstractFragment implements AdapterView.
             public void onResponse(Call<TicketList[]> call, Response<TicketList[]> response) {
                 ticketList = response.body();
                 populateTable();
-                ((MainActivity) getActivity()).authorisedUser.setUnread_ticket("0");
+                ((MainActivity) getActivity()).blinkMessageIcon = false;
                 showProgress(false , content , progressBar);
 
             }
@@ -142,7 +142,7 @@ public class TicketListFragment extends AbstractFragment implements AdapterView.
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
         ArrayList list = new ArrayList<>(Arrays.asList(ticketList));
         TicketList item = (TicketList) list.get(i);
-        goToGetTicketFragment(Integer.parseInt(item.getId()));
+        goToGetTicketFragment(Integer.parseInt(item.getId()),item.getTracker_title());
 
     }
     public void populateTable() {
@@ -152,10 +152,11 @@ public class TicketListFragment extends AbstractFragment implements AdapterView.
         TicketListAdapter trackerAdapter = new TicketListAdapter(getContext(), Arrays.asList(ticketList));
         ticketListView.setAdapter(trackerAdapter);
     }
-    private void goToGetTicketFragment(int ticketId){
+    private void goToGetTicketFragment(int ticketId,String name){
         Bundle bundle = new Bundle();
         try{
             ApplicationUtil.setValueToBundle(bundle,"get_ticket_id", ticketId);
+            ApplicationUtil.setValueToBundle(bundle, "tracker_name", name);
         }catch (JsonProcessingException e){
             logger.debug("Error while trying write to bundle");
         }

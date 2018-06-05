@@ -53,11 +53,11 @@ public class BalanceFragment extends AbstractFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        super.onCreateView(inflater,container,savedInstanceState);
+        super.onCreateView(inflater, container, savedInstanceState);
         View view = inflater.inflate(R.layout.fragment_balance, container, false);
-        ButterKnife.bind(this,view);
+        ButterKnife.bind(this, view);
 
-        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
+        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
         DrawerLayout drawer = ((MainActivity) getActivity()).getDrawer();
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 getActivity(), drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -66,7 +66,8 @@ public class BalanceFragment extends AbstractFragment {
         toolbar.setTitle(fragmentName());
 
 
-        getBalance();
+        if (isAdded() && getActivity() != null)
+            getBalance();
         return view;
     }
 
@@ -81,7 +82,6 @@ public class BalanceFragment extends AbstractFragment {
     }
 
 
-
     private void getBalance() {
         Procedure procedure = new Procedure(Action.CALL);
         procedure.setFormat(WayMapsService.DEFAULT_FORMAT);
@@ -89,39 +89,43 @@ public class BalanceFragment extends AbstractFragment {
         procedure.setName(Action.FIN_GET);
         procedure.setUser_id(authorizedUser.getId());
         procedure.setParams(authorizedUser.getFirm_id());
-        showProgress(true,balanceMain,progressBar);
+        showProgress(true, balanceMain, progressBar);
         Call<FinGet[]> call = RetrofitService.getWayMapsService().finGetProcedure(procedure.getAction(), procedure.getName(),
                 procedure.getIdentficator(), procedure.getUser_id(), procedure.getFormat(), procedure.getParams());
         call.enqueue(new Callback<FinGet[]>() {
             @Override
             public void onResponse(Call<FinGet[]> call, Response<FinGet[]> response) {
-                finGets = response.body();
-                showProgress(false,balanceMain,progressBar);
-                logger.debug("Balance load successfully.");
-                populateTable();
+                if (isAdded() && getActivity() != null) {
+                    finGets = response.body();
+                    showProgress(false, balanceMain, progressBar);
+                    logger.debug("Balance load successfully.");
+                    populateTable();
+                }
             }
 
             @Override
             public void onFailure(Call<FinGet[]> call, Throwable t) {
-                showProgress(false , balanceMain,progressBar);
-                logger.debug("Failed while trying to load balance.");
+                if (isAdded() && getActivity() != null) {
+                    showProgress(false, balanceMain, progressBar);
+                    logger.debug("Failed while trying to load balance.");
+                }
             }
         });
 
     }
 
     public void populateTable() {
-        if (finGets == null){
+        if (finGets == null) {
             finGets = new FinGet[0];
         }
-        DecimalFormat decimalFormat = new DecimalFormat("#,###.00");
+        DecimalFormat decimalFormat = new DecimalFormat("#,##0.00");
         String html1 = null;
         String html2 = null;
         String saldo = null;
-        String accNo = "15" + String.format("%05d",new Integer(authorizedUser.getFirm_id()));
+        String accNo = "15" + String.format("%05d", new Integer(authorizedUser.getFirm_id()));
         String text = getResources().getString(R.string.personal_account) + " " + "№" + accNo +
                 " - " + getString(R.string.balancesmall) + " ";
-        if (finGets.length == 0){
+        if (finGets.length == 0) {
             balance = 0;
             saldo = decimalFormat.format(balance);
             saldo += " " + getString(R.string.uah);
@@ -163,7 +167,6 @@ public class BalanceFragment extends AbstractFragment {
                 TableLayout.LayoutParams.WRAP_CONTENT));
         return tv;
     }*/
-
 
 
 }

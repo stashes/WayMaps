@@ -69,7 +69,7 @@
     <string name="signal">Сигнал GSM</string>
     <string name="satellite">Супутники</string>
     <string name="volume_fuel">Пальне</string>
-    <string name="fuel_consumption">Витрата паьного</string>
+    <string name="fuel_consumption">Витрата пального</string>
     <string name="kmperhour">км/год</string>
     <string name="statusonline">Онлайн</string>
     <string name="statusoffline">Оффлайн</string>
@@ -151,9 +151,11 @@
     <string name="distance_sum">Пробіг до точки</string>
     <string name="date_time">Дата і час</string>
     <string name="continues">Триває</string>
-    <string name="hist_parking_count">Всього зупинок:</string>
+    <string name="hist_parking_count">Всього стоянок:</string>
     <string name="hist_max_speed">Макс. швидкість:</string>
     <string name="hist_speed_limit">Встановлений ліміт швидкості:</string>
     <string name="hist_fuelexpense">Питома витрата:</string>
+    <string name="create_ticket">Створення тікету</string>
+    <string name="map_screen_should_be_chosen">Екран з мапою повинен бути активним</string>
 
 </resources>

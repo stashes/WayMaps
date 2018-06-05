@@ -38,7 +38,7 @@ public class BalanceAdapter extends BaseAdapter {
     @BindView(R.id.balance_credit)
     TextView credit;
 
-    DecimalFormat decimalFormat = new DecimalFormat("#,###.00");
+    DecimalFormat decimalFormat = new DecimalFormat("#,##0.00");
 
     public BalanceAdapter(Context context, List<FinGet> finGets) {
         this.context = context;

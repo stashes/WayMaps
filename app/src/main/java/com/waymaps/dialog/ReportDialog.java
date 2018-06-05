@@ -46,12 +46,12 @@ public class ReportDialog extends Dialog {
 
     @BindView(R.id.report_date_to)
     TextView reportDateTo;
-
+/*
     @BindView(R.id.report_driver_view)
     LinearLayout reportDriverView;
 
     @BindView(R.id.report_driver)
-    TextView reportDriver;
+    TextView reportDriver;*/
 
     @BindView(R.id.report_totaltime_view)
     LinearLayout reportTotalTimeView;
@@ -173,13 +173,13 @@ public class ReportDialog extends Dialog {
             reportObject.setText("");
         }
 
-        String driver = getCurrent.getDriver();
+        /*String driver = getCurrent.getDriver();
         if (driver != null) {
             reportDriver.setText(driver);
         } else {
             reportDriver.setText("");
         }
-
+*/
         String dateF = DateTimeUtil.dateToStringForReport(dateFrom);
         if (dateF != null) {
             reportDateFrom.setText(dateF);
@@ -217,9 +217,10 @@ public class ReportDialog extends Dialog {
         }
 
         String excPer = report.getOverspeed_percent();
-        if (excPer != null) {
-            reportExcessesPercentage.setText(excPer);
-        } else {
+        try {
+            Double per = Double.parseDouble(excPer);
+            reportExcessesPercentage.setText(new DecimalFormat("0.0").format(per) + " %");
+        } catch (NumberFormatException e) {
             reportExcessesPercentage.setText("");
         }
 

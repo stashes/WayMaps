@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.waymaps.R;
@@ -46,7 +47,7 @@ public class MessageFragment extends AbstractFragment implements View.OnClickLis
     private TrackerList tracker;
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    EditText mess_person_from;
+    TextView mess_person_from;
     EditText mess_text;
     Button btn_send;
 
@@ -87,7 +88,7 @@ public class MessageFragment extends AbstractFragment implements View.OnClickLis
 
     @Override
     protected String fragmentName() {
-        return "";
+        return getResources().getString(R.string.create_ticket);
     }
 
     private void initViewElement(View view){

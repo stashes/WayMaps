@@ -223,18 +223,25 @@ public class HistoryMapFragment extends AbstractFragment {
     @BindView(R.id.menu)
     ImageView menu;
 
+    @BindView(R.id.history_engine_view)
+    LinearLayout engineView;
+
+    @BindView(R.id.history_ignition_view)
+    LinearLayout ignitionView;
+
+
     BottomSheetBehavior sheetBehavior;
 
     BasicTrackInfoLayout trackLayout;
 
     BasicTrackInfoLayout pointLayout;
 
-    static class BackButtonLayout{
+    static class BackButtonLayout {
         @BindView(R.id.back_to_all_sec)
         ImageView backToAllSec;
     }
 
-    static class BasicTrackInfoLayout{
+    static class BasicTrackInfoLayout {
         @BindView(R.id.history_burn_fuel)
         TextView historyBurnFuel;
 
@@ -268,159 +275,167 @@ public class HistoryMapFragment extends AbstractFragment {
         View rootView = inflater.inflate(R.layout.fragment_history_map, container, false);
         getAttrFromBundle();
         ButterKnife.bind(this, rootView);
-        showProgress(true,content,progres);
+        if (isAdded() && getActivity() != null) {
 
-        //customize button
-        historyShowOverSpeed.setText(tracker.getMaxspeed());
+            showProgress(true, content, progres);
 
-        limit.setText(tracker.getMaxspeed() + " " + getResources().getString(R.string.kmperhour));
-        maxSpeed.setText(report.getMax_speed() + " " + getResources().getString(R.string.kmperhour));
+            //customize button
+            historyShowOverSpeed.setText(tracker.getMaxspeed());
 
-        //Back button block
-        BackButtonLayout backButtonLayoutPoint = new BackButtonLayout();
-        BackButtonLayout backButtonLayoutParking = new BackButtonLayout();
+            limit.setText(tracker.getMaxspeed() + " " + getResources().getString(R.string.kmperhour));
+            maxSpeed.setText(report.getMax_speed() + " " + getResources().getString(R.string.kmperhour));
 
-        ButterKnife.bind(backButtonLayoutPoint,pointHistoyHeader);
-        ButterKnife.bind(backButtonLayoutParking,parkingHistoryHeader);
+            //Back button block
+            BackButtonLayout backButtonLayoutPoint = new BackButtonLayout();
+            BackButtonLayout backButtonLayoutParking = new BackButtonLayout();
 
-        View.OnClickListener backButton = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onBackPressed();
+            ButterKnife.bind(backButtonLayoutPoint, pointHistoyHeader);
+            ButterKnife.bind(backButtonLayoutParking, parkingHistoryHeader);
+
+            View.OnClickListener backButton = new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    onBackPressed();
+                }
+            };
+
+            backButtonLayoutParking.backToAllSec.setOnClickListener(backButton);
+            backButtonLayoutPoint.backToAllSec.setOnClickListener(backButton);
+
+            //Info layout block
+            pointLayout = new BasicTrackInfoLayout();
+            trackLayout = new BasicTrackInfoLayout();
+
+            ButterKnife.bind(pointLayout, pointHistoryInfo);
+            ButterKnife.bind(trackLayout, trackHistoryInfo);
+
+
+            ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+            DrawerLayout drawer = ((MainActivity) getActivity()).getDrawer();
+            ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                    getActivity(), drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+            drawer.addDrawerListener(toggle);
+            toggle.syncState();
+            ((MainActivity) getActivity()).getSupportActionBar().setTitle(fragmentName());
+
+            mapView = (MapView) rootView.findViewById(R.id.map);
+            mapView.onCreate(savedInstanceState);
+
+            mapView.onResume();
+
+            try {
+                MapsInitializer.initialize(getActivity().getApplicationContext());
+            } catch (Exception e) {
+                logger.error("Error occurs while map initializing");
             }
-        };
 
-        backButtonLayoutParking.backToAllSec.setOnClickListener(backButton);
-        backButtonLayoutPoint.backToAllSec.setOnClickListener(backButton);
+            procedure = configureProcedure();
+            mapView.getMapAsync(new OnMapReadyCallback() {
+                @Override
+                public void onMapReady(final GoogleMap googleMap) {
+                    if (isAdded() && getActivity() != null) {
+                        mMap = googleMap;
+                        TilesProvider.setTile(googleMap, getContext());
+                        mMap.setOnCameraMoveListener(new GoogleMap.OnCameraMoveListener() {
+                            @Override
+                            public void onCameraMove() {
+                                checkMarkerForVisibility();
+                            }
+                        });
+                        mMap.getUiSettings().setRotateGesturesEnabled(false);
+                        ApplicationUtil.showToast(HistoryMapFragment.this.getActivity(), getResources().getString(R.string.downloading_data));
+                        final Call<GetTrack[]> getTrack = RetrofitService.getWayMapsService().getTrack(procedure.getAction(), procedure.getName(),
+                                procedure.getIdentficator(), procedure.getFormat(), procedure.getParams());
+                        getTrack.enqueue(new Callback<GetTrack[]>() {
+                            @Override
+                            public void onResponse(Call<GetTrack[]> call, Response<GetTrack[]> response) {
+                                ApplicationUtil.showToast(HistoryMapFragment.this.getActivity(), getResources().getString(R.string.preprocessing_data));
+                                getTrackResponse = response.body();
+                                getTracks = new ArrayList<>();
+                                LatLngBounds.Builder builder = new LatLngBounds.Builder();
+                                for (GetTrack getTrack : getTrackResponse) {
+                                    if (!(getTrack.getLat() == null || getTrack.getLon() == null)) {
+                                        getTracks.add(getTrack);
+                                        builder.include(new LatLng(Double.parseDouble(getTrack.getLat())
+                                                , Double.parseDouble(getTrack.getLon())));
+                                    }
+                                }
+                                LatLngBounds build = builder.build();
+                                LatLng latLng = new LatLng(build.southwest.latitude, build.southwest.longitude + ((build.southwest.longitude - build.northeast.longitude) / 2.7));
+                                LatLngBounds latLngBounds = new LatLngBounds(latLng, build.northeast);
+                                CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(latLngBounds, SystemUtil.getIntWidth(getActivity()),
+                                        SystemUtil.getIntHeight(getActivity()), 10);
+                                googleMap.animateCamera(cu);
+                                ApplicationUtil.showToast(HistoryMapFragment.this.getActivity(), getResources().getString(R.string.draw_way));
+                                drawMarkers();
+                                fillBasicInfo(trackLayout, getTracks.get(getTracks.size() - 1));
 
-        //Info layout block
-        pointLayout = new BasicTrackInfoLayout();
-        trackLayout = new BasicTrackInfoLayout();
+                                //period
+                                String fromDate;
+                                String toDate;
+                                try {
+                                    fromDate = DateTimeUtil.dateFormatHistory.format(from);
+                                } catch (Exception e) {
+                                    fromDate = "-";
+                                }
+                                try {
+                                    toDate = DateTimeUtil.dateFormatHistory.format(to);
+                                } catch (Exception e) {
+                                    toDate = "-";
+                                }
 
-        ButterKnife.bind(pointLayout,pointHistoryInfo);
-        ButterKnife.bind(trackLayout,trackHistoryInfo);
 
+                                trackLayout.historyPeriodFrom.setText(fromDate);
+                                trackLayout.historyPeriodTo.setText(toDate);
 
-        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
-        DrawerLayout drawer = ((MainActivity) getActivity()).getDrawer();
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                getActivity(), drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.addDrawerListener(toggle);
-        toggle.syncState();
-        ((MainActivity) getActivity()).getSupportActionBar().setTitle(fragmentName());
+                                linearLayout.setVisibility(View.VISIBLE);
+                                sheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                            }
 
-        mapView = (MapView) rootView.findViewById(R.id.map);
-        mapView.onCreate(savedInstanceState);
+                            @Override
+                            public void onFailure(Call<GetTrack[]> call, Throwable t) {
+                                showProgress(false, content, progres);
+                            }
+                        });
 
-        mapView.onResume();
+                        Procedure procedureGetParking = configureGetParkingProcedure();
+                        Call<GetParking[]> getParking = RetrofitService.getWayMapsService().getParking(procedureGetParking.getAction(), procedureGetParking.getName(),
+                                procedureGetParking.getIdentficator(), procedureGetParking.getFormat(), procedureGetParking.getParams());
+                        getParking.enqueue(new Callback<GetParking[]>() {
+                            @Override
+                            public void onResponse(Call<GetParking[]> call, Response<GetParking[]> response) {
+                                getParkingResponse = response.body();
+                                getParkings = new ArrayList<>();
+                                for (GetParking getP : getParkingResponse) {
+                                    if (!(getP.getParking_lat() == null || getP.getParking_lon() == null)) {
+                                        getParkings.add(getP);
+                                    }
+                                }
+                                historyParkingCount.setText(getParkingResponse.length + " " + getResources().getString(R.string.pieces) + ".");
+                                drawParking();
+                            }
 
-        try {
-            MapsInitializer.initialize(getActivity().getApplicationContext());
-        } catch (Exception e) {
-            logger.error("Error occurs while map initializing");
+                            @Override
+                            public void onFailure(Call<GetParking[]> call, Throwable t) {
+                                showProgress(false, content, progres);
+                            }
+                        });
+
+                    }
+                }
+            });
+
+            menu.setImageBitmap(ApplicationUtil.drawToBitmap(getResources().getDrawable(R.drawable.ic_menu)
+                    , getResources().getColor(R.color.light_blue_tr), PorterDuff.Mode.SRC_IN));
+
+            sheetBehavior = BottomSheetBehavior.from(linearLayout);
+
+            historyCarName.setText(getCurrent.getTracker_title());
+            historyCarUserName.setText(getCurrent.getDriver());
+
         }
-
-        procedure = configureProcedure();
-        mapView.getMapAsync(new OnMapReadyCallback() {
-            @Override
-            public void onMapReady(final GoogleMap googleMap) {
-                mMap = googleMap;
-                TilesProvider.setTile(googleMap,getContext());
-                mMap.setOnCameraMoveListener(new GoogleMap.OnCameraMoveListener() {
-                    @Override
-                    public void onCameraMove() {
-                        checkMarkerForVisibility();
-                    }
-                });
-                mMap.getUiSettings().setRotateGesturesEnabled(false);
-                ApplicationUtil.showToast(HistoryMapFragment.this.getActivity(),getResources().getString(R.string.downloading_data));
-                final Call<GetTrack[]> getTrack = RetrofitService.getWayMapsService().getTrack(procedure.getAction(), procedure.getName(),
-                        procedure.getIdentficator(), procedure.getFormat(), procedure.getParams());
-                getTrack.enqueue(new Callback<GetTrack[]>() {
-                    @Override
-                    public void onResponse(Call<GetTrack[]> call, Response<GetTrack[]> response) {
-                        ApplicationUtil.showToast(HistoryMapFragment.this.getActivity(),getResources().getString(R.string.preprocessing_data));
-                        getTrackResponse = response.body();
-                        getTracks = new ArrayList<>();
-                        LatLngBounds.Builder builder = new LatLngBounds.Builder();
-                        for (GetTrack getTrack : getTrackResponse) {
-                            if (!(getTrack.getLat() == null || getTrack.getLon() == null)) {
-                                getTracks.add(getTrack);
-                                builder.include(new LatLng(Double.parseDouble(getTrack.getLat())
-                                        , Double.parseDouble(getTrack.getLon())));
-                            }
-                        }
-                        LatLngBounds build = builder.build();
-                        CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(build, SystemUtil.getIntWidth(getActivity()),
-                                SystemUtil.getIntHeight(getActivity()), 10);
-                        googleMap.animateCamera(cu);
-                        ApplicationUtil.showToast(HistoryMapFragment.this.getActivity(),getResources().getString(R.string.draw_way));
-                        drawMarkers();
-                        fillBasicInfo(trackLayout, getTracks.get(getTracks.size() - 1));
-
-                        //period
-                        String fromDate;
-                        String toDate;
-                        try {
-                            fromDate = DateTimeUtil.dateFormatHistory.format(from);
-                        } catch (Exception e) {
-                            fromDate = "-";
-                        }
-                        try {
-                            toDate = DateTimeUtil.dateFormatHistory.format(to);
-                        } catch (Exception e) {
-                            toDate = "-";
-                        }
-
-
-                        trackLayout.historyPeriodFrom.setText(fromDate);
-                        trackLayout.historyPeriodTo.setText(toDate);
-
-                        linearLayout.setVisibility(View.VISIBLE);
-                        sheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-                    }
-
-                    @Override
-                    public void onFailure(Call<GetTrack[]> call, Throwable t) {
-                        showProgress(false,content,progres);
-                    }
-                });
-
-                Procedure procedureGetParking = configureGetParkingProcedure();
-                Call<GetParking[]> getParking = RetrofitService.getWayMapsService().getParking(procedureGetParking.getAction(), procedureGetParking.getName(),
-                        procedureGetParking.getIdentficator(), procedureGetParking.getFormat(), procedureGetParking.getParams());
-                getParking.enqueue(new Callback<GetParking[]>() {
-                    @Override
-                    public void onResponse(Call<GetParking[]> call, Response<GetParking[]> response) {
-                        getParkingResponse = response.body();
-                        getParkings = new ArrayList<>();
-                        for (GetParking getP : getParkingResponse) {
-                            if (!(getP.getParking_lat() == null || getP.getParking_lon() == null)) {
-                                getParkings.add(getP);
-                            }
-                        }
-                        historyParkingCount.setText(getParkingResponse.length + " " + getResources().getString(R.string.pieces)+".");
-                        drawParking();
-                    }
-
-                    @Override
-                    public void onFailure(Call<GetParking[]> call, Throwable t) {
-                        showProgress(false,content,progres);
-                    }
-                });
-
-            }
-        });
-
-        menu.setImageBitmap(ApplicationUtil.drawToBitmap(getResources().getDrawable(R.drawable.ic_menu)
-                ,getResources().getColor(R.color.light_blue_tr), PorterDuff.Mode.SRC_IN));
-
-        sheetBehavior = BottomSheetBehavior.from(linearLayout);
-
-        historyCarName.setText(getCurrent.getTracker_title());
-        historyCarUserName.setText(getCurrent.getDriver());
-
         return rootView;
+
     }
 
     private Procedure configureGetParkingProcedure() {
@@ -458,8 +473,8 @@ public class HistoryMapFragment extends AbstractFragment {
     private void makeMarkerVisible(boolean visibility) {
         if (currentMarkerVisibility != visibility) {
             for (Marker marker : markers) {
-                if (marker != markers[0] && marker != markers[markers.length-1])
-                marker.setVisible(visibility);
+                if (marker != markers[0] && marker != markers[markers.length - 1])
+                    marker.setVisible(visibility);
             }
             currentMarkerVisibility = visibility;
         }
@@ -469,8 +484,8 @@ public class HistoryMapFragment extends AbstractFragment {
         int numMarkers = getTracks.size();
         markers = new Marker[numMarkers];
         Bitmap bitmap = ApplicationUtil.drawToBitmap(getResources().getDrawable(R.drawable.ic_circle_1), Color.BLACK, POINTHEIGHT, POINTWIDTH);
-        Bitmap flagStart = ApplicationUtil.drawToBitmap(getResources().getDrawable(R.drawable.accent_begin_track),FLAGSIZE,FLAGSIZE);
-        Bitmap flagEnd = ApplicationUtil.drawToBitmap(getResources().getDrawable(R.drawable.accent_end_track),FLAGSIZE,FLAGSIZE);
+        Bitmap flagStart = ApplicationUtil.drawToBitmap(getResources().getDrawable(R.drawable.marker_green), FLAGSIZE, FLAGSIZE);
+        Bitmap flagEnd = ApplicationUtil.drawToBitmap(getResources().getDrawable(R.drawable.marker_red), FLAGSIZE, FLAGSIZE);
         if (isAdded() && getActivity() != null)
             for (int i = 0; i < numMarkers; i++) {
                 markers[i] = mMap.addMarker(new MarkerOptions().position(
@@ -490,27 +505,29 @@ public class HistoryMapFragment extends AbstractFragment {
                 markers[i].setTag(getTracks.get(i));
             }
         currentMarkerVisibility = false;
-        drawWay();
-        showProgress(false,content,progres);
+        if (isAdded() && getActivity() != null) {
+            drawWay();
+            showProgress(false, content, progres);
 
 
-        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-            @Override
-            public boolean onMarkerClick(Marker marker) {
-                if (currentMarker != null) {
-                    changeMarkerToDefault();
+            mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                @Override
+                public boolean onMarkerClick(Marker marker) {
+                    if (currentMarker != null) {
+                        changeMarkerToDefault();
+                    }
+                    currentMarker = marker;
+                    if (marker.getTag() instanceof GetTrack) {
+                        onMarkerOrListViewClick(marker);
+                        changeView(POINT);
+                    } else {
+                        onParkingClick(marker);
+                        changeView(PARKING);
+                    }
+                    return true;
                 }
-                currentMarker = marker;
-                if (marker.getTag() instanceof GetTrack) {
-                    onMarkerOrListViewClick(marker);
-                    changeView(POINT);
-                } else {
-                    onParkingClick(marker);
-                    changeView(PARKING);
-                }
-                return true;
-            }
-        });
+            });
+        }
     }
 
     private void drawWay() {
@@ -564,7 +581,7 @@ public class HistoryMapFragment extends AbstractFragment {
         GetParking tag = (GetParking) marker.getTag();
         currentMarker.setIcon(BitmapDescriptorFactory.fromBitmap(
                 ApplicationUtil.drawToBitmap(getResources().getDrawable(R.drawable.park2)
-                        ,(int) (PARKINGHEIGHT*1.5), (int)(PARKINGWIDTH*1.5))));
+                        , (int) (PARKINGHEIGHT * 1.5), (int) (PARKINGWIDTH * 1.5))));
         String dateFrom = tag.getStart_date();
         if (dateFrom != null) {
             try {
@@ -587,7 +604,7 @@ public class HistoryMapFragment extends AbstractFragment {
 
         String duration = tag.getDuration();
         if (duration != null) {
-            parkingDuration.setText(DateTimeUtil.longMinToStringDate(Long.parseLong(duration),getContext()));
+            parkingDuration.setText(DateTimeUtil.longMinToStringDate(Long.parseLong(duration), getContext()));
         } else
             parkingDuration.setText("0 " + getContext().getString(R.string.minute));
 
@@ -683,25 +700,35 @@ public class HistoryMapFragment extends AbstractFragment {
 
         //ignition
         String ignition = point.getIgnition();
-        if ("1".equals(ignition)) {
-            ignition = getResources().getString(R.string.on);
-            historyIgnition.setTextColor(getResources().getColor(R.color.success));
+        if ("-1".equals(getCurrent.getIgnition())) {
+            ignitionView.setVisibility(View.GONE);
         } else {
-            ignition = getResources().getString(R.string.off);
-            historyIgnition.setTextColor(getResources().getColor(R.color.fail));
+            ignitionView.setVisibility(View.VISIBLE);
+            if ("1".equals(ignition)) {
+                ignition = getResources().getString(R.string.on);
+                historyIgnition.setTextColor(getResources().getColor(R.color.success));
+            } else {
+                ignition = getResources().getString(R.string.off);
+                historyIgnition.setTextColor(getResources().getColor(R.color.fail));
+            }
+            historyIgnition.setText(ignition);
         }
-        historyIgnition.setText(ignition);
 
         //engine
         String engine = point.getMotor();
-        if ("1".equals(engine)) {
-            engine = getResources().getString(R.string.on);
-            historyEngine.setTextColor(getResources().getColor(R.color.success));
+        if ("-1".equals(getCurrent.getMotor())) {
+            engineView.setVisibility(View.GONE);
         } else {
-            engine = getResources().getString(R.string.off);
-            historyEngine.setTextColor(getResources().getColor(R.color.fail));
+            historyEngine.setVisibility(View.VISIBLE);
+            if ("1".equals(engine)) {
+                engine = getResources().getString(R.string.on);
+                historyEngine.setTextColor(getResources().getColor(R.color.success));
+            } else {
+                engine = getResources().getString(R.string.off);
+                historyEngine.setTextColor(getResources().getColor(R.color.fail));
+            }
+            historyEngine.setText(engine);
         }
-        historyEngine.setText(engine);
 
         //speed
         String speed = point.getSpeed();
@@ -719,20 +746,20 @@ public class HistoryMapFragment extends AbstractFragment {
         }
         pointLayout.historyPeriodTo.setText(toDate);
 
-        fillBasicInfo(pointLayout,getTrack);
+        fillBasicInfo(pointLayout, getTrack);
     }
 
-    private void fillBasicInfo(BasicTrackInfoLayout layout,GetTrack getTrack) {
+    private void fillBasicInfo(BasicTrackInfoLayout layout, GetTrack getTrack) {
         //burnFuel
         String burnFuel = getTrack.getCount_dff();
         String burnFuelStart = getTracks.get(0).getCount_dff();
-        Double b1=-1d;
-        Double b2=-1d;
+        Double b1 = -1d;
+        Double b2 = -1d;
         if (burnFuel != null && burnFuelStart != null) {
             layout.historyBurnFuelView.setVisibility(View.VISIBLE);
             try {
-                b1  = Double.parseDouble(burnFuel);
-                b2  = Double.parseDouble(burnFuelStart);
+                b1 = Double.parseDouble(burnFuel);
+                b2 = Double.parseDouble(burnFuelStart);
                 layout.historyBurnFuel.setText(((b1 - b2) / 10) + " " + getResources().getString(R.string.l));
             } catch (Exception e) {
                 layout.historyBurnFuelView.setVisibility(View.GONE);
@@ -760,7 +787,7 @@ public class HistoryMapFragment extends AbstractFragment {
             layout.historyDistance.setText("-");
         }
 
-        if ((d1 != -1) &&(d2 != -1)&&(b1 != -1)&&(b2 != -1)) {
+        if ((d1 != -1) && (d2 != -1) && (b1 != -1) && (b2 != -1)) {
             try {
                 layout.fuelExpense.setText(new DecimalFormat("0.0").format((((b1 - b2) / 10) * 100) / ((d1 - d2) / 1000)) + " " + getResources().getString(R.string.l) +
                         "/" + "100" + getResources().getString(R.string.km));
@@ -789,7 +816,7 @@ public class HistoryMapFragment extends AbstractFragment {
         }
 */
         isOverSpeed = !isOverSpeed;
-        if (isOverSpeed){
+        if (isOverSpeed) {
             historyShowOverSpeed.setBackground(getContext().getResources().getDrawable(R.drawable.ic_overspeed_new));
             maxSpeedView.setVisibility(View.VISIBLE);
             limitView.setVisibility(View.VISIBLE);
@@ -809,28 +836,28 @@ public class HistoryMapFragment extends AbstractFragment {
             polyline.setVisible(show);
         }
 
-        final int delay = 50; //milliseconds
+        final int delay = 25; //milliseconds
         registerUpdateHandler(handler);
         final int[] currentColor = new int[1];
         currentColor[0] = POLYLINECOLOR;
         final int[] i = new int[1];
         i[0] = 0;
         final boolean[] side = new boolean[1];
-        side[0] =true;
+        side[0] = true;
         int green = Color.green(POLYLINECOLOR);
         int green1 = Color.green(POLYLINECOLOR2);
         int blue = Color.blue(POLYLINECOLOR);
         int blue1 = Color.blue(POLYLINECOLOR2);
         int red = Color.red(POLYLINECOLOR);
         int red1 = Color.red(POLYLINECOLOR2);
-        final float deltag = (green - green1)/80;
-        final float deltar = (red - red1)/80;
-        final float deltab = (blue - blue1)/80;
+        final float deltag = (green - green1) / 80;
+        final float deltar = (red - red1) / 80;
+        final float deltab = (blue - blue1) / 80;
 
         final float[] rgb = new float[3];
-        rgb[0] =red;
-        rgb[1] =green;
-        rgb[2] =blue;
+        rgb[0] = red;
+        rgb[1] = green;
+        rgb[2] = blue;
 
 
         handler.postDelayed(new Runnable() {
@@ -842,18 +869,18 @@ public class HistoryMapFragment extends AbstractFragment {
                 }
 
                 if (side[0]) {
-                    rgb[0] -=deltar;
-                    rgb[1] -=deltag;
-                    rgb[2] -=deltab;
+                    rgb[0] -= deltar;
+                    rgb[1] -= deltag;
+                    rgb[2] -= deltab;
                     for (Polyline polyline : overSpeeds) {
-                        polyline.setColor(Color.rgb((int)rgb[0],(int)rgb[1],(int)rgb[2]));
+                        polyline.setColor(Color.rgb((int) rgb[0], (int) rgb[1], (int) rgb[2]));
                     }
                 } else {
-                    rgb[0] +=deltar;
-                    rgb[1] +=deltag;
-                    rgb[2] +=deltab;
+                    rgb[0] += deltar;
+                    rgb[1] += deltag;
+                    rgb[2] += deltab;
                     for (Polyline polyline : overSpeeds) {
-                        polyline.setColor(Color.rgb((int)rgb[0],(int)rgb[1],(int)rgb[2]));
+                        polyline.setColor(Color.rgb((int) rgb[0], (int) rgb[1], (int) rgb[2]));
                     }
                 }
                 i[0]++;
@@ -869,7 +896,7 @@ public class HistoryMapFragment extends AbstractFragment {
             marker.setVisible(!isShowParking);
         }
         isShowParking = !isShowParking;
-        if (isShowParking){
+        if (isShowParking) {
             parkingCountView.setVisibility(View.VISIBLE);
             historyShowParking.setImageDrawable(getResources().getDrawable(R.drawable.park2));
         } else {
@@ -895,15 +922,15 @@ public class HistoryMapFragment extends AbstractFragment {
                     ApplicationUtil.drawToBitmap(getResources().getDrawable(R.drawable.park1), PARKINGHEIGHT, PARKINGWIDTH)));
         } else if (currentMarker.getTag() instanceof GetTrack) {
             GetTrack tag = (GetTrack) currentMarker.getTag();
-            if (!tag.equals(getTracks.get(0)) && !tag.equals(getTracks.get(getTracks.size()-1)))
+            if (!tag.equals(getTracks.get(0)) && !tag.equals(getTracks.get(getTracks.size() - 1)))
                 currentMarker.setIcon(BitmapDescriptorFactory.fromBitmap(
                         ApplicationUtil.drawToBitmap(getResources().getDrawable(R.drawable.ic_circle_1), Color.BLACK, POINTHEIGHT, POINTWIDTH)));
-            else if (tag.equals(getTracks.get(getTracks.size()-1)))
+            else if (tag.equals(getTracks.get(getTracks.size() - 1)))
                 currentMarker.setIcon(BitmapDescriptorFactory.fromBitmap(
-                        ApplicationUtil.drawToBitmap(getResources().getDrawable(R.drawable.accent_end_track),FLAGSIZE,FLAGSIZE)));
+                        ApplicationUtil.drawToBitmap(getResources().getDrawable(R.drawable.marker_red), FLAGSIZE, FLAGSIZE)));
             else if (tag.equals(getTracks.get(0)))
                 currentMarker.setIcon(BitmapDescriptorFactory.fromBitmap(
-                        ApplicationUtil.drawToBitmap(getResources().getDrawable(R.drawable.accent_begin_track),FLAGSIZE,FLAGSIZE)));
+                        ApplicationUtil.drawToBitmap(getResources().getDrawable(R.drawable.marker_green), FLAGSIZE, FLAGSIZE)));
         }
     }
 
@@ -974,7 +1001,7 @@ public class HistoryMapFragment extends AbstractFragment {
 
     @Override
     public void onStop() {
-        clearMemory();
+        //clearMemory();
         removeBgTasks();
         super.onStop();
     }
@@ -998,7 +1025,7 @@ public class HistoryMapFragment extends AbstractFragment {
     }
 
     @OnClick(R.id.menu)
-    public void onMenuClick(){
+    public void onMenuClick() {
         ((MainActivity) getActivity()).getDrawer().openDrawer(Gravity.LEFT);
     }
 
@@ -1006,8 +1033,8 @@ public class HistoryMapFragment extends AbstractFragment {
         handlers.add(handler);
     }
 
-    public void removeBgTasks(){
-        for (Handler handler : handlers){
+    public void removeBgTasks() {
+        for (Handler handler : handlers) {
             handler.removeCallbacksAndMessages(null);
         }
     }

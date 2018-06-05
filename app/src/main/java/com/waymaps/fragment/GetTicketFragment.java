@@ -16,6 +16,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.waymaps.R;
@@ -53,10 +54,11 @@ public class GetTicketFragment extends AbstractFragment implements AdapterView.O
     ListView ticketsListView;
     View progressBar;
     View content;
+    TextView name;
     private Ticket[] tickets;
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
     private HashMap trackerId = new HashMap();
     int ticketId;
+    private String trackerName;
     FloatingActionButton fab;
 
     @Override
@@ -67,10 +69,11 @@ public class GetTicketFragment extends AbstractFragment implements AdapterView.O
         ticketsListView = view.findViewById(R.id.get_ticket_table);
         progressBar = view.findViewById(R.id.progress_layout);
         content = view.findViewById(R.id.get_ticket_content);
+        name = view.findViewById(R.id.mess_person_from);
         fab = view.findViewById(R.id.fab_comment_dialog);
         fab.setOnClickListener(this);
         ButterKnife.bind(this, view);
-
+        name.setText(trackerName);
         ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
         DrawerLayout drawer = ((MainActivity) getActivity()).getDrawer();
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -116,6 +119,7 @@ public class GetTicketFragment extends AbstractFragment implements AdapterView.O
     private void getAttrFromBundle(){
         try {
             ticketId = (Integer) ApplicationUtil.getObjectFromBundle(getArguments(), "get_ticket_id", Integer.class);
+            trackerName = ApplicationUtil.getObjectFromBundle(getArguments(), "tracker_name", String.class);
         } catch (IOException e) {
             logger.error("Error while trying to parse parameters {}", this.getClass());
         }
