@@ -1,4 +1,5 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -9,9 +10,17 @@
     android:id="@+id/login_activity_contain"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/verylightgray">
+    android:background="@color/very2lightgray">
 
     <include layout="@layout/progress_bar"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="10dp"
+        android:background="@drawable/logo_accent_ua_white">
+
+    </LinearLayout>
 
     <ScrollView
         android:id="@+id/login_form"
@@ -37,6 +46,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/login"
+                    android:background="@drawable/corner_view3dp"
                     android:maxLines="1"
                     android:singleLine="true" />
 
@@ -57,6 +67,7 @@
                     android:imeOptions="actionUnspecified"
                     android:inputType="textPassword"
                     android:maxLines="1"
+                    android:background="@drawable/corner_view3dp"
                     android:singleLine="true" />
 
                 <CheckBox
@@ -70,7 +81,7 @@
 
             <Button
                 android:textColor="@color/white"
-                android:background="@color/colorPrimary"
+                android:background="@drawable/corner_view3dppk"
                 android:id="@+id/log_in_btn"
                 style="?android:textAppearanceSmall"
                 android:layout_width="100dp"
@@ -78,11 +89,19 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:text="@string/log_in"
+
                 android:textStyle="bold" />
 
         </LinearLayout>
 
     </ScrollView>
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/login_form"
+        app:srcCompat="@drawable/logo" />
 
 </RelativeLayout>
 </RelativeLayout>

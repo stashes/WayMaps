@@ -119,7 +119,7 @@ public class ChooseMapTypeFragment extends AbstractFragment {
                 LocalPreferenceManager.setMapProvider(getContext(), MapProvider.GOOGLE_SATELLITE.name());
                 break;
         }
-        ((MainActivity)getActivity()).map();
+        ((MainActivity) getActivity()).onBackPressed();
     }
 
     @Override

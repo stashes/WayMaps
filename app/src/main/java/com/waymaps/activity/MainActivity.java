@@ -25,6 +25,7 @@ import android.widget.Toast;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.android.gms.maps.model.LatLng;
+import com.mikepenz.materialdrawer.Drawer;
 import com.waymaps.R;
 import com.waymaps.api.RetrofitService;
 import com.waymaps.api.WayMapsService;
@@ -300,7 +301,7 @@ public class MainActivity extends AppCompatActivity
 
 
     private void chooseProvider() {
-        if (currentFragment instanceof GMapFragment || currentFragment instanceof HistoryMapFragment) {
+        if (getSupportFragmentManager().getFragments().get(0) instanceof GMapFragment) {
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             currentFragment = new ChooseMapTypeFragment();
             try {
@@ -312,6 +313,18 @@ public class MainActivity extends AppCompatActivity
             ft.replace(R.id.content_main, currentFragment);
             ft.addToBackStack(null);
             ft.commit();
+            while (getSupportFragmentManager().getBackStackEntryCount() > 0)
+                getSupportFragmentManager().popBackStackImmediate();
+
+            for (Fragment fragment : getSupportFragmentManager().getFragments()) {
+                if (fragment != null) {
+                    if (getSupportFragmentManager().getFragments().get(getSupportFragmentManager().getFragments().size()-1) != fragment)
+                        if (fragment instanceof GMapFragment)
+                            if (getSecondDrawer()!=null)
+                                getSecondDrawer().getDrawerLayout().setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+                        getSupportFragmentManager().beginTransaction().remove(fragment).commit();
+                }
+            }
         } else {
             ApplicationUtil.showToast(getApplicationContext(), getResources().getString(R.string.map_screen_should_be_chosen));
         }
@@ -359,16 +372,23 @@ public class MainActivity extends AppCompatActivity
         } catch (JsonProcessingException e) {
             logger.error("Error writing user {}", authorisedUser.toString());
         }
+        while (getSupportFragmentManager().getBackStackEntryCount() > 0)
+            getSupportFragmentManager().popBackStackImmediate();
+
+        for (Fragment fragment : getSupportFragmentManager().getFragments()) {
+            if (fragment != null) {
+                if (getSupportFragmentManager().getFragments().get(getSupportFragmentManager().getFragments().size()-1) != fragment)
+                    if (fragment instanceof GMapFragment)
+                        if (getSecondDrawer()!=null)
+                            getSecondDrawer().getDrawerLayout().setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+                    getSupportFragmentManager().beginTransaction().remove(fragment).commit();
+            }
+        }
         ft.replace(R.id.content_main, currentFragment);
         firstLaunch = false;
         ft.commit();
-        for (Fragment fragment : getSupportFragmentManager().getFragments()) {
-            if (fragment != null) {
-                getSupportFragmentManager().beginTransaction().remove(fragment).commit();
-            }
-        }
-        while (getSupportFragmentManager().getBackStackEntryCount() > 0)
-            getSupportFragmentManager().popBackStackImmediate();
+
+
 
     }
 
@@ -545,6 +565,14 @@ public class MainActivity extends AppCompatActivity
         }
     };
 */
+        public  Drawer getSecondDrawer(){
+            for (Fragment f : getSupportFragmentManager().getFragments()){
+                if (f instanceof GMapFragment){
+                    return ((GMapFragment)f).drawerSecond;
+                }
+            }
+            return null;
+        }
 
 }
 

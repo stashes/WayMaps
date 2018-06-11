@@ -13,6 +13,7 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -118,7 +119,7 @@ public class GMapFragment extends AbstractFragment implements OnMapReadyCallback
     private Boolean isActive;
     private long timesMarkerUpdate;
     private String pickedId;
-    private Drawer drawerSecond;
+    public static Drawer drawerSecond;
     private GetGroup[] getGroups;
     private GetCurrentAdapter adapter;
 
@@ -375,31 +376,33 @@ public class GMapFragment extends AbstractFragment implements OnMapReadyCallback
                 public void onResponse(Call<GetGroup[]> call, Response<GetGroup[]> response) {
                     getGroups = response.body();
 
-                    drawerSecond = new DrawerBuilder(getActivity())
-                            .withActionBarDrawerToggle(false)
-                            .withDrawerGravity(Gravity.END)
-                            .addDrawerItems(new PrimaryDrawerItem().withName(R.string.all).withTag(null), new DividerDrawerItem())
-                            .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
-                                @Override
-                                public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-                                    if (drawerItem.getTag() == null) {
-                                        pickedGroup = null;
-                                        carGroupView.setVisibility(View.GONE);
-                                    } else {
-                                        pickedGroup = (GetGroup) drawerItem.getTag();
-                                        carGroup.setText(pickedGroup.getTitle());
-                                        carGroupView.setVisibility(View.VISIBLE);
+                        DrawerBuilder drawerBuilder = new DrawerBuilder(getActivity())
+                                .withActionBarDrawerToggle(false)
+                                .withDrawerGravity(Gravity.END)
+                                .addDrawerItems(new PrimaryDrawerItem().withName(R.string.all).withTag(null), new DividerDrawerItem())
+                                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+                                    @Override
+                                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+                                        if (drawerItem.getTag() == null) {
+                                            pickedGroup = null;
+                                            carGroupView.setVisibility(View.GONE);
+                                        } else {
+                                            pickedGroup = (GetGroup) drawerItem.getTag();
+                                            carGroup.setText(pickedGroup.getTitle());
+                                            carGroupView.setVisibility(View.VISIBLE);
+                                        }
+                                        updateMarkersPosition();
+                                        drawerSecond.closeDrawer();
+                                        return true;
                                     }
-                                    updateMarkersPosition();
-                                    drawerSecond.closeDrawer();
-                                    return true;
-                                }
-                            })
-                            .build();
+                                });
+                        drawerSecond = drawerBuilder.build();
+                        for (int i = 0; i < getGroups.length; i++) {
+                            drawerSecond.addItem(new SecondaryDrawerItem().withName(getGroups[i].getTitle()).withTag(getGroups[i]));
+                        }
 
-                    for (int i = 0; i < getGroups.length; i++) {
-                        drawerSecond.addItem(new SecondaryDrawerItem().withName(getGroups[i].getTitle()).withTag(getGroups[i]));
-                    }
+
+
 
 
                 }
@@ -416,7 +419,7 @@ public class GMapFragment extends AbstractFragment implements OnMapReadyCallback
             carGroupExit.setImageBitmap(ApplicationUtil.drawToBitmap(getResources().getDrawable(R.drawable.ic_exit)
                     , getResources().getColor(R.color.colorAccent)));
             this.group.setImageBitmap(ApplicationUtil.drawToBitmap(getResources().getDrawable(R.drawable.group_ic)
-                    , getResources().getColor(R.color.light_blue_tr), PorterDuff.Mode.MULTIPLY));
+                    , getResources().getColor(R.color.light_blue), PorterDuff.Mode.SRC_IN));
             groupButtonView.setVisibility(View.VISIBLE);
 
         }
@@ -487,6 +490,7 @@ public class GMapFragment extends AbstractFragment implements OnMapReadyCallback
 
     }
 
+
     private void updateMethod(int flag) {
         final Handler handler = new Handler();
 
@@ -498,6 +502,9 @@ public class GMapFragment extends AbstractFragment implements OnMapReadyCallback
         handler.postDelayed(new Runnable() {
             public void run() {
                 ((MainActivity) getActivity()).setBackgroundTaskExecuting(true);
+                if (drawerSecond != null && getActivity().getSupportFragmentManager().getFragments().size()==1) {
+                    drawerSecond.getDrawerLayout().setDrawerLockMode(DrawerLayout.LOCK_MODE_UNDEFINED);
+                }
                 i[0]++;
                 if (j[0] == 1) {
                     i[0] = 0;
@@ -882,13 +889,30 @@ public class GMapFragment extends AbstractFragment implements OnMapReadyCallback
                 } catch (JsonProcessingException e) {
                     logger.debug("Error while trying write to bundle");
                 }
+
+                if (drawerSecond!=null){
+                    drawerSecond.getDrawerLayout().setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+                }
+
                 historyFragment.setArguments(bundle);
-                FragmentTransaction ft = getFragmentManager().beginTransaction();
+                FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+                List<Fragment> fragments = getActivity().getSupportFragmentManager().getFragments();
+                for (Fragment f : fragments){
+                    if (fragments.get(fragments.size()-1) != f){
+                        ft.remove(f);
+                    }
+                }
+                ft.commit();
+
+                ft = getActivity().getSupportFragmentManager().beginTransaction();
                 ft.addToBackStack(this.getClass().getName());
                 /*                ft.replace(R.id.content_main, historyFragment);*/
                 ft.add(R.id.content_main, historyFragment);
                 ft.hide(GMapFragment.this);
                 ft.commit();
+                if (drawerSecond!=null){
+                    drawerSecond.getDrawerLayout().setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+                }
                 showProgress(false, mapContainer, progressLayout);
             }
 
@@ -1234,6 +1258,9 @@ public class GMapFragment extends AbstractFragment implements OnMapReadyCallback
 
     @Override
     public void onPause() {
+        if (drawerSecond != null) {
+            drawerSecond.getDrawerLayout().setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+        }
         CancelableCallback.cancelAll();
         super.onPause();
     }
@@ -1241,9 +1268,6 @@ public class GMapFragment extends AbstractFragment implements OnMapReadyCallback
     @Override
     public void onResume() {
         updateMethod(1);
-        if (drawerSecond != null) {
-            drawerSecond.getDrawerLayout().setDrawerLockMode(DrawerLayout.LOCK_MODE_UNDEFINED);
-        }
         super.onResume();
     }
 

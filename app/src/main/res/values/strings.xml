@@ -163,5 +163,7 @@
     <string name="hist_speed_limit">Set speed limit:</string>
     <string name="create_ticket">Creating ticket</string>
     <string name="map_screen_should_be_chosen">Map screen should be active</string>
+    <string name="movement_mode">Movement mode</string>
+    <string name="speed_excesses">Speed excesses</string>
 
 </resources>

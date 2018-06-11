@@ -130,6 +130,9 @@ public class HistoryFragment extends AbstractFragment {
         toggle.syncState();
         toolbar.setTitle(fragmentName());
 
+        if (((MainActivity) getActivity()).getSecondDrawer()!= null)
+            ((MainActivity) getActivity()).getSecondDrawer().getDrawerLayout().setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+
         driver.setText(getCurrent.getDriver());
         object.setText(getCurrent.getTracker_title());
         distance.setText("");

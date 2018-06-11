@@ -1,401 +1,473 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/corner_view3dpgray"
     android:orientation="vertical"
     android:padding="10dp">
 
     <LinearLayout
-        android:id="@+id/report_object_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="left"
-            android:layout_weight="0.5"
-            android:text="@string/object" />
-
-        <TextView
-            android:id="@+id/report_object"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="right"
-            android:text="test" />
-    </LinearLayout>
-
-    <!--<LinearLayout
-        android:id="@+id/report_driver_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="left"
-            android:layout_weight="1"
-            android:text="@string/driver" />
-
-        <TextView
-            android:id="@+id/report_driver"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="right"
-            android:text="test" />
-    </LinearLayout>
--->
-
-    <LinearLayout
-        android:id="@+id/report_period_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="left"
-                android:layout_weight="0.5"
-                android:text="@string/picked_period" />
-
-            <TextView
-                android:id="@+id/report_date_from"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="right"
-                android:text="test" />
-        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_margin="3dp"
+            android:background="@drawable/corner_view3dp"
+            android:orientation="vertical"
+            android:padding="4dp">
 
-            <TextView
-                android:id="@+id/report_date_to"
+            <LinearLayout
+                android:id="@+id/report_object_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left"
+                    android:layout_weight="0.5"
+                    android:text="@string/object" />
+
+                <TextView
+                    android:id="@+id/report_object"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="right"
+                    android:text="test" />
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:id="@+id/report_period_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="right"
-                android:text="test" />
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="left"
+                        android:layout_weight="0.5"
+                        android:text="@string/picked_period" />
+
+                    <TextView
+                        android:id="@+id/report_date_from"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="right"
+                        android:text="test" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/report_date_to"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="right"
+                        android:text="test" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:id="@+id/report_driver_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left"
+                    android:layout_weight="0.5"
+                    android:text="@string/driver" />
+
+                <TextView
+                    android:id="@+id/report_driver"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="right"
+                    android:text="test" />
+
+            </LinearLayout>
+
+            <!--<LinearLayout
+                android:id="@+id/report_driver_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left"
+                    android:layout_weight="1"
+                    android:text="@string/driver" />
+
+                <TextView
+                    android:id="@+id/report_driver"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="right"
+                    android:text="test" />
+            </LinearLayout>-->
+
+
         </LinearLayout>
 
-    </LinearLayout>
-
-    <!--<LinearLayout
-        android:id="@+id/report_driver_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="left"
-            android:layout_weight="1"
-            android:text="@string/driver" />
-
-        <TextView
-            android:id="@+id/report_driver"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="right"
-            android:text="test" />
-    </LinearLayout>-->
-
-    <LinearLayout
-        android:id="@+id/report_totaltime_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="left"
-            android:layout_weight="0.5"
-            android:text="@string/total_time" />
-
-        <TextView
-            android:id="@+id/report_totaltime"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="right"
-            android:text="test" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/report_traffic_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="left"
-            android:layout_weight="0.5"
-            android:text="@string/traffic_time" />
-
-        <TextView
-            android:id="@+id/report_traffic_time"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="right"
-            android:text="test" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/report_total_distance_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="left"
-            android:layout_weight="0.5"
-            android:text="@string/total_distance" />
-
-        <TextView
-            android:id="@+id/report_total_distance"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="right"
-            android:text="test" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/report_average_speed_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="left"
-            android:layout_weight="0.5"
-            android:text="@string/average_speed" />
-
-        <TextView
-            android:id="@+id/report_average_speed"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="right"
-            android:text="test" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/report_average_speed_include_parking_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="left"
-            android:layout_weight="0.5"
-            android:text="@string/average_speed_include_parking" />
-
-        <TextView
-            android:id="@+id/report_average_speed_include_parking"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="right"
-            android:text="test" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/report_parking_count_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="left"
-            android:layout_weight="0.5"
-            android:text="@string/parking_count" />
-
-        <TextView
-            android:id="@+id/report_parking_count"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="right"
-            android:text="test" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/report_parking_time_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="left"
-            android:layout_weight="0.5"
-            android:text="@string/parking_time" />
-
-        <TextView
-            android:id="@+id/report_parking_time"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="right"
-            android:text="test" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/report_min_stop_time_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="left"
-            android:layout_weight="0.5"
-            android:text="@string/min_stop_time" />
-
-        <TextView
-            android:id="@+id/report_min_stop_time"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="right"
-            android:text="test" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/report_max_speed_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="left"
-            android:layout_weight="0.5"
-            android:text="@string/max_speed" />
-
-        <TextView
-            android:id="@+id/report_max_speed"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="right"
-            android:text="test" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/report_speed_limit_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="left"
-            android:layout_weight="0.5"
-            android:text="@string/speed_limit" />
-
-        <TextView
-            android:id="@+id/report_speed_limit"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="right"
-            android:text="test" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/report_excesses_total_count_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="left"
-            android:layout_weight="0.5"
-            android:text="@string/excesses_total_count" />
-
-        <TextView
-            android:id="@+id/report_excesses_total_count"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="right"
-            android:text="test" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/report_excesses_total_time_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="left"
-            android:layout_weight="0.5"
-            android:text="@string/excesses_total_time" />
-
-        <TextView
-            android:id="@+id/report_excesses_total_time"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="right"
-            android:text="test" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/report_excesses_percentage_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="left"
-            android:layout_weight="0.5"
-            android:text="@string/excesses_percentage" />
-
-        <TextView
-            android:id="@+id/report_excesses_percentage"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="right"
-            android:text="test" />
-    </LinearLayout>
-
-
-    <LinearLayout
-        android:id="@+id/report_ok_button_view"
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:layout_margin="10dp">
-
-        <Button
-            android:id="@+id/report_ok_button"
+        android:layout_margin="3dp"
+        android:textColor="@color/black"
+        android:text="@string/movement_mode"/>
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/ok"/>
+            android:layout_margin="3dp"
+            android:background="@drawable/corner_view3dp"
+            android:orientation="vertical"
+            android:padding="4dp">
+
+            <LinearLayout
+                android:id="@+id/report_totaltime_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left"
+                    android:layout_weight="0.5"
+                    android:text="@string/total_time" />
+
+                <TextView
+                    android:id="@+id/report_totaltime"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="right"
+                    android:text="test" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/report_traffic_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left"
+                    android:layout_weight="0.5"
+                    android:text="@string/traffic_time" />
+
+                <TextView
+                    android:id="@+id/report_traffic_time"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="right"
+                    android:text="test" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/report_total_distance_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left"
+                    android:layout_weight="0.5"
+                    android:text="@string/total_distance" />
+
+                <TextView
+                    android:id="@+id/report_total_distance"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="right"
+                    android:text="test" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/report_average_speed_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left"
+                    android:layout_weight="0.5"
+                    android:text="@string/average_speed" />
+
+                <TextView
+                    android:id="@+id/report_average_speed"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="right"
+                    android:text="test" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/report_average_speed_include_parking_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left"
+                    android:layout_weight="0.5"
+                    android:text="@string/average_speed_include_parking" />
+
+                <TextView
+                    android:id="@+id/report_average_speed_include_parking"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="right"
+                    android:text="test" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="3dp"
+            android:textColor="@color/black"
+            android:text="@string/parking"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="3dp"
+            android:background="@drawable/corner_view3dp"
+            android:orientation="vertical"
+            android:padding="4dp">
+
+            <LinearLayout
+                android:id="@+id/report_parking_count_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left"
+                    android:layout_weight="0.5"
+                    android:text="@string/parking_count" />
+
+                <TextView
+                    android:id="@+id/report_parking_count"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="right"
+                    android:text="test" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/report_parking_time_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left"
+                    android:layout_weight="0.5"
+                    android:text="@string/parking_time" />
+
+                <TextView
+                    android:id="@+id/report_parking_time"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="right"
+                    android:text="test" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/report_min_stop_time_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left"
+                    android:layout_weight="0.5"
+                    android:text="@string/min_stop_time" />
+
+                <TextView
+                    android:id="@+id/report_min_stop_time"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="right"
+                    android:text="test" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="3dp"
+            android:textColor="@color/black"
+            android:text="@string/speed_excesses"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="3dp"
+            android:background="@drawable/corner_view3dp"
+            android:orientation="vertical"
+            android:padding="4dp">
+
+            <LinearLayout
+                android:id="@+id/report_max_speed_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left"
+                    android:layout_weight="0.5"
+                    android:text="@string/max_speed" />
+
+                <TextView
+                    android:id="@+id/report_max_speed"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="right"
+                    android:text="test" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/report_speed_limit_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left"
+                    android:layout_weight="0.5"
+                    android:text="@string/speed_limit" />
+
+                <TextView
+                    android:id="@+id/report_speed_limit"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="right"
+                    android:text="test" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/report_excesses_total_count_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left"
+                    android:layout_weight="0.5"
+                    android:text="@string/excesses_total_count" />
+
+                <TextView
+                    android:id="@+id/report_excesses_total_count"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="right"
+                    android:text="test" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/report_excesses_total_time_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left"
+                    android:layout_weight="0.5"
+                    android:text="@string/excesses_total_time" />
+
+                <TextView
+                    android:id="@+id/report_excesses_total_time"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="right"
+                    android:text="test" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/report_excesses_percentage_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left"
+                    android:layout_weight="0.5"
+                    android:text="@string/excesses_percentage" />
+
+                <TextView
+                    android:id="@+id/report_excesses_percentage"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="right"
+                    android:text="test" />
+            </LinearLayout>
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:id="@+id/report_ok_button_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp"
+            android:gravity="center">
+
+            <Button
+                android:id="@+id/report_ok_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/corner_view3dppk"
+                android:text="@string/ok"
+                android:textColor="@color/white" />
+        </LinearLayout>
     </LinearLayout>
 
-</LinearLayout>
+</ScrollView>
