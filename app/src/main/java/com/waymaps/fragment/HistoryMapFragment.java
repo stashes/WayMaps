@@ -361,11 +361,14 @@ public class HistoryMapFragment extends AbstractFragment {
                                     }
                                 }
                                 LatLngBounds build = builder.build();
-                                LatLng latLng = new LatLng(build.southwest.latitude, build.southwest.longitude + ((build.southwest.longitude - build.northeast.longitude) / 2.7));
-                                LatLngBounds latLngBounds = new LatLngBounds(latLng, build.northeast);
-                                CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(latLngBounds, SystemUtil.getIntWidth(getActivity()),
-                                        SystemUtil.getIntHeight(getActivity()), 10);
-                                googleMap.animateCamera(cu);
+                   //             LatLng latLng = new LatLng(build.southwest.latitude, build.southwest.longitude + ((build.southwest.longitude - build.northeast.longitude) / 2.7));
+                     //           LatLngBounds latLngBounds = new LatLngBounds(latLng, build.northeast);
+                                CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(build, ((int)(SystemUtil.getIntWidth(getActivity()))),
+                                        ((int)(SystemUtil.getIntHeight(getActivity()))), 0);
+                                googleMap.moveCamera(cu);
+                                LatLng target = googleMap.getCameraPosition().target;
+                                float zoom = googleMap.getCameraPosition().zoom;
+                                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(target.latitude,(target.longitude*1 + build.southwest.longitude*2)/3),(zoom-1.4f)));
                                 ApplicationUtil.showToast(HistoryMapFragment.this.getActivity(), getResources().getString(R.string.draw_way));
                                 drawMarkers();
                                 fillBasicInfo(trackLayout, getTracks.get(getTracks.size() - 1));
@@ -688,14 +691,16 @@ public class HistoryMapFragment extends AbstractFragment {
             voltage = "0";
         }
         String power = point.getPower();
-        if (power != null || "1".equals(power)) {
-            power = getResources().getString(R.string.network);
-        } else
+        if (power == null || "0".equals(power)) {
             power = getResources().getString(R.string.battery);
+            historyVoltage.setTextColor(getResources().getColor(R.color.yellow));
+        } else {
+            power = getResources().getString(R.string.network);
+            historyVoltage.setTextColor(getResources().getColor(R.color.success));
+        }
         voltage = new DecimalFormat("0.0").format(Double.parseDouble(voltage));
         historyVoltage.setText(power
                 + " (" + voltage + getResources().getString(R.string.v) + ")");
-        historyVoltage.setTextColor(getResources().getColor(R.color.success));
 
 
         //ignition

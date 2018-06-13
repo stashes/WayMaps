@@ -34,61 +34,55 @@
             android:id="@+id/email_login_form"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:paddingTop="50dp">
 
-            <android.support.design.widget.TextInputLayout
+
+            <AutoCompleteTextView
+                android:id="@+id/input_login"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:background="@drawable/corner_view3dp"
+                android:drawableLeft="@drawable/ic_user"
+                android:hint="@string/login"
+                android:maxLines="1"
+                android:singleLine="true" />
 
-                <AutoCompleteTextView
-                    android:drawableLeft="@drawable/ic_user"
-                    android:id="@+id/input_login"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/login"
-                    android:background="@drawable/corner_view3dp"
-                    android:maxLines="1"
-                    android:singleLine="true" />
 
-            </android.support.design.widget.TextInputLayout>
-
-            <android.support.design.widget.TextInputLayout
+            <EditText
+                android:id="@+id/input_pass"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:background="@drawable/corner_view3dp"
+                android:drawableLeft="@drawable/ic_password"
+                android:hint="@string/pass"
+                android:imeActionId="6"
+                android:imeActionLabel="@string/pass"
+                android:imeOptions="actionUnspecified"
+                android:inputType="textPassword"
+                android:maxLines="1"
+                android:singleLine="true" />
 
-                <EditText
-                    android:drawableLeft="@drawable/ic_password"
-                    android:id="@+id/input_pass"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/pass"
-                    android:imeActionId="6"
-                    android:imeActionLabel="@string/pass"
-                    android:imeOptions="actionUnspecified"
-                    android:inputType="textPassword"
-                    android:maxLines="1"
-                    android:background="@drawable/corner_view3dp"
-                    android:singleLine="true" />
+            <CheckBox
+                android:id="@+id/pass_save"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/pass_save" />
 
-                <CheckBox
-                    android:id="@+id/pass_save"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/pass_save" />
-
-            </android.support.design.widget.TextInputLayout>
 
             <Button
-                android:textColor="@color/white"
-                android:background="@drawable/corner_view3dppk"
                 android:id="@+id/log_in_btn"
                 style="?android:textAppearanceSmall"
                 android:layout_width="100dp"
-                android:layout_gravity="center"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
                 android:layout_marginTop="16dp"
+                android:background="@drawable/corner_view3dppk"
                 android:text="@string/log_in"
+                android:textColor="@color/white"
 
                 android:textStyle="bold" />
 
@@ -101,6 +95,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@+id/login_form"
+        android:layout_marginBottom="-30dp"
         app:srcCompat="@drawable/logo" />
 
 </RelativeLayout>

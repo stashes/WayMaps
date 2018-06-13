@@ -376,33 +376,30 @@ public class GMapFragment extends AbstractFragment implements OnMapReadyCallback
                 public void onResponse(Call<GetGroup[]> call, Response<GetGroup[]> response) {
                     getGroups = response.body();
 
-                        DrawerBuilder drawerBuilder = new DrawerBuilder(getActivity())
-                                .withActionBarDrawerToggle(false)
-                                .withDrawerGravity(Gravity.END)
-                                .addDrawerItems(new PrimaryDrawerItem().withName(R.string.all).withTag(null), new DividerDrawerItem())
-                                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
-                                    @Override
-                                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-                                        if (drawerItem.getTag() == null) {
-                                            pickedGroup = null;
-                                            carGroupView.setVisibility(View.GONE);
-                                        } else {
-                                            pickedGroup = (GetGroup) drawerItem.getTag();
-                                            carGroup.setText(pickedGroup.getTitle());
-                                            carGroupView.setVisibility(View.VISIBLE);
-                                        }
-                                        updateMarkersPosition();
-                                        drawerSecond.closeDrawer();
-                                        return true;
+                    DrawerBuilder drawerBuilder = new DrawerBuilder(getActivity())
+                            .withActionBarDrawerToggle(false)
+                            .withDrawerGravity(Gravity.END)
+                            .addDrawerItems(new PrimaryDrawerItem().withName(R.string.all).withTag(null), new DividerDrawerItem())
+                            .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+                                @Override
+                                public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+                                    if (drawerItem.getTag() == null) {
+                                        pickedGroup = null;
+                                        carGroupView.setVisibility(View.GONE);
+                                    } else {
+                                        pickedGroup = (GetGroup) drawerItem.getTag();
+                                        carGroup.setText(pickedGroup.getTitle());
+                                        carGroupView.setVisibility(View.VISIBLE);
                                     }
-                                });
-                        drawerSecond = drawerBuilder.build();
-                        for (int i = 0; i < getGroups.length; i++) {
-                            drawerSecond.addItem(new SecondaryDrawerItem().withName(getGroups[i].getTitle()).withTag(getGroups[i]));
-                        }
-
-
-
+                                    updateMarkersPosition();
+                                    drawerSecond.closeDrawer();
+                                    return true;
+                                }
+                            });
+                    drawerSecond = drawerBuilder.build();
+                    for (int i = 0; i < getGroups.length; i++) {
+                        drawerSecond.addItem(new SecondaryDrawerItem().withName(getGroups[i].getTitle()).withTag(getGroups[i]));
+                    }
 
 
                 }
@@ -424,22 +421,19 @@ public class GMapFragment extends AbstractFragment implements OnMapReadyCallback
 
         }
 
-        if ((!"0".equals(authorizedUser.getUnread_ticket()) && authorizedUser.getUnread_ticket() != null)
+        if (((MainActivity) getActivity()).blinkMessageIcon && (!"0".equals(authorizedUser.getUnread_ticket()) && authorizedUser.getUnread_ticket() != null)
                 && ("1".equals(authorizedUser.getManager()) || "1".equals(authorizedUser.getDiler()))) {
             message.setImageBitmap(ApplicationUtil.drawToBitmap(getResources().getDrawable(R.drawable.ic_mail)
                     , getResources().getColor(R.color.light_blue), PorterDuff.Mode.SRC_IN));
             message.setVisibility(View.VISIBLE);
-
-            if (((MainActivity) getActivity()).blinkMessageIcon) {
-                ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(message, View.ALPHA, 1, 0);
-                objectAnimator.setRepeatCount(Animation.INFINITE);
-                objectAnimator.setRepeatMode(Animation.REVERSE);
-                objectAnimator.setDuration(1200);
-                objectAnimator.setInterpolator(new LinearInterpolator());
-                AnimatorSet animatorSet = new AnimatorSet();
-                animatorSet.playTogether(objectAnimator);
-                animatorSet.start();
-            }
+            ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(message, View.ALPHA, 1, 0);
+            objectAnimator.setRepeatCount(Animation.INFINITE);
+            objectAnimator.setRepeatMode(Animation.REVERSE);
+            objectAnimator.setDuration(1200);
+            objectAnimator.setInterpolator(new LinearInterpolator());
+            AnimatorSet animatorSet = new AnimatorSet();
+            animatorSet.playTogether(objectAnimator);
+            animatorSet.start();
         }
     }
 
@@ -502,7 +496,7 @@ public class GMapFragment extends AbstractFragment implements OnMapReadyCallback
         handler.postDelayed(new Runnable() {
             public void run() {
                 ((MainActivity) getActivity()).setBackgroundTaskExecuting(true);
-                if (drawerSecond != null && getActivity().getSupportFragmentManager().getFragments().size()==1) {
+                if (drawerSecond != null && getActivity().getSupportFragmentManager().getFragments().size() == 1) {
                     drawerSecond.getDrawerLayout().setDrawerLockMode(DrawerLayout.LOCK_MODE_UNDEFINED);
                 }
                 i[0]++;
@@ -890,15 +884,15 @@ public class GMapFragment extends AbstractFragment implements OnMapReadyCallback
                     logger.debug("Error while trying write to bundle");
                 }
 
-                if (drawerSecond!=null){
+                if (drawerSecond != null) {
                     drawerSecond.getDrawerLayout().setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
                 }
 
                 historyFragment.setArguments(bundle);
                 FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
                 List<Fragment> fragments = getActivity().getSupportFragmentManager().getFragments();
-                for (Fragment f : fragments){
-                    if (fragments.get(fragments.size()-1) != f){
+                for (Fragment f : fragments) {
+                    if (fragments.get(fragments.size() - 1) != f) {
                         ft.remove(f);
                     }
                 }
@@ -910,7 +904,7 @@ public class GMapFragment extends AbstractFragment implements OnMapReadyCallback
                 ft.add(R.id.content_main, historyFragment);
                 ft.hide(GMapFragment.this);
                 ft.commit();
-                if (drawerSecond!=null){
+                if (drawerSecond != null) {
                     drawerSecond.getDrawerLayout().setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
                 }
                 showProgress(false, mapContainer, progressLayout);
@@ -976,7 +970,7 @@ public class GMapFragment extends AbstractFragment implements OnMapReadyCallback
 
         //engine
         String engine = tag.getMotor();
-        if ("-1".equals(engine)){
+        if ("-1".equals(engine)) {
             carEngineView.setVisibility(View.GONE);
         } else {
             if ("1".equals(engine)) {
@@ -993,7 +987,7 @@ public class GMapFragment extends AbstractFragment implements OnMapReadyCallback
 
         //fuelConsumption
         String fuelConsumption = tag.getQ_dff();
-        if ("-1".equals(fuelConsumption) || fuelConsumption == null) {
+        if ("-1".equals(fuelConsumption) || fuelConsumption == null || "-1.00".equals(fuelConsumption)) {
             carFuelConsumptionView.setVisibility(View.GONE);
         } else {
             double v = (Double.parseDouble(fuelConsumption)) / 10;
@@ -1004,7 +998,7 @@ public class GMapFragment extends AbstractFragment implements OnMapReadyCallback
 
         //volumeFuel
         String fuelVolume = tag.getDff();
-        if ("-1".equals(fuelVolume) || fuelVolume == null) {
+        if ("-1".equals(fuelVolume) || fuelVolume == null || "-1.00".equals(fuelVolume)) {
             carVolumeFuelView.setVisibility(View.GONE);
         } else {
             double v = Double.parseDouble(fuelVolume) / 10;
@@ -1074,19 +1068,21 @@ public class GMapFragment extends AbstractFragment implements OnMapReadyCallback
             carVoltageView.setVisibility(View.GONE);
         } else {
             String power = tag.getPower();
-            if (power != null || "1".equals(power)) {
-                power = getResources().getString(R.string.network);
-            } else
+            if (power == null || "0".equals(power)) {
                 power = getResources().getString(R.string.battery);
+                carVoltage.setTextColor(getResources().getColor(R.color.yellow));
+            } else {
+                power = getResources().getString(R.string.network);
+                carVoltage.setTextColor(getResources().getColor(R.color.success));
+            }
             voltage = new DecimalFormat("0.0").format(Double.parseDouble(voltage));
             carVoltage.setText(power
                     + " (" + voltage + getResources().getString(R.string.v) + ")");
-            carVoltage.setTextColor(getResources().getColor(R.color.success));
         }
 
         //ignition
         String ignition = tag.getIgnition();
-        if ("-1".equals(ignition)){
+        if ("-1".equals(ignition)) {
             carIgnitionView.setVisibility(View.GONE);
         } else {
             if ("1".equals(ignition)) {
@@ -1144,7 +1140,7 @@ public class GMapFragment extends AbstractFragment implements OnMapReadyCallback
         carName.setText(cName);
 
         //icon
-        Bitmap bitmap = ApplicationUtil.pickImage(getContext(),0,"1",tag.getMarker(), tag.getColor());
+        Bitmap bitmap = ApplicationUtil.pickImage(getContext(), 0, "1", tag.getMarker(), tag.getColor());
         carImage.setImageBitmap(bitmap);
     }
 

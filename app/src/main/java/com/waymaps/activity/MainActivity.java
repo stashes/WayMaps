@@ -95,6 +95,8 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         if (getIntent().getBooleanExtra("EXIT", false)) {
+            authorisedUser = new User();
+            authorisedUser.setId(String.valueOf(getIntent().getStringExtra("USER")));
             LogoutCredentials logoutCredentials = getLogoutCredential();
             RetrofitService.getWayMapsService().logoutProcedure(logoutCredentials.getAction(), logoutCredentials.getUserId(),
                     logoutCredentials.getIdentificator()).enqueue(new Callback<Void>() {
@@ -201,6 +203,7 @@ public class MainActivity extends AppCompatActivity
                         mainIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                         mainIntent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
                         mainIntent.putExtra("EXIT", true);
+                        mainIntent.putExtra("USER", authorisedUser.getId());
                         startActivity(mainIntent);
                     } else {
                         ApplicationUtil.showToast(this, getString(R.string.press_one_more_time));
