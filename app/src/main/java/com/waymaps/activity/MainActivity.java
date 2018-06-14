@@ -102,16 +102,16 @@ public class MainActivity extends AppCompatActivity
                     logoutCredentials.getIdentificator()).enqueue(new Callback<Void>() {
                 @Override
                 public void onResponse(Call<Void> call, Response<Void> response) {
-
+                    System.exit(0);
                 }
 
                 @Override
                 public void onFailure(Call<Void> call, Throwable t) {
-
+                    System.exit(0);
                 }
             });
-            //finish();
             System.exit(0);
+            finish();
         }
         super.onCreate(savedInstanceState);
 

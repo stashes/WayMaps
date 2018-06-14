@@ -144,6 +144,7 @@ public class GetTicketFragment extends AbstractFragment implements AdapterView.O
         Bundle bundle = new Bundle();
         try{
             ApplicationUtil.setValueToBundle(bundle,"get_ticket_id", ticketId);
+            ApplicationUtil.setValueToBundle(bundle,"tracker_name", trackerName);
         }catch (JsonProcessingException e){
             logger.debug("Error while trying write to bundle");
         }

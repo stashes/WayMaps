@@ -676,7 +676,7 @@ public class GMapFragment extends AbstractFragment implements OnMapReadyCallback
     }
 
     private void resizeMap(@NonNull View bottomSheet) {
-        mapView.setPadding(0, 0, 0, SystemUtil.getIntHeight(getActivity()) - SystemUtil.getStatusBarHeight(getActivity()) - bottomSheet.getTop());
+        mapView.setPadding(0, 0, 0, SystemUtil.getIntHeight(getActivity()) - SystemUtil.getStatusBarHeight(getActivity()) - bottomSheet.getTop() - (int) (0.06*SystemUtil.getIntHeight(getActivity())));
     }
 
     private void all(boolean collapse) {
@@ -1070,7 +1070,7 @@ public class GMapFragment extends AbstractFragment implements OnMapReadyCallback
             String power = tag.getPower();
             if (power == null || "0".equals(power)) {
                 power = getResources().getString(R.string.battery);
-                carVoltage.setTextColor(getResources().getColor(R.color.yellow));
+                carVoltage.setTextColor(getResources().getColor(R.color.darkyellow));
             } else {
                 power = getResources().getString(R.string.network);
                 carVoltage.setTextColor(getResources().getColor(R.color.success));

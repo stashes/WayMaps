@@ -39,6 +39,7 @@ public class CommentDialogFragment extends DialogFragment implements View.OnClic
     EditText text;
     Button addComent;
     int ticketId;
+    private String trackerName;
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -53,6 +54,7 @@ public class CommentDialogFragment extends DialogFragment implements View.OnClic
     private void getAttrFromBundle(){
         try {
             ticketId = (Integer) ApplicationUtil.getObjectFromBundle(getArguments(), "get_ticket_id", Integer.class);
+            trackerName = ApplicationUtil.getObjectFromBundle(getArguments(), "tracker_name", String.class);
         } catch (IOException e) {
         }
     }
@@ -87,6 +89,8 @@ public class CommentDialogFragment extends DialogFragment implements View.OnClic
         Bundle bundle = new Bundle();
         try{
             ApplicationUtil.setValueToBundle(bundle,"get_ticket_id", ticketId);
+            ApplicationUtil.setValueToBundle(bundle,"tracker_name", trackerName);
+
         }catch (JsonProcessingException e){
 
         }

@@ -162,10 +162,10 @@ public class TicketListFragment extends AbstractFragment implements AdapterView.
         }
         GetTicketFragment getTicketFragment = new GetTicketFragment();
         getTicketFragment.setArguments(bundle);
-        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.content_main, getTicketFragment);
         ft.addToBackStack("getTicketList");
-        getFragmentManager().popBackStackImmediate("map",0);
+        //getFragmentManager().popBackStackImmediate("map",0);
         ft.commit();
 
     }

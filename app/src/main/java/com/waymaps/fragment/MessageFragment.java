@@ -1,5 +1,6 @@
 package com.waymaps.fragment;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentTransaction;
@@ -11,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -133,16 +135,33 @@ public class MessageFragment extends AbstractFragment implements View.OnClickLis
     }
     private void goToMapfragment(){
         TicketListFragment ticketListFragment =  new TicketListFragment();
+        Bundle bundle = new Bundle();
         try {
             ticketListFragment.setArguments(ApplicationUtil.setValueToBundle
-                    (new Bundle(),"user",authorizedUser));
+                    (bundle,"user",authorizedUser));
+            ticketListFragment.setArguments(ApplicationUtil.setValueToBundle
+                    (bundle,"tracker_name",tracker.getTitle()));
         } catch (JsonProcessingException e) {
             logger.error("Error writing user {}",authorizedUser.toString());
         }
-        FragmentTransaction ft = getFragmentManager().beginTransaction();
+
+        InputMethodManager inputManager = (InputMethodManager) getActivity().getSystemService(
+                Context.INPUT_METHOD_SERVICE);
+        inputManager.hideSoftInputFromWindow(mess_text.getWindowToken(),
+                InputMethodManager.HIDE_NOT_ALWAYS);
+
+        getActivity().getSupportFragmentManager().popBackStackImmediate("ticketList",0);
+        FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.content_main, ticketListFragment);
-        ft.remove(this);
+        //ft.remove(this);
         ft.commit();
+
+
+
+        /*ft = getActivity().getSupportFragmentManager().beginTransaction();
+        ft.replace(R.id.content_main, ticketListFragment);
+        //ft.remove(this);
+        ft.commit();*/
     }
 
     @Override

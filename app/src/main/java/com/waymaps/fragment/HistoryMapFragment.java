@@ -693,7 +693,7 @@ public class HistoryMapFragment extends AbstractFragment {
         String power = point.getPower();
         if (power == null || "0".equals(power)) {
             power = getResources().getString(R.string.battery);
-            historyVoltage.setTextColor(getResources().getColor(R.color.yellow));
+            historyVoltage.setTextColor(getResources().getColor(R.color.darkyellow));
         } else {
             power = getResources().getString(R.string.network);
             historyVoltage.setTextColor(getResources().getColor(R.color.success));
