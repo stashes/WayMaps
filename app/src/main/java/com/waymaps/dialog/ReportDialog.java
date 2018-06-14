@@ -83,6 +83,9 @@ public class ReportDialog extends Dialog {
     @BindView(R.id.report_average_speed_include_parking)
     TextView reportAverageSpeedIncludeParking;
 
+    @BindView(R.id.report_average_speed_include_parking_text)
+    TextView reportAverageSpeedIncludeParkingText;
+
     @BindView(R.id.report_parking_count_view)
     LinearLayout reportParkingCountView;
 
@@ -206,6 +209,7 @@ public class ReportDialog extends Dialog {
         }
 
         String avgspeedip = report.getSpeed_avg();
+        reportAverageSpeedIncludeParkingText.setText(reportAverageSpeedIncludeParkingText.getText().toString().trim());
         if (avgspeedip != null) {
             try{
                 avgspeedip = format.format(Double.parseDouble(avgspeedip));

@@ -195,7 +195,7 @@ public class HistoryFragment extends AbstractFragment {
     @OnClick(R.id.history_show_report)
     protected void report() {
         ReportDialog reportDialog = new ReportDialog(getContext(), authorizedUser, getCurrent, tracker, report, trackCount, dateFromD, dateToD);
-        reportDialog.getWindow().setLayout((int) (SystemUtil.getIntWidth(getActivity()) * 1), (int) (SystemUtil.getIntHeight(getActivity()) * 1));
+        reportDialog.getWindow().setLayout((int) (SystemUtil.getIntWidth(getActivity()) * 0.8), (int) (SystemUtil.getIntHeight(getActivity()) * 0.7));
         reportDialog.show();
     }
 
