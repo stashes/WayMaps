@@ -123,17 +123,17 @@ public class BalanceFragment extends AbstractFragment {
         String html2 = null;
         String saldo = null;
         String accNo = "15" + String.format("%05d", new Integer(authorizedUser.getFirm_id()));
-        String text = getResources().getString(R.string.personal_account) + " " + "№" + accNo +
-                " - " + getString(R.string.balancesmall) + " ";
+        String text = getResources().getString(R.string.personal_account) + " " + "№"  + accNo +  "<br>" +
+                getString(R.string.balancesmall) + " ";
         if (finGets.length == 0) {
             balance = 0;
             saldo = decimalFormat.format(balance);
-            saldo += " " + getString(R.string.uah);
+            saldo += " " + authorizedUser.getCurrency();
             html1 = "<font>" + text + "</font>";
         } else {
             balance = new Double(finGets[0].getBalance());
             saldo = decimalFormat.format(balance);
-            saldo += " " + getString(R.string.uah);
+            saldo += " " + authorizedUser.getCurrency();
             html1 = "<font>" + text + "</font>";
         }
         if (balance > 0) {

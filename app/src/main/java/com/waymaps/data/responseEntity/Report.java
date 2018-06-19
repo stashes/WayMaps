@@ -14,6 +14,8 @@ public class Report {
     private String speed_avg;
     private String stop_time;
     private String max_speed;
+    private String total_fuel;
+    private String qff;
     private String overspeed_count;
     private String overspeed_seconds;
     private String overspeed_percent;
@@ -21,10 +23,7 @@ public class Report {
     public Report() {
     }
 
-    public Report(String total_odometr, String parking_count, String total_period,
-                  String parking_time, String action_time, String speed_action, String speed_avg,
-                  String stop_time, String max_speed, String overspeed_count,
-                  String overspeed_seconds, String overspeed_percent) {
+    public Report(String total_odometr, String parking_count, String total_period, String parking_time, String action_time, String speed_action, String speed_avg, String stop_time, String max_speed, String total_fuel, String qff, String overspeed_count, String overspeed_seconds, String overspeed_percent) {
         this.total_odometr = total_odometr;
         this.parking_count = parking_count;
         this.total_period = total_period;
@@ -34,6 +33,8 @@ public class Report {
         this.speed_avg = speed_avg;
         this.stop_time = stop_time;
         this.max_speed = max_speed;
+        this.total_fuel = total_fuel;
+        this.qff = qff;
         this.overspeed_count = overspeed_count;
         this.overspeed_seconds = overspeed_seconds;
         this.overspeed_percent = overspeed_percent;
@@ -135,6 +136,22 @@ public class Report {
         this.overspeed_percent = overspeed_percent;
     }
 
+    public String getTotal_fuel() {
+        return total_fuel;
+    }
+
+    public void setTotal_fuel(String total_fuel) {
+        this.total_fuel = total_fuel;
+    }
+
+    public String getQff() {
+        return qff;
+    }
+
+    public void setQff(String qff) {
+        this.qff = qff;
+    }
+
     @Override
     public String toString() {
         return "Report{" +
@@ -147,6 +164,8 @@ public class Report {
                 ", speed_avg='" + speed_avg + '\'' +
                 ", stop_time='" + stop_time + '\'' +
                 ", max_speed='" + max_speed + '\'' +
+                ", total_fuel='" + total_fuel + '\'' +
+                ", qff='" + qff + '\'' +
                 ", overspeed_count='" + overspeed_count + '\'' +
                 ", overspeed_seconds='" + overspeed_seconds + '\'' +
                 ", overspeed_percent='" + overspeed_percent + '\'' +

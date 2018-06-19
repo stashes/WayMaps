@@ -1,9 +1,11 @@
 package com.waymaps.fragment;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -28,14 +30,18 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.CustomCap;
+import com.google.android.gms.maps.model.JointType;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.gms.maps.model.RoundCap;
 import com.google.android.gms.maps.model.TileOverlayOptions;
 import com.waymaps.R;
 import com.waymaps.activity.MainActivity;
@@ -89,7 +95,9 @@ public class HistoryMapFragment extends AbstractFragment {
     public static final int POINTWIDTH = 30;
 
     public static final int PARKINGWIDTH = 60;
+    public static final int ARROWWIDTH = 70;
     public static final int PARKINGHEIGHT = 60;
+    public static final int ARROWHEIGHT = 70;
 
     public static final int FLAGSIZE = 50;
 
@@ -111,6 +119,7 @@ public class HistoryMapFragment extends AbstractFragment {
     private GetParking[] getParkingResponse;
     private List<GetParking> getParkings;
     private Marker[] markers;
+    private Marker[] directions;
     private Marker[] stopMarkers;
     private Procedure procedure;
     private Marker currentMarker;
@@ -235,6 +244,7 @@ public class HistoryMapFragment extends AbstractFragment {
     BasicTrackInfoLayout trackLayout;
 
     BasicTrackInfoLayout pointLayout;
+    private Integer maxSpeedInt = null;
 
     static class BackButtonLayout {
         @BindView(R.id.back_to_all_sec)
@@ -283,7 +293,7 @@ public class HistoryMapFragment extends AbstractFragment {
             historyShowOverSpeed.setText(tracker.getMaxspeed());
 
             limit.setText(tracker.getMaxspeed() + " " + getResources().getString(R.string.kmperhour));
-            maxSpeed.setText(report.getMax_speed() + " " + getResources().getString(R.string.kmperhour));
+            maxSpeed.setText(trackCount.getMax_speed() + " " + getResources().getString(R.string.kmperhour));
 
             //Back button block
             BackButtonLayout backButtonLayoutPoint = new BackButtonLayout();
@@ -479,6 +489,10 @@ public class HistoryMapFragment extends AbstractFragment {
                 if (marker != markers[0] && marker != markers[markers.length - 1])
                     marker.setVisible(visibility);
             }
+            for (Marker marker : directions) {
+                if (marker!=null)
+                    marker.setVisible(visibility);
+            }
             currentMarkerVisibility = visibility;
         }
     }
@@ -486,9 +500,17 @@ public class HistoryMapFragment extends AbstractFragment {
     private void drawMarkers() {
         int numMarkers = getTracks.size();
         markers = new Marker[numMarkers];
+        directions = new Marker[numMarkers];
         Bitmap bitmap = ApplicationUtil.drawToBitmap(getResources().getDrawable(R.drawable.ic_circle_1), Color.BLACK, POINTHEIGHT, POINTWIDTH);
+        Bitmap direction = ApplicationUtil.drawToBitmap(getResources().getDrawable(R.drawable.arrow_left), Color.BLACK,ARROWHEIGHT,ARROWWIDTH);
         Bitmap flagStart = ApplicationUtil.drawToBitmap(getResources().getDrawable(R.drawable.marker_green), FLAGSIZE, FLAGSIZE);
         Bitmap flagEnd = ApplicationUtil.drawToBitmap(getResources().getDrawable(R.drawable.marker_red), FLAGSIZE, FLAGSIZE);
+        BitmapDescriptor bitDesc = BitmapDescriptorFactory.fromBitmap(bitmap) ;
+        BitmapDescriptor flagStartDesc = BitmapDescriptorFactory.fromBitmap(flagStart) ;
+        BitmapDescriptor flagEndDesc = BitmapDescriptorFactory.fromBitmap(flagEnd);
+        BitmapDescriptor directionDesc = BitmapDescriptorFactory.fromBitmap(direction) ;
+
+
         if (isAdded() && getActivity() != null)
             for (int i = 0; i < numMarkers; i++) {
                 markers[i] = mMap.addMarker(new MarkerOptions().position(
@@ -496,14 +518,36 @@ public class HistoryMapFragment extends AbstractFragment {
                                 , Double.parseDouble(getTracks.get(i).getLon())))
                         .anchor(0.5f, 0.5f));
                 if (i == 0) {
-                    markers[i].setIcon(BitmapDescriptorFactory.fromBitmap(flagStart));
+                    markers[i].setIcon(flagStartDesc);
                     markers[i].setVisible(true);
                 } else if (i == (numMarkers - 1)) {
-                    markers[i].setIcon(BitmapDescriptorFactory.fromBitmap(flagEnd));
+                    markers[i].setIcon(flagEndDesc);
                     markers[i].setVisible(true);
+                    float angle = (float) getAngle(Double.parseDouble(getTracks.get(i-1).getLat()),
+                            Double.parseDouble(getTracks.get(i-1).getLon()),
+                            Double.parseDouble(getTracks.get(i).getLat())
+                            ,Double.parseDouble(getTracks.get(i).getLon()));
+                    LatLng latLng = new LatLng(((Double.parseDouble(getTracks.get(i-1).getLat()) + Double.parseDouble(getTracks.get(i).getLat()))/2)
+                            , ((Double.parseDouble(getTracks.get(i-1).getLon()) + Double.parseDouble(getTracks.get(i).getLon()))/2));
+                    directions[i-1] = mMap.addMarker(new MarkerOptions().position(latLng)
+                            .anchor(0.5f, 0.5f));
+                    directions[i-1].setIcon(directionDesc);
+                    directions[i-1].setRotation(angle-90);
+                    directions[i-1].setVisible(false);
                 } else {
-                    markers[i].setIcon(BitmapDescriptorFactory.fromBitmap(bitmap));
+                    markers[i].setIcon(bitDesc);
                     markers[i].setVisible(false);
+                    float angle = (float) getAngle(Double.parseDouble(getTracks.get(i-1).getLat()),
+                            Double.parseDouble(getTracks.get(i-1).getLon()),
+                            Double.parseDouble(getTracks.get(i).getLat())
+                            ,Double.parseDouble(getTracks.get(i).getLon()));
+                    LatLng latLng = new LatLng(((Double.parseDouble(getTracks.get(i-1).getLat()) + Double.parseDouble(getTracks.get(i).getLat()))/2)
+                            , ((Double.parseDouble(getTracks.get(i-1).getLon()) + Double.parseDouble(getTracks.get(i).getLon()))/2));
+                    directions[i-1] = mMap.addMarker(new MarkerOptions().position(latLng)
+                            .anchor(0.5f, 0.5f));
+                    directions[i-1].setIcon(directionDesc);
+                    directions[i-1].setRotation(angle-90);
+                    directions[i-1].setVisible(false);
                 }
                 markers[i].setTag(getTracks.get(i));
             }
@@ -523,7 +567,7 @@ public class HistoryMapFragment extends AbstractFragment {
                     if (marker.getTag() instanceof GetTrack) {
                         onMarkerOrListViewClick(marker);
                         changeView(POINT);
-                    } else {
+                    } else if (marker.getTag() instanceof GetParking) {
                         onParkingClick(marker);
                         changeView(PARKING);
                     }
@@ -533,10 +577,23 @@ public class HistoryMapFragment extends AbstractFragment {
         }
     }
 
+    protected static double getAngle(double startLat, double startLng, double endLat, double endLng){
+        double longitude1 = startLng;
+        double longitude2 = endLng;
+        double latitude1 = Math.toRadians(startLat);
+        double latitude2 = Math.toRadians(endLat);
+        double longDiff= Math.toRadians(longitude2-longitude1);
+        double y= Math.sin(longDiff)*Math.cos(latitude2);
+        double x=Math.cos(latitude1)*Math.sin(latitude2)-Math.sin(latitude1)*Math.cos(latitude2)*Math.cos(longDiff);
+
+        return (Math.toDegrees(Math.atan2(y, x))+360)%360;
+    }
+
     private void drawWay() {
         overSpeeds = new ArrayList<>();
         PolylineOptions polylineOptions = new PolylineOptions().width(5.0f).geodesic(true).
                 color(ApplicationUtil.changeColorScaleTo16Int(getCurrent.getColor()));
+
         for (int i = 0; i < markers.length; i++) {
             GetTrack tag = (GetTrack) markers[i].getTag();
             polylineOptions.add(new LatLng(Double.parseDouble(tag.getLat()),
@@ -814,6 +871,11 @@ public class HistoryMapFragment extends AbstractFragment {
     @OnClick(R.id.history_show_overspeed)
     protected void overSpeed() {
         removeBgTasks();
+
+/*        if (maxSpeedInt == null){
+            for ()
+        }*/
+
         updatePolyline(!isOverSpeed);
 /*
         for (Polyline polyline : overSpeeds) {

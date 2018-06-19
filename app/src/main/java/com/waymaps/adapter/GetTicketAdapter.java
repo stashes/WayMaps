@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.waymaps.R;
+import com.waymaps.activity.MainActivity;
 import com.waymaps.data.responseEntity.Ticket;
 import com.waymaps.data.responseEntity.TicketList;
 import com.waymaps.util.ApplicationUtil;
@@ -74,13 +75,23 @@ public class GetTicketAdapter extends BaseAdapter {private Context context;
         }
         ButterKnife.bind(this,view);
         Ticket ticket = getTickets(position);
-        if (ticket.getReadDate() == null){
-            ticketMail.setImageBitmap(ApplicationUtil.drawToBitmap(context.getResources().getDrawable(R.drawable.ic_mail)
-                    , context.getResources().getColor(R.color.light_blue)
-                    , PorterDuff.Mode.SRC_IN));
-            ticketMessage.setTypeface(null, Typeface.BOLD);
+
+        if (ticket.getReadDate() == null) {
+            ticketMail.setImageBitmap(ApplicationUtil.drawToBitmap(context.getResources().getDrawable(R.drawable.arrowtp)));
         } else {
-            ticketMail.setImageBitmap(ApplicationUtil.drawToBitmap(context.getResources().getDrawable(R.drawable.mail_open_ic)
+            ticketMail.setImageBitmap(ApplicationUtil.drawToBitmap(context.getResources().getDrawable(R.drawable.arrowfl)));
+        }
+
+
+        if (ticket.getUserTitle() != null && ticket.getUserTitle().equals(MainActivity.authorisedUser.getUser_title())){
+            ticketMail.setImageBitmap(ApplicationUtil.drawToBitmap(ticketMail.getDrawable()
+                    , context.getResources().getColor(R.color.light_green)
+                    , PorterDuff.Mode.SRC_IN));
+            ticketMail.setRotation(180f);
+
+            //ticketMessage.setTypeface(null, Typeface.BOLD);
+        } else {
+            ticketMail.setImageBitmap(ApplicationUtil.drawToBitmap(ticketMail.getDrawable()
                     , context.getResources().getColor(R.color.light_blue)
                     , PorterDuff.Mode.SRC_IN));
         }

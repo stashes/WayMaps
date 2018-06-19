@@ -24,6 +24,8 @@ public class Action {
     public static final String GET_TRACK = "m_get_track";
     public static final String GET_PARKING = "m_get_parking";
     public static final String POINT_DATA = "m_point_data";
+    public static final String SEND_MAIL_CREATE = "send_kurator_ticket_mail";
+    public static final String SEND_MAIL_COMMENT = "send_kurator_comment_mail";
 
 
 

@@ -21,6 +21,7 @@ import com.waymaps.data.requestEntity.Action;
 import com.waymaps.data.requestEntity.Procedure;
 import com.waymaps.data.requestEntity.parameters.IdParam;
 import com.waymaps.data.requestEntity.parameters.Parameter;
+import com.waymaps.data.requestEntity.parameters.StringParam;
 import com.waymaps.data.responseEntity.User;
 import com.waymaps.util.ApplicationUtil;
 import com.waymaps.util.SystemUtil;
@@ -71,12 +72,26 @@ public class CommentDialogFragment extends DialogFragment implements View.OnClic
         procedure.setIdentficator(SystemUtil.getWifiMAC(getActivity()));
         procedure.setName(Action.COMMENT_ADD);
         procedure.setUser_id(MainActivity.authorisedUser.getId());
-        String parameter = ticketId + ",'" + text.getText().toString() + "'," + MainActivity.authorisedUser.getId();
+        final String mess = text.getText().toString();
+        String parameter = ticketId + ",'" + mess + "'," + MainActivity.authorisedUser.getId();
         Call<Void> call = RetrofitService.getWayMapsService().addComment(procedure.getAction(), procedure.getName(),
                 procedure.getIdentficator(), procedure.getUser_id(), procedure.getFormat(), parameter);
         call.enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
+                RetrofitService.getWayMapsService().sendMailComment(Action.SEND_MAIL_COMMENT,new StringParam(mess).getParameters(), MainActivity.authorisedUser.getFirm_id(),
+                        "'"+MainActivity.authorisedUser.getFirm_title()+"'","'" + MainActivity.authorisedUser.getUser_title() + "'"
+                        ,"'" +trackerName+"'").enqueue(new Callback<Void>() {
+                    @Override
+                    public void onResponse(Call<Void> call, Response<Void> response) {
+
+                    }
+
+                    @Override
+                    public void onFailure(Call<Void> call, Throwable t) {
+
+                    }
+                });
             }
 
             @Override

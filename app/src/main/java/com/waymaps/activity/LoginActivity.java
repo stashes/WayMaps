@@ -75,6 +75,9 @@ public class LoginActivity extends AppCompatActivity {
     @BindView(R.id.login_form)
     View mLoginFormView;
 
+    @BindView(R.id.login_background)
+    View mBackground;
+
     @BindView(R.id.pass_save)
     CheckBox mPassSave;
 
@@ -249,7 +252,7 @@ public class LoginActivity extends AppCompatActivity {
         } else {
             if (Double.parseDouble(user.getSaldo()) < -20.0) {
                 NotificationManager.showNotification(this,
-                        getString(R.string.notif_saldo_minus) + "-" + user.getSaldo() + user.getCurrency());
+                        getString(R.string.notif_saldo_minus) + ":  " + user.getSaldo() + user.getCurrency());
             }
             MainActivityIntent mainActivityIntent = new MainActivityIntent(this);
             try {
@@ -314,6 +317,16 @@ public class LoginActivity extends AppCompatActivity {
                 }
             });
 
+
+            mBackground.setVisibility(show ? View.GONE : View.VISIBLE);
+            mBackground.animate().setDuration(shortAnimTime).alpha(
+                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    mBackground.setVisibility(show ? View.GONE : View.VISIBLE);
+                }
+            });
+
             mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
             mProgressView.animate().setDuration(shortAnimTime).alpha(
                     show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
@@ -327,6 +340,7 @@ public class LoginActivity extends AppCompatActivity {
             // and hide the relevant UI components.
             mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
             mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+            mBackground.setVisibility(show ? View.GONE : View.VISIBLE);
         }
     }
 

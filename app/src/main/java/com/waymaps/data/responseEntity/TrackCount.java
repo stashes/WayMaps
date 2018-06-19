@@ -7,13 +7,23 @@ package com.waymaps.data.responseEntity;
 public class TrackCount {
     private String coun;
     private String odo;
+    private String max_speed;
 
     public TrackCount() {
     }
 
-    public TrackCount(String coun, String odo) {
+    public TrackCount(String coun, String odo, String max_speed) {
         this.coun = coun;
         this.odo = odo;
+        this.max_speed = max_speed;
+    }
+
+    public String getMax_speed() {
+        return max_speed;
+    }
+
+    public void setMax_speed(String max_speed) {
+        this.max_speed = max_speed;
     }
 
     public String getCoun() {
@@ -37,6 +47,7 @@ public class TrackCount {
         return "TrackCount{" +
                 "coun='" + coun + '\'' +
                 ", odo='" + odo + '\'' +
+                ", max_speed='" + max_speed + '\'' +
                 '}';
     }
 }

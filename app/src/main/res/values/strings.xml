@@ -142,7 +142,7 @@
     <string name="get_tracker">Trackers</string>
     <string name="personal_account">Personal account</string>
     <string name="uah">UAH</string>
-    <string name="balancesmall">balance</string>
+    <string name="balancesmall">Current balance: </string>
     <string name="parking">Parking</string>
     <string name="way_point">Way point</string>
     <string name="downloading_data">Downloading data...</string>
@@ -165,5 +165,9 @@
     <string name="map_screen_should_be_chosen">Map screen should be active</string>
     <string name="movement_mode">Movement mode</string>
     <string name="speed_excesses">Speed excesses</string>
+    <string name="used_fuel">Used fuel</string>
+    <string name="report_fuel_consumption">Fuel consumption</string>
+    <string name="calculating">Calculating...</string>
+    <string name="Manager">Manager</string>
 
 </resources>

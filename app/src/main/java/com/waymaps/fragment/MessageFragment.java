@@ -107,8 +107,6 @@ public class MessageFragment extends AbstractFragment implements View.OnClickLis
             NotificationManager.showNotification(getActivity() , "Text field is empty");
         }else {
             sendMessage();
-            NotificationManager.showNotification(getActivity(), "SMS sended");
-            goToMapfragment();
         }
     }
     private void sendMessage(){
@@ -122,9 +120,24 @@ public class MessageFragment extends AbstractFragment implements View.OnClickLis
         procedure.setParams(p.getParameters());
         Call<Void> call = RetrofitService.getWayMapsService().sendMessage(procedure.getAction(), procedure.getName(),
                 procedure.getIdentficator(), procedure.getFormat(), procedure.getParams());
-       call.enqueue(new Callback<Void>() {
+        call.enqueue(new Callback<Void>() {
            @Override
            public void onResponse(Call<Void> call, Response<Void> response) {
+               NotificationManager.showNotification(getActivity(), "SMS sended");
+               goToMapfragment();
+               RetrofitService.getWayMapsService().sendMailCreate(Action.SEND_MAIL_CREATE,authorizedUser.getFirm_id(),
+                       "'"+authorizedUser.getFirm_title()+"'","'" + authorizedUser.getUser_title() + "'"
+                       ,"'" + tracker.getTitle()+"'").enqueue(new Callback<Void>() {
+                   @Override
+                   public void onResponse(Call<Void> call, Response<Void> response) {
+
+                   }
+
+                   @Override
+                   public void onFailure(Call<Void> call, Throwable t) {
+
+                   }
+               });
            }
 
            @Override

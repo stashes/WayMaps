@@ -140,6 +140,19 @@ public class ReportDialog extends Dialog {
     @BindView(R.id.report_min_stop_time)
     TextView reportMinStopTime;
 
+    @BindView(R.id.report_total_fuel_view)
+    LinearLayout reportTotalFuelView;
+
+    @BindView(R.id.report_total_fuel)
+    TextView reportTotalFuel;
+
+    @BindView(R.id.report_fuel_consumption_view)
+    LinearLayout reportFuelConsumptionView;
+
+    @BindView(R.id.report_fuel_consumption)
+    TextView reportFuelConsumption;
+
+
     private User authorisedUser;
     private GetCurrent getCurrent;
     private Report report;
@@ -151,7 +164,7 @@ public class ReportDialog extends Dialog {
     private Date dateFrom;
     private Date dateTo;
 
-    public ReportDialog(@NonNull Context context, User authorisedUser, GetCurrent getCurrent, TrackerList tracker,Report report, TrackCount trackCount, Date dateFrom, Date dateTo) {
+    public ReportDialog(@NonNull Context context, User authorisedUser, GetCurrent getCurrent, TrackerList tracker, Report report, TrackCount trackCount, Date dateFrom, Date dateTo) {
         super(context);
         this.authorisedUser = authorisedUser;
         this.getCurrent = getCurrent;
@@ -183,6 +196,38 @@ public class ReportDialog extends Dialog {
         } else {
             reportDriverView.setVisibility(View.GONE);
         }
+
+        String totalFuel = report.getTotal_fuel();
+        if (totalFuel != null) {
+            try {
+                double tf = Double.parseDouble(totalFuel);
+                tf /= 10;
+                totalFuel = format.format(tf);
+                reportTotalFuelView.setVisibility(View.VISIBLE);
+                reportTotalFuel.setText(totalFuel + " " + getContext().getResources().getString(R.string.l));
+            } catch (Exception e) {
+                reportTotalFuelView.setVisibility(View.GONE);
+            }
+        } else {
+            reportTotalFuelView.setVisibility(View.GONE);
+        }
+
+        String fuelConsumption = report.getQff();
+        if (fuelConsumption != null) {
+            try {
+                double fc = Double.parseDouble(fuelConsumption);
+                fc /= 10;
+                fuelConsumption = format.format(fc);
+                reportFuelConsumptionView.setVisibility(View.VISIBLE);
+                reportFuelConsumption.setText(fuelConsumption + " " + getContext().getResources().getString(R.string.lperkm));
+            } catch (Exception e) {
+                reportFuelConsumptionView.setVisibility(View.GONE);
+            }
+        } else {
+            reportFuelConsumptionView.setVisibility(View.GONE);
+        }
+
+
         String dateF = DateTimeUtil.dateToStringForReport(dateFrom);
         if (dateF != null) {
             reportDateFrom.setText(dateF);
@@ -199,7 +244,7 @@ public class ReportDialog extends Dialog {
 
         String avgspeed = report.getSpeed_action();
         if (avgspeed != null) {
-            try{
+            try {
                 avgspeed = format.format(Double.parseDouble(avgspeed));
             } finally {
                 reportAverageSpeed.setText(avgspeed + " " + getContext().getResources().getString(R.string.kmperhour));
@@ -211,7 +256,7 @@ public class ReportDialog extends Dialog {
         String avgspeedip = report.getSpeed_avg();
         reportAverageSpeedIncludeParkingText.setText(reportAverageSpeedIncludeParkingText.getText().toString().trim());
         if (avgspeedip != null) {
-            try{
+            try {
                 avgspeedip = format.format(Double.parseDouble(avgspeedip));
             } finally {
                 reportAverageSpeedIncludeParking.setText(avgspeedip + " " + getContext().getResources().getString(R.string.kmperhour));
@@ -224,7 +269,7 @@ public class ReportDialog extends Dialog {
         try {
             Double per = Double.parseDouble(excPer);
             reportExcessesPercentage.setText(new DecimalFormat("0.0").format(per) + " %");
-        } catch (NumberFormatException e) {
+        } catch (Exception e) {
             reportExcessesPercentage.setText("");
         }
 
@@ -237,7 +282,7 @@ public class ReportDialog extends Dialog {
 
         String excT = report.getOverspeed_seconds();
         if (excT != null) {
-            excT =  DateTimeUtil.longToStringDate(Long.parseLong(excT),getContext());
+            excT = DateTimeUtil.longToStringDate(Long.parseLong(excT), getContext());
             reportExcessesTotalTime.setText(excT);
         } else {
             reportExcessesTotalTime.setText("");
@@ -259,7 +304,7 @@ public class ReportDialog extends Dialog {
 
         String minstop = report.getStop_time();
         if (minstop != null) {
-            minstop = DateTimeUtil.longMinToStringDate(Long.parseLong(minstop),getContext());
+            minstop = DateTimeUtil.longMinToStringDate(Long.parseLong(minstop), getContext());
             reportMinStopTime.setText(minstop);
         } else {
             reportMinStopTime.setText("");
@@ -274,7 +319,7 @@ public class ReportDialog extends Dialog {
 
         String parktime = report.getParking_time();
         if (parktime != null) {
-            parktime = DateTimeUtil.longMinToStringDate(Long.parseLong(parktime),getContext());
+            parktime = DateTimeUtil.longMinToStringDate(Long.parseLong(parktime), getContext());
             reportParkingTime.setText(parktime);
         } else {
             reportParkingTime.setText("");
@@ -282,8 +327,8 @@ public class ReportDialog extends Dialog {
 
         String dist = report.getTotal_odometr();
         if (dist != null) {
-            try{
-                dist = format.format((Double.parseDouble(dist)/1000));
+            try {
+                dist = format.format((Double.parseDouble(dist) / 1000));
             } finally {
                 reportTotalDistance.setText(dist + " " + getContext().getString(R.string.km));
             }
@@ -293,7 +338,7 @@ public class ReportDialog extends Dialog {
 
         String totalTime = report.getTotal_period();
         if (totalTime != null) {
-            totalTime = DateTimeUtil.longMinToStringDate(Long.parseLong(totalTime),getContext());
+            totalTime = DateTimeUtil.longMinToStringDate(Long.parseLong(totalTime), getContext());
             reportTotalTime.setText(totalTime);
         } else {
             reportTotalTime.setText("");
@@ -301,7 +346,7 @@ public class ReportDialog extends Dialog {
 
         String trtime = report.getAction_time();
         if (trtime != null) {
-            trtime= DateTimeUtil.longMinToStringDate(Long.parseLong(trtime),getContext());
+            trtime = DateTimeUtil.longMinToStringDate(Long.parseLong(trtime), getContext());
             reportTraffic.setText(trtime);
         } else {
             reportTraffic.setText("");
@@ -310,7 +355,7 @@ public class ReportDialog extends Dialog {
     }
 
     @OnClick(R.id.report_ok_button)
-    protected void ok(){
+    protected void ok() {
         dismiss();
     }
 }

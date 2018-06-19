@@ -12,9 +12,9 @@
 
     <!--Balance layout -->
     <string name="column1">Дата</string>
-    <string name="column2">Надходження оплати клієнта</string>
-    <string name="column3">Списання коштів за послуги</string>
-    <string name="column4">Баланс по ос. рахунку</string>
+    <string name="column2">Оплата клієнта</string>
+    <string name="column3">Списання коштів</string>
+    <string name="column4">Баланс рахунку</string>
 
     <!--Message Layout-->
     <string name="message_from">Відправник</string>
@@ -136,7 +136,7 @@
     <string name="group_list">Список груп</string>
     <string name="get_tracker">Трекери</string>
     <string name="personal_account">Особовий рахунок</string>
-    <string name="balancesmall">баланс</string>
+    <string name="balancesmall">Поточний баланс: </string>
     <string name="uah">грн</string>
     <string name="map_type">Обрати тип мапи</string>
     <string name="filter_by_group">Фільтр по групі:</string>
@@ -159,5 +159,10 @@
     <string name="map_screen_should_be_chosen">Екран з мапою повинен бути активним</string>
     <string name="movement_mode">Режим руху</string>
     <string name="speed_excesses">Перевищення швидкості</string>
+    <string name="used_fuel">Використано пального</string>
+    <string name="report_fuel_consumption">Питома витрата</string>
+    <string name="calculating">Обчислення...</string>
+    <string name="Manager">Куратор</string>
+
 
 </resources>

@@ -110,8 +110,9 @@ public class MainActivity extends AppCompatActivity
                     System.exit(0);
                 }
             });
-            System.exit(0);
             finish();
+            System.exit(0);
+            return;
         }
         super.onCreate(savedInstanceState);
 
@@ -520,7 +521,7 @@ public class MainActivity extends AppCompatActivity
                 String html2 = null;
                 String saldo = null;
                 String text = getResources().getString(R.string.balance) + ": ";
-                saldo = new DecimalFormat("#,##0.00").format(bal) + " " + getString(R.string.uah);
+                saldo = new DecimalFormat("#,##0.00").format(bal) + " " + authorisedUser.getCurrency();
                 html1 = "<font>" + text + "</font>";
 
                 if (bal > 0) {

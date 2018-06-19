@@ -3,6 +3,7 @@ package com.waymaps.fragment;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -66,12 +67,13 @@ public class TicketListFragment extends AbstractFragment implements AdapterView.
     FloatingActionButton fab;
     View progressBar;
     View content;
-
+    Context context = null;
 
     @Override
     @Nullable
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
+        context = getContext();
         View view = inflater.inflate(R.layout.ticket_list_layout, container, false);
         ticketListView = view.findViewById(R.id.ticket_table);
         progressBar = view.findViewById(R.id.progress_layout);
@@ -109,6 +111,7 @@ public class TicketListFragment extends AbstractFragment implements AdapterView.
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        showProgress(false , content , progressBar);
     }
     private void getTickers(final View view){
         Procedure procedure = new Procedure(Action.CALL);
@@ -127,12 +130,14 @@ public class TicketListFragment extends AbstractFragment implements AdapterView.
                 ticketList = response.body();
                 populateTable();
                 ((MainActivity) getActivity()).blinkMessageIcon = false;
+                if (getContext() != null)
                 showProgress(false , content , progressBar);
 
             }
 
             @Override
             public void onFailure(Call<TicketList[]> call, Throwable t) {
+                if (getContext() != null)
                 showProgress(false , content , progressBar);
             }
         });
@@ -149,7 +154,7 @@ public class TicketListFragment extends AbstractFragment implements AdapterView.
         if (ticketList == null){
             ticketList = new TicketList[0];
         }
-        TicketListAdapter trackerAdapter = new TicketListAdapter(getContext(), Arrays.asList(ticketList));
+        TicketListAdapter trackerAdapter = new TicketListAdapter(context, Arrays.asList(ticketList));
         ticketListView.setAdapter(trackerAdapter);
     }
     private void goToGetTicketFragment(int ticketId,String name){

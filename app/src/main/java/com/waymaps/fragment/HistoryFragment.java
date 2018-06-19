@@ -14,6 +14,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -194,9 +195,8 @@ public class HistoryFragment extends AbstractFragment {
 
     @OnClick(R.id.history_show_report)
     protected void report() {
-        ReportDialog reportDialog = new ReportDialog(getContext(), authorizedUser, getCurrent, tracker, report, trackCount, dateFromD, dateToD);
-        reportDialog.getWindow().setLayout((int) (SystemUtil.getIntWidth(getActivity()) * 0.8), (int) (SystemUtil.getIntHeight(getActivity()) * 0.7));
-        reportDialog.show();
+        ApplicationUtil.showToast(getActivity(),getContext().getString(R.string.calculating));
+        loadReport();
     }
 
 
@@ -226,8 +226,9 @@ public class HistoryFragment extends AbstractFragment {
                     toast.show();
                 } else {
                     report = reports[0];
-                    historyCalculateView.setVisibility(View.GONE);
-                    hisoryShowInfoView.setVisibility(View.VISIBLE);
+                    ReportDialog reportDialog = new ReportDialog(getContext(), authorizedUser, getCurrent, tracker, report, trackCount, dateFromD, dateToD);
+                    reportDialog.getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT,WindowManager.LayoutParams.WRAP_CONTENT);
+                    reportDialog.show();
                 }
             }
 
@@ -249,6 +250,7 @@ public class HistoryFragment extends AbstractFragment {
 
     @OnClick(R.id.history_calculate)
     protected void calculate() {
+        ApplicationUtil.showToast(getActivity(),getContext().getString(R.string.calculating));
         Procedure procedure = new Procedure(Action.CALL);
         //todo change
         Parameter parameter = new IdParam(getCurrent.getId());
@@ -278,7 +280,8 @@ public class HistoryFragment extends AbstractFragment {
                         String distanceKm = new DecimalFormat("0.0").format(
                                 Double.parseDouble(trackCounts[0].getOdo()) / 1000);
                         distance.setText(distanceKm + " " + getString(R.string.km));
-                        loadReport();
+                        historyCalculateView.setVisibility(View.GONE);
+                        hisoryShowInfoView.setVisibility(View.VISIBLE);
                     } else {
                         distance.setText("0.0 " + getString(R.string.km));
                         Toast toast = Toast.makeText(getContext(),

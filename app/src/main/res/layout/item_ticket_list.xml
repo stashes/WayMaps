@@ -16,28 +16,32 @@
             android:layout_margin="4dp"
             android:src="@drawable/ic_mail" />
 
-        <TextView
-            android:id="@+id/ticketUsr"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginLeft="10dp"
-            android:text="Техпідтримка"
-            android:textColor="#FF000000"
-            android:textSize="18dp"
-            android:textStyle="bold"></TextView>
+            android:paddingLeft="10dp"
+            android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/ticketDate"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:text="2017-12-17 12:16"
-            android:textColor="#FF000000"
-            android:textSize="15dp"
-            android:textStyle="italic"></TextView>
+            <TextView
+                android:id="@+id/ticketUsr"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="Техпідтримка"
+                android:textColor="#FF000000"
+                android:textSize="18dp"
+                android:textStyle="bold"></TextView>
+
+            <TextView
+                android:id="@+id/ticketDate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="2017-12-17 12:16"
+                android:textColor="#FF000000"
+                android:textSize="15dp"
+                android:textStyle="italic"></TextView>
+        </LinearLayout>
 
     </LinearLayout>
 

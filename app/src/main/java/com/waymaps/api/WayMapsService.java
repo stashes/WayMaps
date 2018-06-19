@@ -138,8 +138,25 @@ public interface WayMapsService {
     @FormUrlEncoded
     @POST("./")
     Call<GetGroup[]> getGroup(@Field("action") String action, @Field("name") String name,
-                                  @Field("identificator") String identificator,
-                                  @Field("format") String format, @Field("params") String params);
+                              @Field("identificator") String identificator,
+                              @Field("format") String format, @Field("params") String params);
+
+    @FormUrlEncoded
+    @POST("./")
+    Call<Void> sendMailComment(@Field("action") String action,
+                               @Field("comment_text") String comment_text,
+                              @Field("firm_id") String firm_id,
+                              @Field("firm_name") String firm_name,
+                               @Field("user_name") String user_name,
+                               @Field("device_name") String device_name);
+
+    @FormUrlEncoded
+    @POST("./")
+    Call<Void> sendMailCreate(@Field("action") String action,
+                               @Field("firm_id") String firm_id,
+                               @Field("firm_name") String firm_name,
+                               @Field("user_name") String user_name,
+                               @Field("device_name") String device_name);
 
 
 }

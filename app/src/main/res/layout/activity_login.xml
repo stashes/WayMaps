@@ -15,8 +15,10 @@
     <include layout="@layout/progress_bar"/>
 
     <LinearLayout
+        android:id="@+id/login_background"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:orientation="vertical"
         android:padding="10dp"
         android:background="@drawable/logo_accent_ua_white">
 

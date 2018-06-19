@@ -8,7 +8,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical">
 
 
@@ -93,6 +93,7 @@
                             android:layout_height="wrap_content"
                             android:gravity="right"
                             android:text="test" />
+
                         <TextView
                             android:id="@+id/report_date_to"
                             android:layout_width="match_parent"
@@ -102,6 +103,7 @@
                     </LinearLayout>
 
                 </LinearLayout>
+
                 <LinearLayout
                     android:id="@+id/report_totaltime_view"
                     android:layout_width="match_parent"
@@ -125,8 +127,6 @@
 
 
             </LinearLayout>
-
-
 
 
             <!--<LinearLayout
@@ -153,114 +153,172 @@
 
         </LinearLayout>
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="3dp"
-        android:textColor="@color/black"
-        android:text="@string/movement_mode"/>
-        <LinearLayout
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="3dp"
-            android:background="@drawable/corner_view3dp"
-            android:orientation="vertical"
-            android:padding="4dp">
+            android:text="@string/movement_mode"
+            android:textColor="@color/black" />
 
 
-
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
             <LinearLayout
-                android:id="@+id/report_traffic_view"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_margin="3dp"
+                android:background="@drawable/corner_view3dp"
+                android:orientation="vertical"
+                android:padding="4dp">
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="left"
-                    android:layout_weight="0.5"
-                    android:text="@string/traffic_time" />
 
-                <TextView
-                    android:id="@+id/report_traffic_time"
+                <LinearLayout
+                    android:id="@+id/report_traffic_view"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:gravity="right"
-                    android:text="test" />
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="left"
+                        android:layout_weight="0.5"
+                        android:text="@string/traffic_time" />
+
+                    <TextView
+                        android:id="@+id/report_traffic_time"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="right"
+                        android:text="test" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/report_total_distance_view"
+                    android:layout_width="match_parent"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="left"
+                        android:layout_weight="0.5"
+                        android:text="@string/total_distance" />
+
+                    <TextView
+                        android:id="@+id/report_total_distance"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="right"
+                        android:text="test" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/report_average_speed_view"
+                    android:layout_width="match_parent"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="left"
+                        android:layout_weight="0.5"
+                        android:text="@string/average_speed" />
+
+                    <TextView
+                        android:id="@+id/report_average_speed"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="right"
+                        android:text="test" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/report_average_speed_include_parking_view"
+                    android:layout_width="match_parent"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/report_average_speed_include_parking_text"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="left"
+                        android:layout_weight="0.5"
+                        android:text="@string/average_speed_include_parking" />
+
+                    <TextView
+                        android:id="@+id/report_average_speed_include_parking"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="right"
+                        android:text="test" />
+                </LinearLayout>
+
+
+                <LinearLayout
+                    android:id="@+id/report_total_fuel_view"
+                    android:layout_width="match_parent"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="left"
+                        android:layout_weight="0.5"
+                        android:text="@string/used_fuel" />
+
+                    <TextView
+                        android:id="@+id/report_total_fuel"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="right"
+                        android:text="test" />
+                </LinearLayout>
+
+
+
+                <LinearLayout
+                    android:id="@+id/report_fuel_consumption_view"
+                    android:layout_width="match_parent"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="left"
+                        android:layout_weight="0.5"
+                        android:text="@string/report_fuel_consumption" />
+
+                    <TextView
+                        android:id="@+id/report_fuel_consumption"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.8"
+                        android:gravity="right"
+                        android:text="test" />
+                </LinearLayout>
+
             </LinearLayout>
 
-            <LinearLayout
-                android:id="@+id/report_total_distance_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="left"
-                    android:layout_weight="0.5"
-                    android:text="@string/total_distance" />
-
-                <TextView
-                    android:id="@+id/report_total_distance"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="right"
-                    android:text="test" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/report_average_speed_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="left"
-                    android:layout_weight="0.5"
-                    android:text="@string/average_speed" />
-
-                <TextView
-                    android:id="@+id/report_average_speed"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="right"
-                    android:text="test" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/report_average_speed_include_parking_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <TextView
-                    android:id="@+id/report_average_speed_include_parking_text"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="left"
-                    android:layout_weight="0.5"
-                    android:text="@string/average_speed_include_parking" />
-
-                <TextView
-                    android:id="@+id/report_average_speed_include_parking"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="right"
-                    android:text="test" />
-            </LinearLayout>
-        </LinearLayout>
+        </RelativeLayout>
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="3dp"
-            android:textColor="@color/black"
-            android:text="@string/parking"/>
+            android:text="@string/parking"
+            android:textColor="@color/black" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -340,8 +398,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="3dp"
-            android:textColor="@color/black"
-            android:text="@string/speed_excesses"/>
+            android:text="@string/speed_excesses"
+            android:textColor="@color/black" />
 
         <LinearLayout
             android:layout_width="match_parent"
