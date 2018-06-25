@@ -164,7 +164,7 @@
     <string name="calculating">Вычисление...</string>
     <string name="Manager">Куратор</string>
     <string name="ticker_created">Тикет создан</string>
-    <string name="markers_will_be_filtered">Внимание! Маршрут содержит большое количество точек, маркеры будет равномерно профильтровано.</string>
+    <string name="markers_will_be_filtered">Внимание! Маршрут содержит большое количество точек, маркеры будут равномерно профильтрованы.</string>
 
 
 
