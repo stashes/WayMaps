@@ -15,6 +15,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -939,6 +940,7 @@ public class GMapFragment extends AbstractFragment implements OnMapReadyCallback
         linearLayoutCar.setVisibility(View.GONE);
         changeBSheetState(BottomSheetBehavior.STATE_COLLAPSED, sheetBehavior);
         filtered = false;
+        filterCar.setImageBitmap(ApplicationUtil.drawToBitmap(getResources().getDrawable(R.drawable.filter), Color.GRAY));
         locked = false;
         mMap.getUiSettings().setScrollGesturesEnabled(true);
         currentMarker = null;
@@ -1203,6 +1205,8 @@ public class GMapFragment extends AbstractFragment implements OnMapReadyCallback
         if (drawerSecond != null && drawerSecond.isDrawerOpen()) {
             drawerSecond.closeDrawer();
             return true;
+        } else if(((MainActivity)getActivity()).getDrawer().isDrawerOpen(GravityCompat.START)){
+            return super.onBackPressed();
         } else if (linearLayoutCar.getVisibility() == View.VISIBLE) {
             backToAll();
             return true;

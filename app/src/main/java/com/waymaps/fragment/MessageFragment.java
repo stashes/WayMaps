@@ -123,7 +123,7 @@ public class MessageFragment extends AbstractFragment implements View.OnClickLis
         call.enqueue(new Callback<Void>() {
            @Override
            public void onResponse(Call<Void> call, Response<Void> response) {
-               NotificationManager.showNotification(getActivity(), "SMS sended");
+               NotificationManager.showNotification(getActivity(), getResources().getString(R.string.ticker_created));
                goToMapfragment();
                RetrofitService.getWayMapsService().sendMailCreate(Action.SEND_MAIL_CREATE,authorizedUser.getFirm_id(),
                        "'"+authorizedUser.getFirm_title()+"'","'" + authorizedUser.getUser_title() + "'"

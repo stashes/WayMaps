@@ -163,6 +163,9 @@
     <string name="report_fuel_consumption">Питома витрата</string>
     <string name="calculating">Обчислення...</string>
     <string name="Manager">Куратор</string>
+    <string name="ticker_created">Тікет створено</string>
+    <string name="markers_will_be_filtered">Увага! Маршрут містить велику кількість точок, маркери буде рівномірно профільтровано.</string>
+
 
 
 </resources>

@@ -252,7 +252,18 @@
 
             </LinearLayout>
         </LinearLayout>
+        <LinearLayout
+            android:id="@+id/history_show_warn_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="@string/markers_will_be_filtered"/>
 
+        </LinearLayout>
 
 
     </LinearLayout>

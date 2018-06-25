@@ -94,6 +94,9 @@ public class HistoryFragment extends AbstractFragment {
     @BindView(R.id.history_object)
     TextView object;
 
+    @BindView(R.id.history_show_warn_view)
+    LinearLayout hisoryShowWarnView;
+
     private static final int DIALOG_DATE_FROM = 1;
     private static final int DIALOG_DATE_TO = 2;
 
@@ -250,7 +253,7 @@ public class HistoryFragment extends AbstractFragment {
 
     @OnClick(R.id.history_calculate)
     protected void calculate() {
-        ApplicationUtil.showToast(getActivity(),getContext().getString(R.string.calculating));
+        final Toast toast = ApplicationUtil.showToast(getActivity(), getContext().getString(R.string.calculating), 0);
         Procedure procedure = new Procedure(Action.CALL);
         //todo change
         Parameter parameter = new IdParam(getCurrent.getId());
@@ -281,7 +284,11 @@ public class HistoryFragment extends AbstractFragment {
                                 Double.parseDouble(trackCounts[0].getOdo()) / 1000);
                         distance.setText(distanceKm + " " + getString(R.string.km));
                         historyCalculateView.setVisibility(View.GONE);
+                        if (Double.parseDouble(trackCount.getCoun()) > HistoryMapFragment.MARKER_LIMIT*2){
+                            hisoryShowWarnView.setVisibility(View.VISIBLE);
+                        }
                         hisoryShowInfoView.setVisibility(View.VISIBLE);
+                        toast.cancel();
                     } else {
                         distance.setText("0.0 " + getString(R.string.km));
                         Toast toast = Toast.makeText(getContext(),
@@ -322,6 +329,7 @@ public class HistoryFragment extends AbstractFragment {
         distance.setText("");
         historyCalculateView.setVisibility(View.VISIBLE);
         hisoryShowInfoView.setVisibility(View.GONE);
+        hisoryShowWarnView.setVisibility(View.GONE);
     }
 
     private void showDialog(int dialog_id) {

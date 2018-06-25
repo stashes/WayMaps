@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!--Main Activity -->
+    <string name="exit_dialog">Выход</string>
+    <string name="exit_message">Вы действительно хотите выйти ?</string>
+    <string name="yes">Да</string>
+    <string name="no">Нет</string>
+    <string name="cancel">Отменить</string>
+    <string name="notif_firm_bloked">Извините, но у Вас есть просроченный долг по абонентской плате в суме</string>
+    <string name="notif_saldo_minus">Обратите внимание, у Вас есть неоплаченные услуги на сумму</string>
+
+    <!--Balance layout -->
+    <string name="column1">Дата</string>
+    <string name="column2">Оплата клиента</string>
+    <string name="column3">Списание средств</string>
+    <string name="column4">Баланс счета</string>
+
+    <!--Message Layout-->
+    <string name="message_from">Отправитель</string>
+    <string name="type_your_message">Введите свое сообщение</string>
+    <string name="send_message">Отправить</string>
+    <string name="message_actionbar_title">Создание тикета</string>
+
+    <!--Tracker list layout-->
+    <string name="tracker_list_actionbar_title">Выбор трекера</string>
+
+    <!--Ticket list layout-->
+    <string name="ticket_list_actionbar_title">Тикеты</string>
+
+    <!--GetTicket list layout -->
+    <string name="get_ticket_actionbar_title">Тикет</string>
+    <string name="add_comment">Введите Ваш комментарий</string>
+
+    <!--GetFirms list layout -->
+    <string name="get_firms_actionbar_title">Список фирм</string>
+    <string name="app_name">WayMaps</string>
+    <string name="login">Логин</string>
+    <string name="pass">Пароль</string>
+    <string name="log_in">Войти</string>
+    <string name="error_field_pass">Ошибка проверки пароля</string>
+    <string name="error_field_login">Ошибка проверки логіну</string>
+    <string name="error_field_login_null">Логин не может быть пустым</string>
+    <string name="error_field_pass_null">Пароль не может быть пустым</string>
+    <string name="error_incorrect_credentials">Пароль или логин неверный</string>
+    <string name="pass_save">Запомнить пароль</string>
+    <string name="action_settings">Настройки</string>
+    <string name="logout">Выйти</string>
+    <string name="balance">Баланс</string>
+    <string name="technical_support">Техническая поддержка</string>
+    <string name="save_location">Сохранить состояние карты</string>
+    <string name="settings">Настройки</string>
+    <string name="online">Онлайн</string>
+    <string name="title_activity_maps">Карта</string>
+    <string name="date">Дата</string>
+    <string name="debet">Дебет</string>
+    <string name="credit">Кредит</string>
+    <string name="location_saved">Локацию сохранено!</string>
+    <string name="error_saving_location">Режим онлайн должен быть выбранным</string>
+    <string name="record_not_found">Записи не найдены</string>
+    <string name="state">Статус</string>
+    <string name="actual">Актуальность</string>
+    <string name="stop">Стоянка</string>
+    <string name="mini_stop">Остановка</string>
+    <string name="speed">Скорость</string>
+    <string name="ignition">Ззажигание</string>
+    <string name="engine">Двигатель</string>
+    <string name="voltage">Питание</string>
+    <string name="signal">Сигнал GSM</string>
+    <string name="satellite">Спутники</string>
+    <string name="volume_fuel">Топливо</string>
+    <string name="fuel_consumption">Расход топлива</string>
+    <string name="kmperhour">км/час</string>
+    <string name="statusonline">Онлайн</string>
+    <string name="statusoffline">Оффлайн</string>
+    <string name="on">Включено</string>
+    <string name="off">Отключено</string>
+    <string name="lperkm">л/100 км</string>
+    <string name="l">л</string>
+    <string name="very_well">Отличный</string>
+    <string name="good">Хороший</string>
+    <string name="normal">Нормальный</string>
+    <string name="bad">Слабый</string>
+    <string name="absent">Отсутствует</string>
+    <string name="pieces">шт</string>
+    <string name="battery">Батарея</string>
+    <string name="v">V</string>
+    <string name="day">дн</string>
+    <string name="hour">ч</string>
+    <string name="minute">мин</string>
+    <string name="second">с</string>
+    <string name="all">Все</string>
+    <string name="moving">Движется</string>
+    <string name="speedsmall">скорость</string>
+    <string name="history_date_from">Дата с</string>
+    <string name="history">История</string>
+    <string name="pick_end_date">Выберите дату конца</string>
+    <string name="pick_start_date">Выберите дату начала</string>
+    <string name="picked_period">Выбранный период</string>
+    <string name="object">Объект</string>
+    <string name="driver">Водитель</string>
+    <string name="select_time_period">Выберите период:</string>
+    <string name="track_length">Длина маршрута:</string>
+    <string name="calculate">Вычислить</string>
+    <string name="show_track">Показать маршрут</string>
+    <string name="show_report">Показать отчет</string>
+    <string name="no_data_found">Данных не найдено</string>
+    <string name="km">км</string>
+    <string name="somethin_went_wrong">Возникли проблемы…</string>
+    <string name="total_time">Общее время</string>
+    <string name="traffic_time">Время в пути</string>
+    <string name="trafic_time">Время в пути</string>
+    <string name="total_distance">Общее расстояние</string>
+    <string name="average_speed">Средняя скорость</string>
+    <string name="average_speed_include_parking">Средняя скорость (включая стоянки)</string>
+    <string name="parking_count">Количество стоянок</string>
+    <string name="parking_time">Время стоянок</string>
+    <string name="max_speed">Максимальная скорость</string>
+    <string name="speed_limit">Лимит скорости</string>
+    <string name="excesses_total_count">Количество превышений</string>
+    <string name="excesses_total_time">Время превышений</string>
+    <string name="excesses_percentage">Процент превышений</string>
+    <string name="ok">Ок!</string>
+    <string name="min_stop_time">Критерий продолжительности стоянки</string>
+    <string name="chosen_period">Выбранный период</string>
+    <string name="distance_for_period">Пробег за период</string>
+    <string name="fuel_burned">Использовано топлива</string>
+    <string name="network">Сеть</string>
+    <string name="error_loading_point">Ошибка при загрузке точки</string>
+    <string name="from">с</string>
+    <string name="to">до</string>
+    <string name="duration">Продолжительность</string>
+    <string name="distance">Пробег до стоянки</string>
+    <string name="date_from">Начало</string>
+    <string name="date_to">Конец</string>
+    <string name="group_list">Список групп</string>
+    <string name="get_tracker">Трекеры</string>
+    <string name="personal_account">Личный счет</string>
+    <string name="balancesmall">Текущий баланс: </string>
+    <string name="uah">грн</string>
+    <string name="map_type">Выбрать тип карты</string>
+    <string name="filter_by_group">Фильтр по группе:</string>
+    <string name="press_one_more_time">Нажмите еще раз для выхода</string>
+    <string name="done">Готово!</string>
+    <string name="prepare_stop_info">Подготовка информации об остановках...</string>
+    <string name="draw_way">Загрузка пути...</string>
+    <string name="preprocessing_data">Обработка данных...</string>
+    <string name="downloading_data">Загрузка данних...</string>
+    <string name="way_point">Точка пути</string>
+    <string name="parking">Стоянка</string>
+    <string name="distance_sum">Пробег к точке</string>
+    <string name="date_time">Дата и время</string>
+    <string name="continues">Продолжается</string>
+    <string name="hist_parking_count">Всего стоянок:</string>
+    <string name="hist_max_speed">Макс. скорость:</string>
+    <string name="hist_speed_limit">Установленный лимит скорости:</string>
+    <string name="hist_fuelexpense">Потребляемый расход:</string>
+    <string name="create_ticket">Создание тикета</string>
+    <string name="map_screen_should_be_chosen">Экран с картой должен быть активным</string>
+    <string name="movement_mode">Режим движения</string>
+    <string name="speed_excesses">Превышение скорости</string>
+    <string name="used_fuel">Использовано топлива</string>
+    <string name="report_fuel_consumption">Потребляемый расход</string>
+    <string name="calculating">Вычисление...</string>
+    <string name="Manager">Куратор</string>
+    <string name="ticker_created">Тикет создан</string>
+    <string name="markers_will_be_filtered">Внимание! Маршрут содержит большое количество точек, маркеры будет равномерно профильтровано.</string>
+
+
+
+</resources>

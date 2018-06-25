@@ -1,11 +1,10 @@
 package com.waymaps.fragment;
 
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
-import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -14,6 +13,7 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.ArrayMap;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -24,6 +24,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -33,16 +34,12 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
-import com.google.android.gms.maps.model.CustomCap;
-import com.google.android.gms.maps.model.JointType;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
-import com.google.android.gms.maps.model.RoundCap;
-import com.google.android.gms.maps.model.TileOverlayOptions;
 import com.waymaps.R;
 import com.waymaps.activity.MainActivity;
 import com.waymaps.api.RetrofitService;
@@ -63,8 +60,6 @@ import com.waymaps.data.responseEntity.TrackCount;
 import com.waymaps.data.responseEntity.TrackerList;
 import com.waymaps.util.ApplicationUtil;
 import com.waymaps.util.DateTimeUtil;
-import com.waymaps.util.LocalPreferenceManager;
-import com.waymaps.util.MapProvider;
 import com.waymaps.util.SystemUtil;
 import com.waymaps.util.TilesProvider;
 
@@ -76,7 +71,14 @@ import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Observable;
+import java.util.Observer;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -91,6 +93,8 @@ import retrofit2.Response;
 
 public class HistoryMapFragment extends AbstractFragment {
 
+
+    public static final int MARKER_LIMIT = 1500;
     public static final int POINTHEIGHT = 30;
     public static final int POINTWIDTH = 30;
 
@@ -110,16 +114,17 @@ public class HistoryMapFragment extends AbstractFragment {
 
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
-    private GoogleMap mMap;
+    private static GoogleMap mMap;
     private MapView mapView;
     private TrackCount trackCount;
     private GetCurrent getCurrent;
     private GetTrack[] getTrackResponse;
-    private List<GetTrack> getTracks;
+    private static List<GetTrack> getTracks;
+    private static List<GetTrack> getTracksForTrack;
     private GetParking[] getParkingResponse;
     private List<GetParking> getParkings;
-    private Marker[] markers;
-    private Marker[] directions;
+    private static Marker[] markers;
+    private static Marker[] directions;
     private Marker[] stopMarkers;
     private Procedure procedure;
     private Marker currentMarker;
@@ -132,6 +137,16 @@ public class HistoryMapFragment extends AbstractFragment {
     private boolean currentMarkerVisibility;
     private ArrayList<Handler> handlers = new ArrayList<>();
     private Report report;
+    static volatile int numMrkrs;
+    volatile boolean mapsLoaded;
+    static AtomicInteger currentMarkerN;
+    static double step;
+    private static Map<MarkerOptions,MarkerOptions> markerOptionsMap;
+
+    static BitmapDescriptor bitDesc;
+    static BitmapDescriptor flagStartDesc;
+    static BitmapDescriptor flagEndDesc;
+    static BitmapDescriptor directionDesc;
 
     @BindView(R.id.rootView)
     CoordinatorLayout coordinatorLayout;
@@ -245,6 +260,7 @@ public class HistoryMapFragment extends AbstractFragment {
 
     BasicTrackInfoLayout pointLayout;
     private Integer maxSpeedInt = null;
+    long timeMillis;
 
     static class BackButtonLayout {
         @BindView(R.id.back_to_all_sec)
@@ -281,13 +297,13 @@ public class HistoryMapFragment extends AbstractFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        timeMillis = System.currentTimeMillis();
+        logger.info("Starting executing method");
         super.onCreateView(inflater, container, savedInstanceState);
         View rootView = inflater.inflate(R.layout.fragment_history_map, container, false);
         getAttrFromBundle();
         ButterKnife.bind(this, rootView);
         if (isAdded() && getActivity() != null) {
-
-            showProgress(true, content, progres);
 
             //customize button
             historyShowOverSpeed.setText(tracker.getMaxspeed());
@@ -331,8 +347,7 @@ public class HistoryMapFragment extends AbstractFragment {
             mapView = (MapView) rootView.findViewById(R.id.map);
             mapView.onCreate(savedInstanceState);
 
-            mapView.onResume();
-
+            logger.info("Starting map loading {}", (double) (System.currentTimeMillis() - timeMillis) / 1000);
             try {
                 MapsInitializer.initialize(getActivity().getApplicationContext());
             } catch (Exception e) {
@@ -343,6 +358,7 @@ public class HistoryMapFragment extends AbstractFragment {
             mapView.getMapAsync(new OnMapReadyCallback() {
                 @Override
                 public void onMapReady(final GoogleMap googleMap) {
+                    logger.info("Map async start {}", (double) (System.currentTimeMillis() - timeMillis) / 1000);
                     if (isAdded() && getActivity() != null) {
                         mMap = googleMap;
                         TilesProvider.setTile(googleMap, getContext());
@@ -353,16 +369,19 @@ public class HistoryMapFragment extends AbstractFragment {
                             }
                         });
                         mMap.getUiSettings().setRotateGesturesEnabled(false);
-                        ApplicationUtil.showToast(HistoryMapFragment.this.getActivity(), getResources().getString(R.string.downloading_data));
+                        logger.info("prepare gettrack call {}", (double) (System.currentTimeMillis() - timeMillis) / 1000);
+                        //ApplicationUtil.showToast(HistoryMapFragment.this.getActivity(), getResources().getString(R.string.downloading_data));
                         final Call<GetTrack[]> getTrack = RetrofitService.getWayMapsService().getTrack(procedure.getAction(), procedure.getName(),
                                 procedure.getIdentficator(), procedure.getFormat(), procedure.getParams());
                         getTrack.enqueue(new Callback<GetTrack[]>() {
                             @Override
                             public void onResponse(Call<GetTrack[]> call, Response<GetTrack[]> response) {
-                                ApplicationUtil.showToast(HistoryMapFragment.this.getActivity(), getResources().getString(R.string.preprocessing_data));
+                                logger.info("get track response {}", (double) (System.currentTimeMillis() - timeMillis) / 1000);
+                                //ApplicationUtil.showToast(HistoryMapFragment.this.getActivity(), getResources().getString(R.string.preprocessing_data));
                                 getTrackResponse = response.body();
                                 getTracks = new ArrayList<>();
                                 LatLngBounds.Builder builder = new LatLngBounds.Builder();
+                                logger.info("Starting repacking data {}", (double) (System.currentTimeMillis() - timeMillis) / 1000);
                                 for (GetTrack getTrack : getTrackResponse) {
                                     if (!(getTrack.getLat() == null || getTrack.getLon() == null)) {
                                         getTracks.add(getTrack);
@@ -371,16 +390,18 @@ public class HistoryMapFragment extends AbstractFragment {
                                     }
                                 }
                                 LatLngBounds build = builder.build();
-                   //             LatLng latLng = new LatLng(build.southwest.latitude, build.southwest.longitude + ((build.southwest.longitude - build.northeast.longitude) / 2.7));
-                     //           LatLngBounds latLngBounds = new LatLngBounds(latLng, build.northeast);
-                                CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(build, ((int)(SystemUtil.getIntWidth(getActivity()))),
-                                        ((int)(SystemUtil.getIntHeight(getActivity()))), 0);
+                                //             LatLng latLng = new LatLng(build.southwest.latitude, build.southwest.longitude + ((build.southwest.longitude - build.northeast.longitude) / 2.7));
+                                //           LatLngBounds latLngBounds = new LatLngBounds(latLng, build.northeast);
+                                CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(build, ((int) (SystemUtil.getIntWidth(getActivity()))),
+                                        ((int) (SystemUtil.getIntHeight(getActivity()))), 0);
                                 googleMap.moveCamera(cu);
                                 LatLng target = googleMap.getCameraPosition().target;
                                 float zoom = googleMap.getCameraPosition().zoom;
-                                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(target.latitude,(target.longitude*1 + build.southwest.longitude*2)/3),(zoom-1.4f)));
-                                ApplicationUtil.showToast(HistoryMapFragment.this.getActivity(), getResources().getString(R.string.draw_way));
+                                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(target.latitude, (target.longitude * 1 + build.southwest.longitude * 2) / 3), (zoom - 1.4f)));
+                                //ApplicationUtil.showToast(HistoryMapFragment.this.getActivity(), getResources().getString(R.string.draw_way));
+                                logger.info("start drawing markers {}", (double) (System.currentTimeMillis() - timeMillis) / 1000);
                                 drawMarkers();
+                                logger.info("markers drawn {}", (double) (System.currentTimeMillis() - timeMillis) / 1000);
                                 fillBasicInfo(trackLayout, getTracks.get(getTracks.size() - 1));
 
                                 //period
@@ -403,6 +424,7 @@ public class HistoryMapFragment extends AbstractFragment {
 
                                 linearLayout.setVisibility(View.VISIBLE);
                                 sheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+
                             }
 
                             @Override
@@ -447,6 +469,7 @@ public class HistoryMapFragment extends AbstractFragment {
             historyCarUserName.setText(getCurrent.getDriver());
 
         }
+        mapView.onResume();
         return rootView;
 
     }
@@ -486,123 +509,100 @@ public class HistoryMapFragment extends AbstractFragment {
     private void makeMarkerVisible(boolean visibility) {
         if (currentMarkerVisibility != visibility) {
             for (Marker marker : markers) {
-                if (marker != markers[0] && marker != markers[markers.length - 1])
+                if (marker != markers[0] && marker != markers[getTracks.size() - 1] && marker != null)
                     marker.setVisible(visibility);
             }
             for (Marker marker : directions) {
-                if (marker!=null)
+                if (marker != null)
                     marker.setVisible(visibility);
             }
             currentMarkerVisibility = visibility;
         }
     }
 
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        new Runnable() {
+            @Override
+            public void run() {
+                showProgress(true, content, progres);
+            }
+        }.run();
+    }
+
     private void drawMarkers() {
-        int numMarkers = getTracks.size();
-        markers = new Marker[numMarkers];
-        directions = new Marker[numMarkers];
+        numMrkrs = getTracks.size();
+        step = 0;
+        if (numMrkrs > MARKER_LIMIT) {
+            step = (numMrkrs / MARKER_LIMIT) - 1;
+        }
+        markers = new Marker[numMrkrs];
+        directions = new Marker[numMrkrs];
         Bitmap bitmap = ApplicationUtil.drawToBitmap(getResources().getDrawable(R.drawable.ic_circle_1), Color.BLACK, POINTHEIGHT, POINTWIDTH);
-        Bitmap direction = ApplicationUtil.drawToBitmap(getResources().getDrawable(R.drawable.arrow_left), Color.BLACK,ARROWHEIGHT,ARROWWIDTH);
+        Bitmap direction = ApplicationUtil.drawToBitmap(getResources().getDrawable(R.drawable.arrow_left), Color.BLACK, ARROWHEIGHT, ARROWWIDTH);
         Bitmap flagStart = ApplicationUtil.drawToBitmap(getResources().getDrawable(R.drawable.marker_green), FLAGSIZE, FLAGSIZE);
         Bitmap flagEnd = ApplicationUtil.drawToBitmap(getResources().getDrawable(R.drawable.marker_red), FLAGSIZE, FLAGSIZE);
-        BitmapDescriptor bitDesc = BitmapDescriptorFactory.fromBitmap(bitmap) ;
-        BitmapDescriptor flagStartDesc = BitmapDescriptorFactory.fromBitmap(flagStart) ;
-        BitmapDescriptor flagEndDesc = BitmapDescriptorFactory.fromBitmap(flagEnd);
-        BitmapDescriptor directionDesc = BitmapDescriptorFactory.fromBitmap(direction) ;
+        bitDesc = BitmapDescriptorFactory.fromBitmap(bitmap);
+        flagStartDesc = BitmapDescriptorFactory.fromBitmap(flagStart);
+        flagEndDesc = BitmapDescriptorFactory.fromBitmap(flagEnd);
+        directionDesc = BitmapDescriptorFactory.fromBitmap(direction);
 
-
-        if (isAdded() && getActivity() != null)
-            for (int i = 0; i < numMarkers; i++) {
-                markers[i] = mMap.addMarker(new MarkerOptions().position(
-                        new LatLng(Double.parseDouble(getTracks.get(i).getLat())
-                                , Double.parseDouble(getTracks.get(i).getLon())))
-                        .anchor(0.5f, 0.5f));
-                if (i == 0) {
-                    markers[i].setIcon(flagStartDesc);
-                    markers[i].setVisible(true);
-                } else if (i == (numMarkers - 1)) {
-                    markers[i].setIcon(flagEndDesc);
-                    markers[i].setVisible(true);
-                    float angle = (float) getAngle(Double.parseDouble(getTracks.get(i-1).getLat()),
-                            Double.parseDouble(getTracks.get(i-1).getLon()),
-                            Double.parseDouble(getTracks.get(i).getLat())
-                            ,Double.parseDouble(getTracks.get(i).getLon()));
-                    LatLng latLng = new LatLng(((Double.parseDouble(getTracks.get(i-1).getLat()) + Double.parseDouble(getTracks.get(i).getLat()))/2)
-                            , ((Double.parseDouble(getTracks.get(i-1).getLon()) + Double.parseDouble(getTracks.get(i).getLon()))/2));
-                    directions[i-1] = mMap.addMarker(new MarkerOptions().position(latLng)
-                            .anchor(0.5f, 0.5f));
-                    directions[i-1].setIcon(directionDesc);
-                    directions[i-1].setRotation(angle-90);
-                    directions[i-1].setVisible(false);
-                } else {
-                    markers[i].setIcon(bitDesc);
-                    markers[i].setVisible(false);
-                    float angle = (float) getAngle(Double.parseDouble(getTracks.get(i-1).getLat()),
-                            Double.parseDouble(getTracks.get(i-1).getLon()),
-                            Double.parseDouble(getTracks.get(i).getLat())
-                            ,Double.parseDouble(getTracks.get(i).getLon()));
-                    LatLng latLng = new LatLng(((Double.parseDouble(getTracks.get(i-1).getLat()) + Double.parseDouble(getTracks.get(i).getLat()))/2)
-                            , ((Double.parseDouble(getTracks.get(i-1).getLon()) + Double.parseDouble(getTracks.get(i).getLon()))/2));
-                    directions[i-1] = mMap.addMarker(new MarkerOptions().position(latLng)
-                            .anchor(0.5f, 0.5f));
-                    directions[i-1].setIcon(directionDesc);
-                    directions[i-1].setRotation(angle-90);
-                    directions[i-1].setVisible(false);
-                }
-                markers[i].setTag(getTracks.get(i));
-            }
         currentMarkerVisibility = false;
+
+        ArrayList<GetTrack> getTracksNew = new ArrayList<>();
+        for(int i = 0; i < getTracks.size();i++){
+            getTracksNew.add(getTracks.get(i));
+            if (i == getTracks.size() -1)
+                break;
+            i += step;
+            if (i > getTracks.size()-2){
+                i = getTracks.size()-2;
+            }
+        }
+        getTracksForTrack = getTracks;
+        getTracks = getTracksNew;
+
+
+        markerOptionsMap = new LinkedHashMap<>();
+        MLoader mLoader = new MLoader();
+        Boolean aBoolean = mLoader.doInBackground(markerOptionsMap);
+        mLoader.onPostExecute(aBoolean);
+
         if (isAdded() && getActivity() != null) {
             drawWay();
+
             showProgress(false, content, progres);
-
-
-            mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-                @Override
-                public boolean onMarkerClick(Marker marker) {
-                    if (currentMarker != null) {
-                        changeMarkerToDefault();
-                    }
-                    currentMarker = marker;
-                    if (marker.getTag() instanceof GetTrack) {
-                        onMarkerOrListViewClick(marker);
-                        changeView(POINT);
-                    } else if (marker.getTag() instanceof GetParking) {
-                        onParkingClick(marker);
-                        changeView(PARKING);
-                    }
-                    return true;
-                }
-            });
         }
     }
 
-    protected static double getAngle(double startLat, double startLng, double endLat, double endLng){
+    protected static double getAngle(double startLat, double startLng, double endLat, double endLng) {
         double longitude1 = startLng;
         double longitude2 = endLng;
         double latitude1 = Math.toRadians(startLat);
         double latitude2 = Math.toRadians(endLat);
-        double longDiff= Math.toRadians(longitude2-longitude1);
-        double y= Math.sin(longDiff)*Math.cos(latitude2);
-        double x=Math.cos(latitude1)*Math.sin(latitude2)-Math.sin(latitude1)*Math.cos(latitude2)*Math.cos(longDiff);
+        double longDiff = Math.toRadians(longitude2 - longitude1);
+        double y = Math.sin(longDiff) * Math.cos(latitude2);
+        double x = Math.cos(latitude1) * Math.sin(latitude2) - Math.sin(latitude1) * Math.cos(latitude2) * Math.cos(longDiff);
 
-        return (Math.toDegrees(Math.atan2(y, x))+360)%360;
+        return (Math.toDegrees(Math.atan2(y, x)) + 360) % 360;
     }
 
     private void drawWay() {
+        logger.info("Starting draw way {}", (double) (System.currentTimeMillis() - timeMillis) / 1000);
         overSpeeds = new ArrayList<>();
         PolylineOptions polylineOptions = new PolylineOptions().width(5.0f).geodesic(true).
                 color(ApplicationUtil.changeColorScaleTo16Int(getCurrent.getColor()));
 
-        for (int i = 0; i < markers.length; i++) {
-            GetTrack tag = (GetTrack) markers[i].getTag();
+        for (int i = 0; i < getTracksForTrack.size(); i++) {
+            GetTrack tag = (GetTrack) getTracksForTrack.get(i);
             polylineOptions.add(new LatLng(Double.parseDouble(tag.getLat()),
                     Double.parseDouble(tag.getLon()))).zIndex(1);
             if ("1".equals(tag.getOver_speed())) {
-                if (i >= 1 && i < markers.length - 1) {
+                if (i >= 1 && i < getTracksForTrack.size() - 1) {
                     PolylineOptions overSpeed = new PolylineOptions().width(9.0f).geodesic(true).color(Color.RED).visible(false).zIndex(20);
-                    GetTrack tag0 = (GetTrack) markers[i - 1].getTag();
-                    GetTrack tag2 = (GetTrack) markers[i + 1].getTag();
+                    GetTrack tag0 = getTracksForTrack.get(i - 1);
+                    GetTrack tag2 = getTracksForTrack.get(i + 1);
 
                     overSpeed.add(new LatLng(Double.parseDouble(tag0.getLat()),
                             Double.parseDouble(tag0.getLon())));
@@ -615,7 +615,10 @@ public class HistoryMapFragment extends AbstractFragment {
                 }
             }
         }
+        logger.info("way drawed{}", (double) (System.currentTimeMillis() - timeMillis) / 1000);
         Polyline polyline = mMap.addPolyline(polylineOptions);
+        showProgress(false, content, progres);
+        mapsLoaded = true;
 
     }
 
@@ -1105,6 +1108,89 @@ public class HistoryMapFragment extends AbstractFragment {
             handler.removeCallbacksAndMessages(null);
         }
     }
+
+    public class MLoader extends AsyncTask<Map<MarkerOptions,MarkerOptions>,Void,Boolean>{
+
+        @Override
+        protected Boolean doInBackground(Map<MarkerOptions, MarkerOptions>... maps) {
+            for (int i = 0; i <getTracks.size();i++){
+                //logger.info("number rec {}",i);
+                Map hashMap = maps[0];
+                MarkerOptions markerOptions = new MarkerOptions().position(
+                        new LatLng(Double.parseDouble(getTracks.get(i).getLat())
+                                , Double.parseDouble(getTracks.get(i).getLon())))
+                        .anchor(0.5f, 0.5f);
+                MarkerOptions directionOptions = null;
+                if (i == 0) {
+                    markerOptions.icon(flagStartDesc);
+                    markerOptions.visible(true);
+                } else if (i == (getTracks.size() - 1)) {
+                    markerOptions.icon(flagEndDesc);
+                    markerOptions.visible(true);
+                    float angle = (float) getAngle(Double.parseDouble(getTracksForTrack.get(getTracksForTrack.indexOf(getTracks.get(i))-1).getLat()),
+                            Double.parseDouble(getTracks.get(i - 1).getLon()),
+                            Double.parseDouble(getTracks.get(i).getLat())
+                            , Double.parseDouble(getTracks.get(i).getLon()));
+                    LatLng latLng = new LatLng(((Double.parseDouble(getTracksForTrack.get(getTracksForTrack.indexOf(getTracks.get(i))-1).getLat()) + Double.parseDouble(getTracks.get(i).getLat())) / 2)
+                            , ((Double.parseDouble(getTracksForTrack.get(getTracksForTrack.indexOf(getTracks.get(i))-1).getLon()) + Double.parseDouble(getTracks.get(i).getLon())) / 2));
+                    directionOptions = new MarkerOptions().position(latLng)
+                            .anchor(0.5f, 0.5f);
+                    directionOptions.icon(directionDesc);
+                    directionOptions.rotation(angle - 90);
+                    directionOptions.visible(false);
+                } else {
+                    markerOptions.icon(bitDesc);
+                    markerOptions.visible(false);
+                    float angle = (float) getAngle(Double.parseDouble(getTracksForTrack.get(getTracksForTrack.indexOf(getTracks.get(i))-1).getLat()),
+                            Double.parseDouble(getTracksForTrack.get(getTracksForTrack.indexOf(getTracks.get(i))-1).getLon()),
+                            Double.parseDouble(getTracks.get(i).getLat())
+                            , Double.parseDouble(getTracks.get(i).getLon()));
+                    LatLng latLng = new LatLng(((Double.parseDouble(getTracksForTrack.get(getTracksForTrack.indexOf(getTracks.get(i))-1).getLat()) + Double.parseDouble(getTracks.get(i).getLat())) / 2)
+                            , ((Double.parseDouble(getTracksForTrack.get(getTracksForTrack.indexOf(getTracks.get(i))-1).getLon()) + Double.parseDouble(getTracks.get(i).getLon())) / 2));
+                    directionOptions = new MarkerOptions().position(latLng)
+                            .anchor(0.5f, 0.5f);
+                    directionOptions.icon(directionDesc);
+                    directionOptions.rotation(angle - 90);
+                    directionOptions.visible(false);
+                }
+                hashMap.put(markerOptions,directionOptions);
+            }
+            return true;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean res) {
+            int i = 0;
+            for (Map.Entry entry : markerOptionsMap.entrySet()){
+                //logger.info("show marker {}",i);
+                markers[i] = mMap.addMarker((MarkerOptions) entry.getKey());
+                markers[i].setTag(getTracks.get(i));
+                if ((MarkerOptions) entry.getValue()!=null)
+                    directions[i] = mMap.addMarker((MarkerOptions) entry.getValue());
+                i++;
+            }
+
+            mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                @Override
+                public boolean onMarkerClick(Marker marker) {
+                    if (currentMarker != null) {
+                        changeMarkerToDefault();
+                    }
+                    currentMarker = marker;
+                    if (marker.getTag() instanceof GetTrack) {
+                        onMarkerOrListViewClick(marker);
+                        changeView(POINT);
+                    } else if (marker.getTag() instanceof GetParking) {
+                        onParkingClick(marker);
+                        changeView(PARKING);
+                    }
+                    return true;
+                }
+            });
+        }
+    }
+
+
 }
 
 

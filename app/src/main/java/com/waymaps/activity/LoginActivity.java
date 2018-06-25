@@ -237,18 +237,19 @@ public class LoginActivity extends AppCompatActivity {
             } catch (JsonProcessingException e) {
                 logger.error("Error writing user {}", user.toString());
             }
+            InputMethodManager inputManager = (InputMethodManager) getSystemService(
+                    Context.INPUT_METHOD_SERVICE);
+            inputManager.hideSoftInputFromWindow(mLoginView.getWindowToken(),
+                    InputMethodManager.HIDE_NOT_ALWAYS);
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             /*ft.addToBackStack("firmList");*/
             ft.replace(R.id.login_activity_contain, firmListFragment);
             ft.commit();
 
-            InputMethodManager inputManager = (InputMethodManager) getSystemService(
-                    Context.INPUT_METHOD_SERVICE);
-            inputManager.hideSoftInputFromWindow(mLoginView.getWindowToken(),
-                    InputMethodManager.HIDE_NOT_ALWAYS);
 
-            ft = getSupportFragmentManager().beginTransaction();
-            ft.replace(R.id.login_activity_contain, firmListFragment).commit();
+
+            /*ft = getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.login_activity_contain, firmListFragment).commit();*/
         } else {
             if (Double.parseDouble(user.getSaldo()) < -20.0) {
                 NotificationManager.showNotification(this,

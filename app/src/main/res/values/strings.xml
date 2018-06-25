@@ -169,5 +169,7 @@
     <string name="report_fuel_consumption">Fuel consumption</string>
     <string name="calculating">Calculating...</string>
     <string name="Manager">Manager</string>
+    <string name="ticker_created">Ticker created</string>
+    <string name="markers_will_be_filtered">Attention! Route include too many points, markers will be evenly filtered.</string>
 
 </resources>

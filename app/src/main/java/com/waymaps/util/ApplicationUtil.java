@@ -222,4 +222,19 @@ public class ApplicationUtil {
         toast.show();
     }
 
+    public static Toast showToast(Context context,String text,int duration) {
+        Toast toast = Toast.makeText(context,
+                text,
+                Toast.LENGTH_SHORT);
+        toast.setGravity(Gravity.CENTER, 0, 0);
+        toast.show();
+        return toast;
+    }
+
+
+    public void dismissToast(Toast toast) {
+        toast.cancel();
+    }
+
+
 }
