@@ -11,12 +11,12 @@
     <string name="error_field_pass_null">Password can\'t be null</string>
     <string name="error_incorrect_credentials">This credentials are incorrect</string>
     <string name="pass_save">Save password</string>
-    <string name="title_activity_main">MainActivity</string>
+    <string translatable="false" name="title_activity_main">MainActivity</string>
     <string name="notif_firm_bloked">Sorry, but you have an overdue fee for a subscription fee</string>
     <string name="notif_saldo_minus">Please note that you have unpaid services in the amount</string>
 
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string translatable="false" name="navigation_drawer_open">Open navigation drawer</string>
+    <string translatable="false" name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="action_settings">Settings</string>
     <string name="logout">Logout</string>

@@ -19,3 +19,25 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+-dontwarn android.support.v4**
+-keep
+
+# ButterKnife 7
+
+-keep class butterknife.** { *; }
+-dontwarn butterknife.internal.**
+-keep class **$$ViewBinder { *; }
+
+-keepclasseswithmembernames class * {
+    @butterknife.* <fields>;
+}
+
+-keepclasseswithmembernames class * {
+    @butterknife.* <methods>;
+}
+
+# Proguard configuration for Jackson 2.x (fasterxml package instead of codehaus package)
+
+-dontwarn com.fasterxml.jackson.databind.ext.**
+-keep class com.fasterxml.jackson.databind.ext.** {*;}
